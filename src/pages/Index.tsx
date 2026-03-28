@@ -12,15 +12,20 @@ import logo from "@/assets/logo-iobee.svg";
 export default function Index() {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1)); // April 2026
   const [selectedClient, setSelectedClient] = useState("all");
+  const [selectedAnalyst, setSelectedAnalyst] = useState("all");
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const clients = useMemo(() => getClients(samplePosts), []);
+  const analysts = useMemo(() => getAnalysts(samplePosts), []);
 
   const filteredPosts = useMemo(() => {
-    if (selectedClient === "all") return samplePosts;
-    return samplePosts.filter((p) => p.client === selectedClient);
-  }, [selectedClient]);
+    return samplePosts.filter((p) => {
+      if (selectedClient !== "all" && p.client !== selectedClient) return false;
+      if (selectedAnalyst !== "all" && p.analyst !== selectedAnalyst) return false;
+      return true;
+    });
+  }, [selectedClient, selectedAnalyst]);
 
   const handlePostClick = useCallback((post: Post) => {
     setSelectedPost(post);
