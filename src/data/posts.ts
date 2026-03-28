@@ -4,6 +4,7 @@ export type FunnelStage = "topo" | "meio" | "fundo";
 export interface Post {
   id: string;
   client: string;
+  analyst: string;
   title: string;
   headline: string;
   format: PostFormat;
