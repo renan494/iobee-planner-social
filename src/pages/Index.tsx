@@ -1,16 +1,66 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useMemo, useCallback } from "react";
+import { addMonths, subMonths } from "date-fns";
+import { samplePosts, getClients, type Post } from "@/data/posts";
+import { CalendarHeader } from "@/components/CalendarHeader";
+import { CalendarGrid } from "@/components/CalendarGrid";
+import { ClientFilter } from "@/components/ClientFilter";
+import { FormatLegend } from "@/components/FormatLegend";
+import { PostDetailModal } from "@/components/PostDetailModal";
+import logo from "@/assets/logo-iobee.svg";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+export default function Index() {
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1)); // April 2026
+  const [selectedClient, setSelectedClient] = useState("all");
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const clients = useMemo(() => getClients(samplePosts), []);
+
+  const filteredPosts = useMemo(() => {
+    if (selectedClient === "all") return samplePosts;
+    return samplePosts.filter((p) => p.client === selectedClient);
+  }, [selectedClient]);
+
+  const handlePostClick = useCallback((post: Post) => {
+    setSelectedPost(post);
+    setModalOpen(true);
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      {/* Top bar */}
+      <header className="sticky top-0 z-30 border-b bg-card/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="iOBEE" className="h-7" />
+            <span className="hidden text-sm font-bold tracking-tight text-muted-foreground sm:block">
+              Calendário de Conteúdo
+            </span>
+          </div>
+          <ClientFilter clients={clients} selected={selectedClient} onChange={setSelectedClient} />
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <CalendarHeader
+            currentDate={currentDate}
+            onPrevMonth={() => setCurrentDate((d) => subMonths(d, 1))}
+            onNextMonth={() => setCurrentDate((d) => addMonths(d, 1))}
+            onToday={() => setCurrentDate(new Date())}
+          />
+          <FormatLegend />
+        </div>
+
+        <CalendarGrid
+          currentDate={currentDate}
+          posts={filteredPosts}
+          onPostClick={handlePostClick}
+        />
+      </main>
+
+      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} />
     </div>
   );
-};
-
-const Index = PlaceholderIndex;
-
-export default Index;
+}
