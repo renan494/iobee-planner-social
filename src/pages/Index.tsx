@@ -43,7 +43,10 @@ export default function Index() {
               Calendário de Conteúdo
             </span>
           </div>
-          <ClientFilter clients={clients} selected={selectedClient} onChange={setSelectedClient} />
+          <div className="flex items-center gap-2">
+            <ClientFilter clients={clients} selected={selectedClient} onChange={setSelectedClient} />
+            <AnalystFilter analysts={analysts} selected={selectedAnalyst} onChange={setSelectedAnalyst} />
+          </div>
         </div>
       </header>
 
