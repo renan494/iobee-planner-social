@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { addMonths, subMonths } from "date-fns";
-import { samplePosts, getClients, type Post } from "@/data/posts";
+import { samplePosts, getClients, getAnalysts, type Post } from "@/data/posts";
+import { AnalystFilter } from "@/components/AnalystFilter";
 import { CalendarHeader } from "@/components/CalendarHeader";
 import { CalendarGrid } from "@/components/CalendarGrid";
 import { ClientFilter } from "@/components/ClientFilter";
