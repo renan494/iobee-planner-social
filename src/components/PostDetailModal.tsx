@@ -4,7 +4,7 @@ import { PostBadge } from "./PostBadge";
 import { FUNNEL_LABELS, type Post } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck } from "lucide-react";
 
 interface PostDetailModalProps {
   post: Post | null;
@@ -35,6 +35,10 @@ export function PostDetailModal({ post, open, onOpenChange }: PostDetailModalPro
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <User className="h-4 w-4" />
               <span>{post.client}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <UserCheck className="h-4 w-4" />
+              <span>{post.analyst}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Target className="h-4 w-4 text-muted-foreground" />

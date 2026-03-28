@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { addMonths, subMonths } from "date-fns";
-import { samplePosts, getClients, type Post } from "@/data/posts";
+import { samplePosts, getClients, getAnalysts, type Post } from "@/data/posts";
+import { AnalystFilter } from "@/components/AnalystFilter";
 import { CalendarHeader } from "@/components/CalendarHeader";
 import { CalendarGrid } from "@/components/CalendarGrid";
 import { ClientFilter } from "@/components/ClientFilter";
@@ -11,15 +12,20 @@ import logo from "@/assets/logo-iobee.svg";
 export default function Index() {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1)); // April 2026
   const [selectedClient, setSelectedClient] = useState("all");
+  const [selectedAnalyst, setSelectedAnalyst] = useState("all");
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const clients = useMemo(() => getClients(samplePosts), []);
+  const analysts = useMemo(() => getAnalysts(samplePosts), []);
 
   const filteredPosts = useMemo(() => {
-    if (selectedClient === "all") return samplePosts;
-    return samplePosts.filter((p) => p.client === selectedClient);
-  }, [selectedClient]);
+    return samplePosts.filter((p) => {
+      if (selectedClient !== "all" && p.client !== selectedClient) return false;
+      if (selectedAnalyst !== "all" && p.analyst !== selectedAnalyst) return false;
+      return true;
+    });
+  }, [selectedClient, selectedAnalyst]);
 
   const handlePostClick = useCallback((post: Post) => {
     setSelectedPost(post);
@@ -37,7 +43,10 @@ export default function Index() {
               Calendário de Conteúdo
             </span>
           </div>
-          <ClientFilter clients={clients} selected={selectedClient} onChange={setSelectedClient} />
+          <div className="flex items-center gap-2">
+            <ClientFilter clients={clients} selected={selectedClient} onChange={setSelectedClient} />
+            <AnalystFilter analysts={analysts} selected={selectedAnalyst} onChange={setSelectedAnalyst} />
+          </div>
         </div>
       </header>
 
