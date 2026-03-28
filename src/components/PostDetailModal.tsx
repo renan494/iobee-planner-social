@@ -36,6 +36,10 @@ export function PostDetailModal({ post, open, onOpenChange }: PostDetailModalPro
               <User className="h-4 w-4" />
               <span>{post.client}</span>
             </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <UserCheck className="h-4 w-4" />
+              <span>{post.analyst}</span>
+            </div>
             <div className="flex items-center gap-2 text-sm">
               <Target className="h-4 w-4 text-muted-foreground" />
               <Badge variant="secondary">{FUNNEL_LABELS[post.funnelStage]}</Badge>
