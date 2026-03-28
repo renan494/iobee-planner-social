@@ -66,4 +66,3 @@ export function getClients(posts: Post[]): string[] {
 export function getAnalysts(posts: Post[]): string[] {
   return [...new Set(posts.map((p) => p.analyst))].sort();
 }
-}
