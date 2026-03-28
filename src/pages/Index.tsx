@@ -20,7 +20,15 @@ import { FormatLegend } from "@/components/FormatLegend";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { ImportModal } from "@/components/ImportModal";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Upload, Download, FileText, FileSpreadsheet } from "lucide-react";
+import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
+import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
 import logo from "@/assets/logo-iobee.svg";
 
