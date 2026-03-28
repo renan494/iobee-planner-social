@@ -20,7 +20,15 @@ import { FormatLegend } from "@/components/FormatLegend";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { ImportModal } from "@/components/ImportModal";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Upload, Download, FileText, FileSpreadsheet } from "lucide-react";
+import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
+import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
 import logo from "@/assets/logo-iobee.svg";
 
@@ -105,10 +113,28 @@ export default function Index() {
           <div className="flex items-center gap-2">
             <ClientFilter clients={clients} selected={selectedClient} onChange={setSelectedClient} />
             <AnalystFilter analysts={analysts} selected={selectedAnalyst} onChange={setSelectedAnalyst} />
-            <Button onClick={() => setImportOpen(true)} size="sm" className="gap-1.5">
+            <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5">
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Importar</span>
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline" className="gap-1.5">
+                  <Download className="h-4 w-4" />
+                  <span className="hidden sm:inline">Exportar</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => exportToPDF(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Exportar PDF
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportToExcel(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                  Exportar Excel
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
