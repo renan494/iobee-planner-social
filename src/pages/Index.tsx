@@ -66,6 +66,11 @@ export default function Index() {
     }
   }, []);
 
+  const handleUpdateDate = useCallback((postId: string, newDate: string) => {
+    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, date: newDate } : p));
+    setSelectedPost((prev) => prev && prev.id === postId ? { ...prev, date: newDate } : prev);
+  }, []);
+
   const navigate = useCallback((dir: 1 | -1) => {
     setCurrentDate((d) => {
       switch (viewMode) {
@@ -157,7 +162,7 @@ export default function Index() {
         {renderView()}
       </main>
 
-      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} />
+      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} />
       <ImportModal
         open={importOpen}
         onOpenChange={setImportOpen}
