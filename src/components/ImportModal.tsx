@@ -76,6 +76,12 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
         parseInt(year)
       );
       onImport(posts);
+      logActivity({
+        action: "calendar_imported",
+        description: `Calendário importado: ${posts.length} pautas de ${effectiveClient}`,
+        analyst: effectiveAnalystVal,
+        client: effectiveClient,
+      });
       toast({
         title: "Importação concluída!",
         description: `${posts.length} pautas importadas para o calendário.`,
