@@ -302,7 +302,12 @@ function PostEntryForm({
             className="flex items-center gap-2 text-sm font-medium text-foreground"
           >
             {entry.collapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-            Post {idx + 1} {entry.title && `— ${entry.title}`}
+            {entry.title || `Post ${idx + 1}`}
+            {entry.title && (
+              <span className="ml-1 text-xs font-normal text-muted-foreground">
+                — {FORMAT_LABELS[entry.postFormat]}
+              </span>
+            )}
           </button>
           <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={onRemove}>
             <Trash2 className="h-3.5 w-3.5" />
