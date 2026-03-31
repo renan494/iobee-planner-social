@@ -52,6 +52,28 @@ export default function Index() {
   const clients = useMemo(() => getClients(posts), [posts]);
   const analysts = useMemo(() => getAnalysts(posts), [posts]);
 
+  const availableClients = useMemo(() => {
+    if (selectedAnalyst === "all") return clients;
+    return getClients(posts.filter((post) => post.analyst === selectedAnalyst));
+  }, [clients, posts, selectedAnalyst]);
+
+  const availableAnalysts = useMemo(() => {
+    if (selectedClient === "all") return analysts;
+    return getAnalysts(posts.filter((post) => post.client === selectedClient));
+  }, [analysts, posts, selectedClient]);
+
+  useEffect(() => {
+    if (selectedClient !== "all" && !availableClients.includes(selectedClient)) {
+      setSelectedClient("all");
+    }
+  }, [availableClients, selectedClient]);
+
+  useEffect(() => {
+    if (selectedAnalyst !== "all" && !availableAnalysts.includes(selectedAnalyst)) {
+      setSelectedAnalyst("all");
+    }
+  }, [availableAnalysts, selectedAnalyst]);
+
   const filteredPosts = useMemo(() => {
     return posts.filter((p) => {
       if (selectedClient !== "all" && p.client !== selectedClient) return false;
@@ -123,8 +145,8 @@ export default function Index() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <ClientFilter clients={clients} selected={selectedClient} onChange={setSelectedClient} />
-            <AnalystFilter analysts={analysts} selected={selectedAnalyst} onChange={setSelectedAnalyst} />
+            <ClientFilter clients={availableClients} selected={selectedClient} onChange={setSelectedClient} />
+            <AnalystFilter analysts={availableAnalysts} selected={selectedAnalyst} onChange={setSelectedAnalyst} />
             <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5">
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Importar</span>
