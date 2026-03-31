@@ -106,7 +106,8 @@ export function PostsProvider({ children }: { children: ReactNode }) {
 
   const addAnalyst = useCallback(async (name: string) => {
     const { error } = await supabase.from("analysts").insert({ name });
-    if (!error) await fetchAnalysts();
+    if (error) throw error;
+    await fetchAnalysts();
   }, [fetchAnalysts]);
 
   const removeAnalyst = useCallback(async (name: string) => {
