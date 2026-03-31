@@ -25,11 +25,13 @@ import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, FUNNEL_LABELS } from "@/data/posts";
 import type { Post, PostFormat, FunnelStage } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
+import { useActivity } from "@/contexts/ActivityContext";
 
 // Analysts are now from context
 
 export default function CreatePost() {
   const { clients, analysts, addPost, addAnalyst } = usePosts();
+  const { logActivity } = useActivity();
   const navigate = useNavigate();
 
   const [client, setClient] = useState("");
@@ -93,6 +95,12 @@ export default function CreatePost() {
       addAnalyst(effectiveAnalyst);
     }
     addPost(post);
+    logActivity({
+      action: "post_created",
+      description: `Post "${post.title}" criado para ${post.client}`,
+      analyst: post.analyst,
+      client: post.client,
+    });
     toast({ title: "Post criado!", description: `"${post.title}" adicionado ao calendário em ${format(date, "dd/MM/yyyy")}.` });
     navigate("/calendario");
   };

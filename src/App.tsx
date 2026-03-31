@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { PostsProvider } from "@/contexts/PostsContext";
+import { ActivityProvider } from "@/contexts/ActivityContext";
 import { AppLayout } from "@/components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import CreatePost from "./pages/CreatePost";
@@ -17,6 +18,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <ActivityProvider>
       <PostsProvider>
         <Toaster />
         <Sonner />
@@ -33,6 +35,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </PostsProvider>
+      </ActivityProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

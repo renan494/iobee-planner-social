@@ -21,6 +21,7 @@ import { parseFileToPost } from "@/lib/fileParser";
 import type { Post } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { usePosts } from "@/contexts/PostsContext";
+import { useActivity } from "@/contexts/ActivityContext";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -38,6 +39,7 @@ interface ImportModalProps {
 
 export function ImportModal({ open, onOpenChange, onImport, existingClients }: ImportModalProps) {
   const { analysts, addAnalyst } = usePosts();
+  const { logActivity } = useActivity();
   const [file, setFile] = useState<File | null>(null);
   const [client, setClient] = useState("");
   const [newClient, setNewClient] = useState("");
@@ -74,6 +76,12 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
         parseInt(year)
       );
       onImport(posts);
+      logActivity({
+        action: "calendar_imported",
+        description: `Calendário importado: ${posts.length} pautas de ${effectiveClient}`,
+        analyst: effectiveAnalystVal,
+        client: effectiveClient,
+      });
       toast({
         title: "Importação concluída!",
         description: `${posts.length} pautas importadas para o calendário.`,
