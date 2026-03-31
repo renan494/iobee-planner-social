@@ -1,9 +1,12 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { BarChart3, Image, Film, Clapperboard, MessageCircle, TrendingUp } from "lucide-react";
+import { BarChart3, Image, Film, Clapperboard, MessageCircle, TrendingUp, Clock, Upload, PenTool, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { usePosts } from "@/contexts/PostsContext";
+import { useActivity } from "@/contexts/ActivityContext";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import type { PostFormat } from "@/data/posts";
 
 const FORMAT_CONFIG: Record<PostFormat, { label: string; icon: typeof Image; color: string }> = {
