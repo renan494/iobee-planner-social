@@ -36,6 +36,7 @@ export function AppSidebar() {
   const items = [
     { title: "Dashboard", url: "/", icon: LayoutDashboard },
     { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
+    { title: "Rascunhos", url: "/rascunhos", icon: FileEdit },
     { title: "Calendário", url: "/calendario", icon: CalendarDays },
     { title: "Clientes", url: "/clientes", icon: Users },
     { title: "Analistas", url: "/analistas", icon: UserCog },

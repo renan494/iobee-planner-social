@@ -40,6 +40,7 @@ function ProtectedRoutes() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/criar" element={<CreatePost />} />
+            <Route path="/rascunhos" element={<Drafts />} />
             <Route path="/calendario" element={<CalendarPage />} />
             <Route path="/clientes" element={<Clients />} />
             <Route path="/analistas" element={<Analysts />} />
