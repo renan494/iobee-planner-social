@@ -53,6 +53,10 @@
     --format-carousel: 210 100% 40%;
     --format-reels: 350 80% 46%;
     --format-stories: 160 100% 39%;
+
+    /* Commemorative date colors */
+    --commemorative: 43 90% 92%;
+    --commemorative-foreground: 30 60% 30%;
   }
 }
 
