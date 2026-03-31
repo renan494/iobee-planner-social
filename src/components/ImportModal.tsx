@@ -83,6 +83,7 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
       setClient("");
       setNewClient("");
       setAnalyst("");
+      setNewAnalyst("");
       if (fileRef.current) fileRef.current.value = "";
       onOpenChange(false);
     } catch (err: any) {
