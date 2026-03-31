@@ -37,6 +37,16 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { signOut } = useAuth();
+  const isAdmin = useAdminCheck();
+
+  const items = [
+    { title: "Dashboard", url: "/", icon: LayoutDashboard },
+    { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
+    { title: "Calendário", url: "/calendario", icon: CalendarDays },
+    { title: "Clientes", url: "/clientes", icon: Users },
+    { title: "Analistas", url: "/analistas", icon: UserCog },
+    ...(isAdmin ? [{ title: "Gerenciar Acessos", url: "/admin", icon: Shield }] : []),
+  ];
 
   return (
     <Sidebar collapsible="icon">

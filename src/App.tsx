@@ -42,6 +42,7 @@ function ProtectedRoutes() {
             <Route path="/calendario" element={<CalendarPage />} />
             <Route path="/clientes" element={<Clients />} />
             <Route path="/analistas" element={<Analysts />} />
+            <Route path="/admin" element={<AdminUsers />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
