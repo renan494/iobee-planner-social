@@ -31,6 +31,7 @@ import { useActivity } from "@/contexts/ActivityContext";
 
 export default function CreatePost() {
   const { clients, analysts, addPost, addAnalyst } = usePosts();
+  const { logActivity } = useActivity();
   const navigate = useNavigate();
 
   const [client, setClient] = useState("");
