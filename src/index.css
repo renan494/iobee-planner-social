@@ -40,12 +40,13 @@
     --radius: 0.75rem;
 
     --sidebar-background: 30 100% 4%;
-    --sidebar-foreground: 40 33% 97%;
+    --sidebar-background: 40 30% 96%;
+    --sidebar-foreground: 30 100% 4%;
     --sidebar-primary: 43 98% 49%;
     --sidebar-primary-foreground: 30 100% 4%;
-    --sidebar-accent: 30 20% 12%;
-    --sidebar-accent-foreground: 40 33% 97%;
-    --sidebar-border: 30 15% 15%;
+    --sidebar-accent: 40 25% 90%;
+    --sidebar-accent-foreground: 30 100% 4%;
+    --sidebar-border: 40 15% 88%;
     --sidebar-ring: 43 98% 49%;
 
     /* Post format colors */
