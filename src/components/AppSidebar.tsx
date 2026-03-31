@@ -69,6 +69,16 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <div className="mt-auto px-3 pb-4">
+          <button
+            onClick={() => signOut()}
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            {!collapsed && <span>Sair</span>}
+          </button>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
