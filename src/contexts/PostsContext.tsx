@@ -12,6 +12,7 @@ interface PostsContextType {
   updatePostDate: (postId: string, newDate: string) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
   addAnalyst: (name: string) => Promise<void>;
+  updateAnalyst: (oldName: string, newName: string) => Promise<void>;
   removeAnalyst: (name: string) => Promise<void>;
 }
 
@@ -110,13 +111,19 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     await fetchAnalysts();
   }, [fetchAnalysts]);
 
+  const updateAnalyst = useCallback(async (oldName: string, newName: string) => {
+    const { error } = await supabase.from("analysts").update({ name: newName }).eq("name", oldName);
+    if (error) throw error;
+    await fetchAnalysts();
+  }, [fetchAnalysts]);
+
   const removeAnalyst = useCallback(async (name: string) => {
     const { error } = await supabase.from("analysts").delete().eq("name", name);
     if (!error) await fetchAnalysts();
   }, [fetchAnalysts]);
 
   return (
-    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, deletePost, addAnalyst, removeAnalyst }}>
+    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, deletePost, addAnalyst, updateAnalyst, removeAnalyst }}>
       {children}
     </PostsContext.Provider>
   );

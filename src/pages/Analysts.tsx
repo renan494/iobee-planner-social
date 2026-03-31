@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { UserPlus, Trash2, Users } from "lucide-react";
+import { UserPlus, Trash2, Users, Pencil, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePosts } from "@/contexts/PostsContext";
 import { toast } from "@/hooks/use-toast";
 
 export default function Analysts() {
-  const { analysts, posts, addAnalyst, removeAnalyst } = usePosts();
+  const { analysts, posts, addAnalyst, updateAnalyst, removeAnalyst } = usePosts();
   const [name, setName] = useState("");
+  const [editingName, setEditingName] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
 
   const handleAdd = async () => {
     const trimmed = name.trim();
@@ -25,6 +27,25 @@ export default function Analysts() {
       toast({ title: "Analista cadastrado!", description: `${trimmed} foi adicionado(a).` });
     } catch (err: any) {
       toast({ title: "Erro ao cadastrar", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleEdit = async (oldName: string) => {
+    const trimmed = editValue.trim();
+    if (!trimmed || trimmed === oldName) {
+      setEditingName(null);
+      return;
+    }
+    if (analysts.includes(trimmed)) {
+      toast({ title: "Esse nome já existe", variant: "destructive" });
+      return;
+    }
+    try {
+      await updateAnalyst(oldName, trimmed);
+      setEditingName(null);
+      toast({ title: "Analista atualizado!", description: `${oldName} → ${trimmed}` });
+    } catch (err: any) {
+      toast({ title: "Erro ao atualizar", description: err.message, variant: "destructive" });
     }
   };
 
@@ -65,27 +86,56 @@ export default function Analysts() {
         )}
         {analysts.map((a) => {
           const count = postCountByAnalyst(a);
+          const isEditing = editingName === a;
           return (
             <div
               key={a}
               className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm"
             >
-              <div>
-                <p className="font-medium text-foreground">{a}</p>
-                <p className="text-xs text-muted-foreground">
-                  {count} {count === 1 ? "post" : "posts"}
-                </p>
+              {isEditing ? (
+                <Input
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleEdit(a); if (e.key === "Escape") setEditingName(null); }}
+                  className="max-w-xs"
+                  autoFocus
+                />
+              ) : (
+                <div>
+                  <p className="font-medium text-foreground">{a}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {count} {count === 1 ? "post" : "posts"}
+                  </p>
+                </div>
+              )}
+              <div className="flex gap-1">
+                {isEditing ? (
+                  <>
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(a)}>
+                      <Save className="h-4 w-4 text-primary" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setEditingName(null)}>
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" size="icon" onClick={() => { setEditingName(a); setEditValue(a); }}>
+                      <Pencil className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        removeAnalyst(a);
+                        toast({ title: `${a} removido(a).` });
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </>
+                )}
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  removeAnalyst(a);
-                  toast({ title: `${a} removido(a).` });
-                }}
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
             </div>
           );
         })}
