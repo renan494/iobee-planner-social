@@ -20,6 +20,7 @@ import { Upload, FileText, Loader2 } from "lucide-react";
 import { parseFileToPost } from "@/lib/fileParser";
 import type { Post } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
+import { usePosts } from "@/contexts/PostsContext";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
