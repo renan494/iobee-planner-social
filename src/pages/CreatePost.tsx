@@ -47,6 +47,7 @@ export default function CreatePost() {
   const [artPreview, setArtPreview] = useState<string | null>(null);
 
   const effectiveClient = client === "__new__" ? newClient.trim() : client;
+  const effectiveAnalyst = analyst === "__new__" ? newAnalyst.trim() : analyst;
 
   const addHashtag = () => {
     const tag = hashtagInput.trim().replace(/^#/, "");
