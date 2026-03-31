@@ -71,7 +71,7 @@ export default function CreatePost() {
   };
 
   const handleSubmit = () => {
-    if (!effectiveClient || !analyst || !date || !title.trim()) {
+    if (!effectiveClient || !effectiveAnalyst || !date || !title.trim()) {
       toast({ title: "Preencha os campos obrigatórios", description: "Cliente, analista, data e título são obrigatórios.", variant: "destructive" });
       return;
     }
