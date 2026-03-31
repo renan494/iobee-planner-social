@@ -57,6 +57,7 @@ interface ParsedPauta {
   funnelStage: FunnelStage;
   legend: string;
   hashtags: string[];
+  parsedDate?: { day: number; month: number };
 }
 
 function detectFormat(text: string): PostFormat {
@@ -79,38 +80,100 @@ function extractHashtags(text: string): string[] {
   return matches.map((h) => h.replace("#", "")).slice(0, 5);
 }
 
+interface ParsedDate {
+  day: number;
+  month: number;
+}
+
+function extractDateFromPage(text: string): ParsedDate | null {
+  // Match patterns like "Quinta-feira, 02/04" or "Sábado, 04/04" or just "02/04"
+  const dateMatch = text.match(/(\d{1,2})\/(\d{1,2})/);
+  if (dateMatch) {
+    return { day: parseInt(dateMatch[1]), month: parseInt(dateMatch[2]) - 1 };
+  }
+  return null;
+}
+
+function isContentPage(text: string): boolean {
+  // A content page has a format keyword AND a date
+  const hasFormat = /\b(EST[AÁ]TICO|CARROSSEL|CAROUSEL|REELS?|STORIES?|STORY)\b/i.test(text);
+  const hasDate = /\d{1,2}\/\d{1,2}/.test(text);
+  return hasFormat && hasDate;
+}
+
+function extractLegend(text: string): string {
+  // Remove format labels, date lines, hashtags, image references, page markers
+  const lines = text.split("\n");
+  const legendLines: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    // Skip format labels
+    if (/^(EST[AÁ]TICO|CARROSSEL|CAROUSEL|REELS?|STORIES?|STORY|REEL)\s*$/i.test(trimmed)) continue;
+    // Skip date lines
+    if (/^(Segunda|Terça|Quarta|Quinta|Sexta|Sábado|Domingo)/i.test(trimmed)) continue;
+    // Skip client name headers (all caps, short)
+    if (/^(DIVINA\s*TERRA|[A-Z\s]{3,20})$/.test(trimmed) && trimmed.length < 25) continue;
+    // Skip hashtag-only lines
+    if (/^#\w/.test(trimmed) && trimmed.split(" ").every(w => w.startsWith("#") || w.length < 3)) continue;
+    // Skip page markers and image refs
+    if (/^(---|###|Images from|\*|parsed-documents|CLIQUE AQUI|Link na bio)/i.test(trimmed)) continue;
+    // Skip very short lines that are likely UI elements
+    if (trimmed.length < 5) continue;
+
+    legendLines.push(trimmed);
+  }
+
+  return legendLines.join("\n").trim();
+}
+
+function extractTitle(text: string): string {
+  const legend = extractLegend(text);
+  // Take first sentence or first 60 chars
+  const firstSentence = legend.match(/^([^.!?\n]{10,80})/);
+  if (firstSentence) {
+    const t = firstSentence[1].trim();
+    return t.length > 60 ? t.substring(0, 57) + "..." : t;
+  }
+  return legend.substring(0, 60).trim() || "Post";
+}
+
 function parsePautas(fullText: string): ParsedPauta[] {
   const pautas: ParsedPauta[] = [];
 
-  // Split by "Pauta" markers
-  const pautaRegex = /Pauta\s*\d+[.:]/gi;
-  const segments = fullText.split(pautaRegex);
+  // Try splitting by page breaks first (PDF format)
+  let pages = fullText.split(/---\s*PAGE BREAK\s*---/i);
 
-  // Skip first segment (before first Pauta)
-  for (let i = 1; i < segments.length; i++) {
-    const segment = segments[i];
+  // If only one page, try slide breaks (PPTX format)
+  if (pages.length <= 1) {
+    pages = fullText.split(/---\s*SLIDE BREAK\s*---/i);
+  }
 
-    // Extract headline
-    const headlineMatch = segment.match(/Headline[:\s]*([^\n.]+)/i);
-    const headline = headlineMatch
-      ? headlineMatch[1].trim()
-      : segment.substring(0, 80).trim();
+  // If still one segment, try the old "Pauta" marker format as fallback
+  if (pages.length <= 1) {
+    const pautaRegex = /Pauta\s*\d+[.:]/gi;
+    const segments = fullText.split(pautaRegex);
+    if (segments.length > 1) {
+      pages = segments.slice(1);
+    }
+  }
 
-    // Extract title from first meaningful text
-    const titleMatch = segment.match(/([A-ZÀ-ÿ][^.!?\n]{5,60})/);
-    const title = titleMatch ? titleMatch[1].trim() : `Pauta ${i}`;
+  for (const page of pages) {
+    if (!isContentPage(page)) continue;
 
-    // Extract legend from "Legenda" section
-    const legendMatch = segment.match(/Legenda[^:]*:\s*([^#]{10,300})/i);
-    const legend = legendMatch ? legendMatch[1].trim() : "";
+    const parsedDate = extractDateFromPage(page);
+    const legend = extractLegend(page);
+    const title = extractTitle(page);
 
     pautas.push({
-      title: title.length > 60 ? title.substring(0, 57) + "..." : title,
-      headline: headline.length > 100 ? headline.substring(0, 97) + "..." : headline,
-      format: detectFormat(segment),
-      funnelStage: detectFunnelStage(segment),
-      legend,
-      hashtags: extractHashtags(segment),
+      title,
+      headline: title,
+      format: detectFormat(page),
+      funnelStage: detectFunnelStage(page),
+      legend: legend.substring(0, 500),
+      hashtags: extractHashtags(page),
+      parsedDate: parsedDate || undefined,
     });
   }
 
@@ -178,18 +241,29 @@ export async function parseFileToPost(
     throw new Error("Nenhuma pauta encontrada no arquivo. Verifique se o documento segue o formato de planejamento.");
   }
 
-  const dates = distributeDates(pautas.length, year, month);
+  // Use parsed dates from the document when available, otherwise distribute evenly
+  const fallbackDates = distributeDates(pautas.length, year, month);
 
-  return pautas.map((pauta, i) => ({
-    id: `import-${Date.now()}-${i}`,
-    client,
-    analyst,
-    title: pauta.title,
-    headline: pauta.headline,
-    format: pauta.format,
-    funnelStage: pauta.funnelStage,
-    date: dates[i] || format(new Date(year, month, i + 1), "yyyy-MM-dd"),
-    hashtags: pauta.hashtags,
-    legend: pauta.legend || undefined,
-  }));
+  return pautas.map((pauta, i) => {
+    let date: string;
+    if (pauta.parsedDate) {
+      const y = pauta.parsedDate.month !== month ? year : year;
+      date = format(new Date(year, pauta.parsedDate.month, pauta.parsedDate.day), "yyyy-MM-dd");
+    } else {
+      date = fallbackDates[i] || format(new Date(year, month, i + 1), "yyyy-MM-dd");
+    }
+
+    return {
+      id: `import-${Date.now()}-${i}`,
+      client,
+      analyst,
+      title: pauta.title,
+      headline: pauta.headline,
+      format: pauta.format,
+      funnelStage: pauta.funnelStage,
+      date,
+      hashtags: pauta.hashtags,
+      legend: pauta.legend || undefined,
+    };
+  });
 }
