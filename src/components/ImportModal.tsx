@@ -40,7 +40,6 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
   const [client, setClient] = useState("");
   const [newClient, setNewClient] = useState("");
   const [analyst, setAnalyst] = useState("");
-  const [month, setMonth] = useState(String(new Date().getMonth()));
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -64,13 +63,12 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
         file,
         effectiveClient,
         analyst,
-        parseInt(year),
-        parseInt(month)
+        parseInt(year)
       );
       onImport(posts);
       toast({
         title: "Importação concluída!",
-        description: `${posts.length} pautas importadas para ${MONTHS[parseInt(month)]}.`,
+        description: `${posts.length} pautas importadas para o calendário.`,
       });
       // Reset
       setFile(null);
@@ -174,32 +172,20 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
             </Select>
           </div>
 
-          {/* Month & Year */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label>Mês</Label>
-              <Select value={month} onValueChange={setMonth}>
-                <SelectTrigger className="bg-card">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {MONTHS.map((m, i) => (
-                    <SelectItem key={i} value={String(i)}>{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Ano</Label>
-              <Input
-                type="number"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                min={2024}
-                max={2030}
-                className="bg-card"
-              />
-            </div>
+          {/* Year */}
+          <div className="space-y-2">
+            <Label>Ano</Label>
+            <Input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              min={2024}
+              max={2030}
+              className="bg-card"
+            />
+            <p className="text-xs text-muted-foreground">
+              As datas dos posts serão extraídas automaticamente do arquivo.
+            </p>
           </div>
         </div>
 
