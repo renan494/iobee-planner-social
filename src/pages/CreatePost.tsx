@@ -89,6 +89,9 @@ export default function CreatePost() {
       legend: content.trim() || undefined,
     };
 
+    if (analyst === "__new__" && effectiveAnalyst) {
+      addAnalyst(effectiveAnalyst);
+    }
     addPost(post);
     toast({ title: "Post criado!", description: `"${post.title}" adicionado ao calendário em ${format(date, "dd/MM/yyyy")}.` });
     navigate("/calendario");
