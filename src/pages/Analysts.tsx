@@ -9,16 +9,23 @@ export default function Analysts() {
   const { analysts, posts, addAnalyst, removeAnalyst } = usePosts();
   const [name, setName] = useState("");
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const trimmed = name.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      toast({ title: "Digite o nome do analista", variant: "destructive" });
+      return;
+    }
     if (analysts.includes(trimmed)) {
       toast({ title: "Analista já existe", variant: "destructive" });
       return;
     }
-    addAnalyst(trimmed);
-    setName("");
-    toast({ title: "Analista cadastrado!", description: `${trimmed} foi adicionado(a).` });
+    try {
+      await addAnalyst(trimmed);
+      setName("");
+      toast({ title: "Analista cadastrado!", description: `${trimmed} foi adicionado(a).` });
+    } catch (err: any) {
+      toast({ title: "Erro ao cadastrar", description: err.message, variant: "destructive" });
+    }
   };
 
   const postCountByAnalyst = (analyst: string) =>
