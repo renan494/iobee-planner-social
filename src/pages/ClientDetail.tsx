@@ -1,17 +1,21 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft, User, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { usePosts } from "@/contexts/PostsContext";
+import { supabase } from "@/integrations/supabase/client";
 import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage } from "@/data/posts";
+import { toast } from "sonner";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const { posts } = usePosts();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const clientName = decodeURIComponent(name || "");
   const clientPosts = useMemo(() => posts.filter((p) => p.client === clientName), [posts, clientName]);
@@ -23,6 +27,37 @@ export default function ClientDetail() {
     return acc;
   }, [clientPosts]);
 
+  // Avatar
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const storagePath = `${encodeURIComponent(clientName)}/avatar`;
+
+  useEffect(() => {
+    const { data } = supabase.storage.from("client-avatars").getPublicUrl(storagePath);
+    // Check if the file actually exists by appending a cache-bust
+    fetch(data.publicUrl, { method: "HEAD" }).then((res) => {
+      if (res.ok) setAvatarUrl(data.publicUrl + "?t=" + Date.now());
+    }).catch(() => {});
+  }, [storagePath]);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { error } = await supabase.storage.from("client-avatars").upload(storagePath, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("client-avatars").getPublicUrl(storagePath);
+      setAvatarUrl(data.publicUrl + "?t=" + Date.now());
+      toast.success("Foto do cliente atualizada!");
+    } catch {
+      toast.error("Erro ao enviar imagem.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
       <Button variant="ghost" size="sm" className="mb-4 gap-1.5" onClick={() => navigate("/clientes")}>
@@ -30,8 +65,26 @@ export default function ClientDetail() {
       </Button>
 
       <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
-          <User className="h-6 w-6 text-muted-foreground" />
+        <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+          <Avatar className="h-12 w-12">
+            {avatarUrl ? (
+              <AvatarImage src={avatarUrl} alt={clientName} />
+            ) : null}
+            <AvatarFallback className="bg-secondary">
+              <User className="h-6 w-6 text-muted-foreground" />
+            </AvatarFallback>
+          </Avatar>
+          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Camera className="h-4 w-4 text-white" />
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarUpload}
+            disabled={uploading}
+          />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-foreground">{clientName}</h1>
