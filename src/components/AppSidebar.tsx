@@ -24,13 +24,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const items = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
-  { title: "Calendário", url: "/calendario", icon: CalendarDays },
-  { title: "Clientes", url: "/clientes", icon: Users },
-  { title: "Analistas", url: "/analistas", icon: UserCog },
-];
 
 export function AppSidebar() {
   const { state } = useSidebar();
