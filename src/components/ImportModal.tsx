@@ -174,11 +174,20 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
                 <SelectValue placeholder="Selecione o analista" />
               </SelectTrigger>
               <SelectContent>
-                {ANALYSTS.map((a) => (
+                {analysts.map((a) => (
                   <SelectItem key={a} value={a}>{a}</SelectItem>
                 ))}
+                <SelectItem value="__new__">+ Novo analista</SelectItem>
               </SelectContent>
             </Select>
+            {analyst === "__new__" && (
+              <Input
+                placeholder="Nome do novo analista"
+                value={newAnalyst}
+                onChange={(e) => setNewAnalyst(e.target.value)}
+                className="bg-card"
+              />
+            )}
           </div>
 
           {/* Year */}
