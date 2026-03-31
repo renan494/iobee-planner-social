@@ -9,11 +9,10 @@ import logo from "@/assets/logo-iobee.svg";
 import { Loader2 } from "lucide-react";
 
 export default function Login() {
-  const { signIn, signUp } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
