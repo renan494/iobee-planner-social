@@ -29,12 +29,13 @@ import { toast } from "@/hooks/use-toast";
 // Analysts are now from context
 
 export default function CreatePost() {
-  const { clients, addPost } = usePosts();
+  const { clients, analysts, addPost, addAnalyst } = usePosts();
   const navigate = useNavigate();
 
   const [client, setClient] = useState("");
   const [newClient, setNewClient] = useState("");
   const [analyst, setAnalyst] = useState("");
+  const [newAnalyst, setNewAnalyst] = useState("");
   const [postFormat, setPostFormat] = useState<PostFormat>("static");
   const [funnelStage, setFunnelStage] = useState<FunnelStage>("topo");
   const [date, setDate] = useState<Date>();
