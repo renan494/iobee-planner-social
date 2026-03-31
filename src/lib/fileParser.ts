@@ -163,13 +163,14 @@ function parsePautas(fullText: string): ParsedPauta[] {
     if (!isContentPage(page)) continue;
 
     const parsedDate = extractDateFromPage(page);
+    const fmt = detectFormat(page);
     const legend = extractLegend(page);
     const title = extractTitle(page);
 
     pautas.push({
       title,
       headline: title,
-      format: detectFormat(page),
+      format: fmt,
       funnelStage: detectFunnelStage(page),
       legend: legend.substring(0, 500),
       hashtags: extractHashtags(page),
@@ -177,7 +178,35 @@ function parsePautas(fullText: string): ParsedPauta[] {
     });
   }
 
-  return pautas;
+  // Deduplicate: carousel/reels with same date are the same post (multiple artboards)
+  const deduped: ParsedPauta[] = [];
+  const seen = new Set<string>();
+
+  for (const pauta of pautas) {
+    const key = pauta.parsedDate
+      ? `${pauta.parsedDate.day}-${pauta.parsedDate.month}-${pauta.format}`
+      : null;
+
+    if (key && seen.has(key)) {
+      // Merge hashtags from duplicate pages into existing entry
+      const existing = deduped.find(
+        (p) => p.parsedDate &&
+          p.parsedDate.day === pauta.parsedDate!.day &&
+          p.parsedDate.month === pauta.parsedDate!.month &&
+          p.format === pauta.format
+      );
+      if (existing) {
+        const newTags = pauta.hashtags.filter((h) => !existing.hashtags.includes(h));
+        existing.hashtags = [...existing.hashtags, ...newTags].slice(0, 10);
+      }
+      continue;
+    }
+
+    if (key) seen.add(key);
+    deduped.push(pauta);
+  }
+
+  return deduped;
 }
 
 function distributeDates(
