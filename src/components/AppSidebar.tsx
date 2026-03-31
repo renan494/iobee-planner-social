@@ -9,7 +9,7 @@ import {
   FileEdit,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import logo from "@/assets/logo-iobee.svg";
@@ -30,6 +30,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navigate = useNavigate();
   const { signOut } = useAuth();
   const isAdmin = useAdminCheck();
 
@@ -46,14 +47,14 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        <div className="flex items-center gap-2 px-4 py-5">
+        <button onClick={() => navigate("/")} className="flex items-center gap-2 px-4 py-5 cursor-pointer">
           <img src={logo} alt="iOBEE" className="h-7 shrink-0" />
           {!collapsed && (
             <span className="text-sm font-bold tracking-tight text-sidebar-foreground/70">
               Planner
             </span>
           )}
-        </div>
+        </button>
 
         <SidebarGroup>
           <SidebarGroupContent>
