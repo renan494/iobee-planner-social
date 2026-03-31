@@ -76,6 +76,7 @@ export default function Dashboard() {
             <TableHeader>
               <TableRow>
                 <TableHead>Analista</TableHead>
+                <TableHead className="text-center">Contas</TableHead>
                 <TableHead className="text-center">Estáticos</TableHead>
                 <TableHead className="text-center">Carrosséis</TableHead>
                 <TableHead className="text-center">Reels</TableHead>
@@ -87,6 +88,7 @@ export default function Dashboard() {
               {analystStats.map((a) => (
                 <TableRow key={a.name}>
                   <TableCell className="font-medium">{a.name}</TableCell>
+                  <TableCell className="text-center">{a.accounts}</TableCell>
                   <TableCell className="text-center">{a.static}</TableCell>
                   <TableCell className="text-center">{a.carousel}</TableCell>
                   <TableCell className="text-center">{a.reels}</TableCell>
