@@ -79,7 +79,7 @@ export default function CreatePost() {
     const post: Post = {
       id: `post-${Date.now()}`,
       client: effectiveClient,
-      analyst,
+      analyst: effectiveAnalyst,
       title: title.trim(),
       headline: title.trim(),
       format: postFormat,
