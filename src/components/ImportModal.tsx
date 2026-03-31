@@ -27,7 +27,7 @@ const MONTHS = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
 
-const ANALYSTS = ["Maria Julya", "Julia"];
+// Analysts now come from context
 
 interface ImportModalProps {
   open: boolean;
