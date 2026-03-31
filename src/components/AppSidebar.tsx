@@ -6,6 +6,7 @@ import {
   UserCog,
   Shield,
   LogOut,
+  FileEdit,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -35,6 +36,7 @@ export function AppSidebar() {
   const items = [
     { title: "Dashboard", url: "/", icon: LayoutDashboard },
     { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
+    { title: "Rascunhos", url: "/rascunhos", icon: FileEdit },
     { title: "Calendário", url: "/calendario", icon: CalendarDays },
     { title: "Clientes", url: "/clientes", icon: Users },
     { title: "Analistas", url: "/analistas", icon: UserCog },

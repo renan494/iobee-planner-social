@@ -59,6 +59,54 @@ export type Database = {
         }
         Relationships: []
       }
+      drafts: {
+        Row: {
+          analyst: string | null
+          client: string | null
+          created_at: string
+          date: string | null
+          format: string | null
+          funnel_stage: string | null
+          hashtags: string[] | null
+          headline: string | null
+          id: string
+          legend: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analyst?: string | null
+          client?: string | null
+          created_at?: string
+          date?: string | null
+          format?: string | null
+          funnel_stage?: string | null
+          hashtags?: string[] | null
+          headline?: string | null
+          id?: string
+          legend?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analyst?: string | null
+          client?: string | null
+          created_at?: string
+          date?: string | null
+          format?: string | null
+          funnel_stage?: string | null
+          hashtags?: string[] | null
+          headline?: string | null
+          id?: string
+          legend?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           analyst: string
