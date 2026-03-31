@@ -21,7 +21,7 @@ const FORMAT_CONFIG: Record<PostFormat, { label: string; icon: typeof Image; col
 export default function Dashboard() {
   const { posts, analysts } = usePosts();
   const { activities, clearActivities } = useActivity();
-  const { isAdmin } = useAdminCheck();
+  const isAdmin = useAdminCheck();
   const navigate = useNavigate();
 
   const formatCounts = useMemo(() => {
