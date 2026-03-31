@@ -9,6 +9,7 @@ import { ptBR } from "date-fns/locale";
 import type { Post } from "@/data/posts";
 import { PostCard } from "./PostCard";
 import { cn } from "@/lib/utils";
+import { getCommemorativeDatesForDay } from "@/data/commemorativeDates";
 
 interface DayViewProps {
   currentDate: Date;
@@ -20,13 +21,25 @@ export function DayView({ currentDate, posts, onPostClick }: DayViewProps) {
   const dateKey = format(currentDate, "yyyy-MM-dd");
   const dayPosts = posts.filter((p) => p.date === dateKey);
   const today = isToday(currentDate);
+  const comDates = getCommemorativeDatesForDay(dateKey);
 
   return (
     <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
       <div className="border-b bg-secondary/50 px-4 py-3">
-        <h3 className={cn("text-lg font-bold capitalize", today && "text-primary")}>
-          {format(currentDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
-        </h3>
+        <div className="flex items-center gap-3">
+          <h3 className={cn("text-lg font-bold capitalize", today && "text-primary")}>
+            {format(currentDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+          </h3>
+          {comDates.map((cd, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center gap-1 rounded-md bg-[hsl(var(--commemorative))] px-2 py-0.5 text-xs font-semibold text-[hsl(var(--commemorative-foreground))]"
+            >
+              <span>{cd.icon}</span>
+              {cd.label}
+            </span>
+          ))}
+        </div>
       </div>
       <div className="p-4">
         {dayPosts.length === 0 ? (

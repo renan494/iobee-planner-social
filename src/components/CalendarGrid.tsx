@@ -12,6 +12,7 @@ import { ptBR } from "date-fns/locale";
 import type { Post } from "@/data/posts";
 import { PostCard } from "./PostCard";
 import { cn } from "@/lib/utils";
+import { getCommemorativeDatesForDay } from "@/data/commemorativeDates";
 
 const WEEKDAYS = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
 const MAX_VISIBLE = 3;
@@ -66,6 +67,24 @@ export function CalendarGrid({ currentDate, posts, onPostClick }: CalendarGridPr
               )}
             >
               <div className="mb-1 flex justify-end">
+                {(() => {
+                  const comDates = getCommemorativeDatesForDay(dateKey);
+                  if (comDates.length === 0) return null;
+                  return (
+                    <div className="mb-0.5 mr-auto flex flex-col gap-0.5">
+                      {comDates.map((cd, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-0.5 rounded-md bg-[hsl(var(--commemorative))] px-1 py-0.5 text-[9px] font-semibold leading-tight text-[hsl(var(--commemorative-foreground))]"
+                          title={cd.label}
+                        >
+                          <span>{cd.icon}</span>
+                          <span className="truncate max-w-[80px]">{cd.label}</span>
+                        </span>
+                      ))}
+                    </div>
+                  );
+                })()}
                 <span
                   className={cn(
                     "flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold",
