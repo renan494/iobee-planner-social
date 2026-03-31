@@ -4,11 +4,13 @@ import {
   CalendarDays,
   Users,
   UserCog,
+  Shield,
   LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import logo from "@/assets/logo-iobee.svg";
 
 import {
@@ -22,19 +24,22 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const items = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
-  { title: "Calendário", url: "/calendario", icon: CalendarDays },
-  { title: "Clientes", url: "/clientes", icon: Users },
-  { title: "Analistas", url: "/analistas", icon: UserCog },
-];
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { signOut } = useAuth();
+  const isAdmin = useAdminCheck();
+
+  const items = [
+    { title: "Dashboard", url: "/", icon: LayoutDashboard },
+    { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
+    { title: "Calendário", url: "/calendario", icon: CalendarDays },
+    { title: "Clientes", url: "/clientes", icon: Users },
+    { title: "Analistas", url: "/analistas", icon: UserCog },
+    ...(isAdmin ? [{ title: "Gerenciar Acessos", url: "/admin", icon: Shield }] : []),
+  ];
 
   return (
     <Sidebar collapsible="icon">
