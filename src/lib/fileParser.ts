@@ -222,7 +222,7 @@ export async function parseFileToPost(
   client: string,
   analyst: string,
   year: number,
-  month: number
+  month?: number
 ): Promise<Post[]> {
   let fullText: string;
 
@@ -241,16 +241,17 @@ export async function parseFileToPost(
     throw new Error("Nenhuma pauta encontrada no arquivo. Verifique se o documento segue o formato de planejamento.");
   }
 
-  // Use parsed dates from the document when available, otherwise distribute evenly
-  const fallbackDates = distributeDates(pautas.length, year, month);
+  // Check if document has its own dates
+  const hasDocDates = pautas.some((p) => p.parsedDate);
+  const fallbackMonth = month ?? new Date().getMonth();
+  const fallbackDates = hasDocDates ? [] : distributeDates(pautas.length, year, fallbackMonth);
 
   return pautas.map((pauta, i) => {
     let date: string;
     if (pauta.parsedDate) {
-      const y = pauta.parsedDate.month !== month ? year : year;
       date = format(new Date(year, pauta.parsedDate.month, pauta.parsedDate.day), "yyyy-MM-dd");
     } else {
-      date = fallbackDates[i] || format(new Date(year, month, i + 1), "yyyy-MM-dd");
+      date = fallbackDates[i] || format(new Date(year, fallbackMonth, i + 1), "yyyy-MM-dd");
     }
 
     return {

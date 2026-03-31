@@ -40,7 +40,6 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
   const [client, setClient] = useState("");
   const [newClient, setNewClient] = useState("");
   const [analyst, setAnalyst] = useState("");
-  const [month, setMonth] = useState(String(new Date().getMonth()));
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
