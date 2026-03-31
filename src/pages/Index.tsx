@@ -40,7 +40,14 @@ export default function Index() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const [posts, setPosts] = useState<Post[]>(samplePosts);
+  const [posts, setPosts] = useState<Post[]>(() => {
+    const saved = localStorage.getItem("iobee-posts");
+    return saved ? JSON.parse(saved) : samplePosts;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("iobee-posts", JSON.stringify(posts));
+  }, [posts]);
 
   const clients = useMemo(() => getClients(posts), [posts]);
   const analysts = useMemo(() => getAnalysts(posts), [posts]);
