@@ -37,10 +37,12 @@ interface ImportModalProps {
 }
 
 export function ImportModal({ open, onOpenChange, onImport, existingClients }: ImportModalProps) {
+  const { analysts, addAnalyst } = usePosts();
   const [file, setFile] = useState<File | null>(null);
   const [client, setClient] = useState("");
   const [newClient, setNewClient] = useState("");
   const [analyst, setAnalyst] = useState("");
+  const [newAnalyst, setNewAnalyst] = useState("");
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
