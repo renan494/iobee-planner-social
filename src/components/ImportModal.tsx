@@ -39,6 +39,7 @@ interface ImportModalProps {
 
 export function ImportModal({ open, onOpenChange, onImport, existingClients }: ImportModalProps) {
   const { analysts, addAnalyst } = usePosts();
+  const { logActivity } = useActivity();
   const [file, setFile] = useState<File | null>(null);
   const [client, setClient] = useState("");
   const [newClient, setNewClient] = useState("");
