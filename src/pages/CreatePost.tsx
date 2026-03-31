@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, FUNNEL_LABELS } from "@/data/posts";
-import type { Post, PostFormat, FunnelStage } from "@/data/posts";
+import type { PostFormat, FunnelStage } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { useActivity } from "@/contexts/ActivityContext";
 
