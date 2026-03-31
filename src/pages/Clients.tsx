@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Users, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +8,7 @@ import { FORMAT_LABELS, type PostFormat } from "@/data/posts";
 
 export default function Clients() {
   const { posts, clients } = usePosts();
+  const navigate = useNavigate();
 
   const clientStats = useMemo(() => {
     return clients.map((name) => {
@@ -32,7 +34,7 @@ export default function Clients() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {clientStats.map((c) => (
-          <Card key={c.name}>
+          <Card key={c.name} className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => navigate(`/clientes/${encodeURIComponent(c.name)}`)}>
             <CardHeader className="flex flex-row items-center gap-3 pb-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
                 <User className="h-5 w-5 text-muted-foreground" />
