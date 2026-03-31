@@ -1,0 +1,1 @@
+CREATE POLICY "Authenticated users can update analysts" ON public.analysts FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
