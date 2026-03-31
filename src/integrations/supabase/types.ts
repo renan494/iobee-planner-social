@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_log: {
+        Row: {
+          action: string
+          analyst: string | null
+          client: string | null
+          created_at: string
+          description: string
+          id: string
+        }
+        Insert: {
+          action: string
+          analyst?: string | null
+          client?: string | null
+          created_at?: string
+          description: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          analyst?: string | null
+          client?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      analysts: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          analyst: string
+          client: string
+          created_at: string
+          date: string
+          format: string
+          funnel_stage: string
+          hashtags: string[]
+          headline: string
+          id: string
+          legend: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          analyst: string
+          client: string
+          created_at?: string
+          date: string
+          format: string
+          funnel_stage: string
+          hashtags?: string[]
+          headline: string
+          id?: string
+          legend?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          analyst?: string
+          client?: string
+          created_at?: string
+          date?: string
+          format?: string
+          funnel_stage?: string
+          hashtags?: string[]
+          headline?: string
+          id?: string
+          legend?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, FUNNEL_LABELS } from "@/data/posts";
-import type { Post, PostFormat, FunnelStage } from "@/data/posts";
+import type { PostFormat, FunnelStage } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { useActivity } from "@/contexts/ActivityContext";
 
@@ -72,14 +72,13 @@ export default function CreatePost() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!effectiveClient || !effectiveAnalyst || !date || !title.trim()) {
       toast({ title: "Preencha os campos obrigatórios", description: "Cliente, analista, data e título são obrigatórios.", variant: "destructive" });
       return;
     }
 
-    const post: Post = {
-      id: `post-${Date.now()}`,
+    const post = {
       client: effectiveClient,
       analyst: effectiveAnalyst,
       title: title.trim(),
@@ -92,10 +91,10 @@ export default function CreatePost() {
     };
 
     if (analyst === "__new__" && effectiveAnalyst) {
-      addAnalyst(effectiveAnalyst);
+      await addAnalyst(effectiveAnalyst);
     }
-    addPost(post);
-    logActivity({
+    await addPost(post);
+    await logActivity({
       action: "post_created",
       description: `Post "${post.title}" criado para ${post.client}`,
       analyst: post.analyst,
