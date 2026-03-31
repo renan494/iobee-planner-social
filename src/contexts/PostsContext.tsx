@@ -12,6 +12,7 @@ interface PostsContextType {
   updatePostDate: (postId: string, newDate: string) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
   addAnalyst: (name: string) => Promise<void>;
+  updateAnalyst: (oldName: string, newName: string) => Promise<void>;
   removeAnalyst: (name: string) => Promise<void>;
 }
 
