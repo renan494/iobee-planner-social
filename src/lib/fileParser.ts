@@ -235,7 +235,13 @@ export async function parseFileToPost(
     throw new Error("Formato não suportado. Use PDF ou PPTX.");
   }
 
+  console.log("[fileParser] Full text length:", fullText.length);
+  console.log("[fileParser] Page breaks found:", (fullText.match(/--- PAGE BREAK ---/g) || []).length);
+  console.log("[fileParser] First 500 chars:", fullText.substring(0, 500));
+
   const pautas = parsePautas(fullText);
+
+  console.log("[fileParser] Pautas found:", pautas.length);
 
   if (pautas.length === 0) {
     throw new Error("Nenhuma pauta encontrada no arquivo. Verifique se o documento segue o formato de planejamento.");
