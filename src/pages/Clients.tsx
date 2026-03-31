@@ -8,6 +8,7 @@ import { FORMAT_LABELS, type PostFormat } from "@/data/posts";
 
 export default function Clients() {
   const { posts, clients } = usePosts();
+  const navigate = useNavigate();
 
   const clientStats = useMemo(() => {
     return clients.map((name) => {
