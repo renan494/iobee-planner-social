@@ -54,8 +54,9 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
     if (!error) await fetchActivities();
   }, [fetchActivities]);
 
-  const clearActivities = useCallback(() => {
-    setActivities([]);
+  const clearActivities = useCallback(async () => {
+    const { error } = await supabase.from("activity_log").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    if (!error) setActivities([]);
   }, []);
 
   return (
