@@ -1,74 +1,121 @@
-import { createContext, useContext, useState, useEffect, useMemo, useCallback, type ReactNode } from "react";
-import { samplePosts, getClients, getAnalysts, type Post } from "@/data/posts";
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { getClients, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
 
 interface PostsContextType {
   posts: Post[];
   clients: string[];
   analysts: string[];
-  addPost: (post: Post) => void;
-  addPosts: (posts: Post[]) => void;
-  updatePostDate: (postId: string, newDate: string) => void;
-  deletePost: (postId: string) => void;
-  addAnalyst: (name: string) => void;
-  removeAnalyst: (name: string) => void;
+  loading: boolean;
+  addPost: (post: Omit<Post, "id">) => Promise<void>;
+  addPosts: (posts: Omit<Post, "id">[]) => Promise<void>;
+  updatePostDate: (postId: string, newDate: string) => Promise<void>;
+  deletePost: (postId: string) => Promise<void>;
+  addAnalyst: (name: string) => Promise<void>;
+  removeAnalyst: (name: string) => Promise<void>;
 }
 
 const PostsContext = createContext<PostsContextType | null>(null);
 
-const DEFAULT_ANALYSTS = ["Maria Julya", "Julia"];
-
 export function PostsProvider({ children }: { children: ReactNode }) {
-  const [posts, setPosts] = useState<Post[]>(() => {
-    const saved = localStorage.getItem("iobee-posts");
-    return saved ? JSON.parse(saved) : samplePosts;
-  });
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [analystNames, setAnalystNames] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [extraAnalysts, setExtraAnalysts] = useState<string[]>(() => {
-    const saved = localStorage.getItem("iobee-analysts");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const fetchPosts = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("*")
+      .order("date", { ascending: true });
+
+    if (!error && data) {
+      const mapped: Post[] = data.map((row) => ({
+        id: row.id,
+        client: row.client,
+        analyst: row.analyst,
+        title: row.title,
+        headline: row.headline,
+        format: row.format as PostFormat,
+        funnelStage: row.funnel_stage as FunnelStage,
+        date: row.date,
+        hashtags: row.hashtags || [],
+        legend: row.legend ?? undefined,
+      }));
+      setPosts(mapped);
+    }
+  }, []);
+
+  const fetchAnalysts = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("analysts")
+      .select("name")
+      .order("name");
+
+    if (!error && data) {
+      setAnalystNames(data.map((a) => a.name));
+    }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem("iobee-posts", JSON.stringify(posts));
-  }, [posts]);
+    Promise.all([fetchPosts(), fetchAnalysts()]).then(() => setLoading(false));
+  }, [fetchPosts, fetchAnalysts]);
 
-  useEffect(() => {
-    localStorage.setItem("iobee-analysts", JSON.stringify(extraAnalysts));
-  }, [extraAnalysts]);
+  const clients = getClients(posts);
+  const analysts = analystNames;
 
-  const clients = useMemo(() => getClients(posts), [posts]);
-  const analysts = useMemo(() => {
-    const fromPosts = getAnalysts(posts);
-    const all = [...new Set([...DEFAULT_ANALYSTS, ...extraAnalysts, ...fromPosts])];
-    return all.sort();
-  }, [posts, extraAnalysts]);
+  const addPost = useCallback(async (post: Omit<Post, "id">) => {
+    const { error } = await supabase.from("posts").insert({
+      client: post.client,
+      analyst: post.analyst,
+      title: post.title,
+      headline: post.headline,
+      format: post.format,
+      funnel_stage: post.funnelStage,
+      date: post.date,
+      hashtags: post.hashtags,
+      legend: post.legend || null,
+    });
+    if (!error) await fetchPosts();
+  }, [fetchPosts]);
 
-  const addPost = useCallback((post: Post) => {
-    setPosts((prev) => [...prev, post]);
-  }, []);
+  const addPosts = useCallback(async (newPosts: Omit<Post, "id">[]) => {
+    const rows = newPosts.map((p) => ({
+      client: p.client,
+      analyst: p.analyst,
+      title: p.title,
+      headline: p.headline,
+      format: p.format,
+      funnel_stage: p.funnelStage,
+      date: p.date,
+      hashtags: p.hashtags,
+      legend: p.legend || null,
+    }));
+    const { error } = await supabase.from("posts").insert(rows);
+    if (!error) await fetchPosts();
+  }, [fetchPosts]);
 
-  const addPosts = useCallback((newPosts: Post[]) => {
-    setPosts((prev) => [...prev, ...newPosts]);
-  }, []);
+  const updatePostDate = useCallback(async (postId: string, newDate: string) => {
+    const { error } = await supabase.from("posts").update({ date: newDate }).eq("id", postId);
+    if (!error) await fetchPosts();
+  }, [fetchPosts]);
 
-  const updatePostDate = useCallback((postId: string, newDate: string) => {
-    setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, date: newDate } : p)));
-  }, []);
+  const deletePost = useCallback(async (postId: string) => {
+    const { error } = await supabase.from("posts").delete().eq("id", postId);
+    if (!error) await fetchPosts();
+  }, [fetchPosts]);
 
-  const deletePost = useCallback((postId: string) => {
-    setPosts((prev) => prev.filter((p) => p.id !== postId));
-  }, []);
+  const addAnalyst = useCallback(async (name: string) => {
+    const { error } = await supabase.from("analysts").insert({ name });
+    if (!error) await fetchAnalysts();
+  }, [fetchAnalysts]);
 
-  const addAnalyst = useCallback((name: string) => {
-    setExtraAnalysts((prev) => prev.includes(name) ? prev : [...prev, name]);
-  }, []);
-
-  const removeAnalyst = useCallback((name: string) => {
-    setExtraAnalysts((prev) => prev.filter((a) => a !== name));
-  }, []);
+  const removeAnalyst = useCallback(async (name: string) => {
+    const { error } = await supabase.from("analysts").delete().eq("name", name);
+    if (!error) await fetchAnalysts();
+  }, [fetchAnalysts]);
 
   return (
-    <PostsContext.Provider value={{ posts, clients, analysts, addPost, addPosts, updatePostDate, deletePost, addAnalyst, removeAnalyst }}>
+    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, deletePost, addAnalyst, removeAnalyst }}>
       {children}
     </PostsContext.Provider>
   );

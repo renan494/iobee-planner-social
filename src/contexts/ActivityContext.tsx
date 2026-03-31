@@ -1,40 +1,58 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface ActivityEntry {
   id: string;
-  action: string; // e.g. "post_created", "calendar_imported", "post_deleted"
+  action: string;
   description: string;
   analyst?: string;
   client?: string;
-  timestamp: string; // ISO string
+  timestamp: string;
 }
 
 interface ActivityContextType {
   activities: ActivityEntry[];
-  logActivity: (entry: Omit<ActivityEntry, "id" | "timestamp">) => void;
+  logActivity: (entry: Omit<ActivityEntry, "id" | "timestamp">) => Promise<void>;
   clearActivities: () => void;
 }
 
 const ActivityContext = createContext<ActivityContextType | null>(null);
 
 export function ActivityProvider({ children }: { children: ReactNode }) {
-  const [activities, setActivities] = useState<ActivityEntry[]>(() => {
-    const saved = localStorage.getItem("iobee-activity-log");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [activities, setActivities] = useState<ActivityEntry[]>([]);
+
+  const fetchActivities = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("activity_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    if (!error && data) {
+      setActivities(data.map((row) => ({
+        id: row.id,
+        action: row.action,
+        description: row.description,
+        analyst: row.analyst ?? undefined,
+        client: row.client ?? undefined,
+        timestamp: row.created_at,
+      })));
+    }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem("iobee-activity-log", JSON.stringify(activities));
-  }, [activities]);
+    fetchActivities();
+  }, [fetchActivities]);
 
-  const logActivity = useCallback((entry: Omit<ActivityEntry, "id" | "timestamp">) => {
-    const newEntry: ActivityEntry = {
-      ...entry,
-      id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      timestamp: new Date().toISOString(),
-    };
-    setActivities((prev) => [newEntry, ...prev].slice(0, 200));
-  }, []);
+  const logActivity = useCallback(async (entry: Omit<ActivityEntry, "id" | "timestamp">) => {
+    const { error } = await supabase.from("activity_log").insert({
+      action: entry.action,
+      description: entry.description,
+      analyst: entry.analyst || null,
+      client: entry.client || null,
+    });
+    if (!error) await fetchActivities();
+  }, [fetchActivities]);
 
   const clearActivities = useCallback(() => {
     setActivities([]);
