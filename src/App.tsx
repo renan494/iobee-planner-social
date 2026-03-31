@@ -12,6 +12,7 @@ import CreatePost from "./pages/CreatePost";
 import CalendarPage from "./pages/CalendarPage";
 import Clients from "./pages/Clients";
 import Analysts from "./pages/Analysts";
+import AdminUsers from "./pages/AdminUsers";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
