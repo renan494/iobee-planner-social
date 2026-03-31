@@ -21,16 +21,11 @@ export default function Login() {
 
     setLoading(true);
     try {
-      if (isSignUp) {
-        await signUp(email, password);
-        toast({ title: "Conta criada!", description: "Verifique seu email para confirmar o cadastro." });
-      } else {
-        await signIn(email, password);
-        navigate("/");
-      }
+      await signIn(email, password);
+      navigate("/");
     } catch (err: any) {
       toast({
-        title: isSignUp ? "Erro ao cadastrar" : "Erro ao entrar",
+        title: "Erro ao entrar",
         description: err.message || "Tente novamente.",
         variant: "destructive",
       });
@@ -45,9 +40,7 @@ export default function Login() {
         <div className="flex flex-col items-center gap-2">
           <img src={logo} alt="iOBEE" className="h-10" />
           <h1 className="text-xl font-bold text-foreground">iOBEE Planner</h1>
-          <p className="text-sm text-muted-foreground">
-            {isSignUp ? "Crie sua conta" : "Faça login para continuar"}
-          </p>
+          <p className="text-sm text-muted-foreground">Faça login para continuar</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
@@ -76,19 +69,9 @@ export default function Login() {
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {isSignUp ? "Cadastrar" : "Entrar"}
+            Entrar
           </Button>
         </form>
-
-        <p className="text-center text-sm text-muted-foreground">
-          {isSignUp ? "Já tem conta?" : "Não tem conta?"}{" "}
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="font-medium text-primary hover:underline"
-          >
-            {isSignUp ? "Faça login" : "Cadastre-se"}
-          </button>
-        </p>
       </div>
     </div>
   );
