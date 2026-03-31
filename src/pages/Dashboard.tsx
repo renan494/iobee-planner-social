@@ -110,11 +110,24 @@ export default function Dashboard() {
 
       {/* Activity Log */}
       <Card className="mt-8">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Clock className="h-4 w-4" />
             Atividades Recentes
           </CardTitle>
+          {isAdmin && activities.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive"
+              onClick={() => {
+                if (confirm("Limpar todo o log de atividades?")) clearActivities();
+              }}
+            >
+              <Trash2 className="mr-1 h-3.5 w-3.5" />
+              Limpar
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           {activities.length === 0 ? (
