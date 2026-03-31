@@ -54,8 +54,10 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
     if (f) setFile(f);
   };
 
+  const effectiveAnalystVal = analyst === "__new__" ? newAnalyst.trim() : analyst;
+
   const handleImport = async () => {
-    if (!file || !effectiveClient || !analyst) {
+    if (!file || !effectiveClient || !effectiveAnalystVal) {
       toast({ title: "Preencha todos os campos", variant: "destructive" });
       return;
     }
