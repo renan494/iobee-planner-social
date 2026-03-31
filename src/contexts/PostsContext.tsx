@@ -9,6 +9,8 @@ interface PostsContextType {
   addPosts: (posts: Post[]) => void;
   updatePostDate: (postId: string, newDate: string) => void;
   deletePost: (postId: string) => void;
+  addAnalyst: (name: string) => void;
+  removeAnalyst: (name: string) => void;
 }
 
 const PostsContext = createContext<PostsContextType | null>(null);
