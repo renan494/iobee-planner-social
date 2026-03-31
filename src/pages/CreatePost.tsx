@@ -26,7 +26,7 @@ import { FORMAT_LABELS, FUNNEL_LABELS } from "@/data/posts";
 import type { Post, PostFormat, FunnelStage } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 
-const ANALYSTS = ["Maria Julya", "Julia"];
+// Analysts are now from context
 
 export default function CreatePost() {
   const { clients, addPost } = usePosts();
