@@ -20,13 +20,14 @@ import { Upload, FileText, Loader2 } from "lucide-react";
 import { parseFileToPost } from "@/lib/fileParser";
 import type { Post } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
+import { usePosts } from "@/contexts/PostsContext";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
 
-const ANALYSTS = ["Maria Julya", "Julia"];
+// Analysts now come from context
 
 interface ImportModalProps {
   open: boolean;
@@ -36,10 +37,12 @@ interface ImportModalProps {
 }
 
 export function ImportModal({ open, onOpenChange, onImport, existingClients }: ImportModalProps) {
+  const { analysts, addAnalyst } = usePosts();
   const [file, setFile] = useState<File | null>(null);
   const [client, setClient] = useState("");
   const [newClient, setNewClient] = useState("");
   const [analyst, setAnalyst] = useState("");
+  const [newAnalyst, setNewAnalyst] = useState("");
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -51,18 +54,23 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
     if (f) setFile(f);
   };
 
+  const effectiveAnalystVal = analyst === "__new__" ? newAnalyst.trim() : analyst;
+
   const handleImport = async () => {
-    if (!file || !effectiveClient || !analyst) {
+    if (!file || !effectiveClient || !effectiveAnalystVal) {
       toast({ title: "Preencha todos os campos", variant: "destructive" });
       return;
     }
 
     setLoading(true);
     try {
+      if (analyst === "__new__" && effectiveAnalystVal) {
+        addAnalyst(effectiveAnalystVal);
+      }
       const posts = await parseFileToPost(
         file,
         effectiveClient,
-        analyst,
+        effectiveAnalystVal,
         parseInt(year)
       );
       onImport(posts);
@@ -75,6 +83,7 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
       setClient("");
       setNewClient("");
       setAnalyst("");
+      setNewAnalyst("");
       if (fileRef.current) fileRef.current.value = "";
       onOpenChange(false);
     } catch (err: any) {
@@ -165,11 +174,20 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
                 <SelectValue placeholder="Selecione o analista" />
               </SelectTrigger>
               <SelectContent>
-                {ANALYSTS.map((a) => (
+                {analysts.map((a) => (
                   <SelectItem key={a} value={a}>{a}</SelectItem>
                 ))}
+                <SelectItem value="__new__">+ Novo analista</SelectItem>
               </SelectContent>
             </Select>
+            {analyst === "__new__" && (
+              <Input
+                placeholder="Nome do novo analista"
+                value={newAnalyst}
+                onChange={(e) => setNewAnalyst(e.target.value)}
+                className="bg-card"
+              />
+            )}
           </div>
 
           {/* Year */}

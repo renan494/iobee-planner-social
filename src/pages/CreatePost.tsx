@@ -26,15 +26,16 @@ import { FORMAT_LABELS, FUNNEL_LABELS } from "@/data/posts";
 import type { Post, PostFormat, FunnelStage } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 
-const ANALYSTS = ["Maria Julya", "Julia"];
+// Analysts are now from context
 
 export default function CreatePost() {
-  const { clients, addPost } = usePosts();
+  const { clients, analysts, addPost, addAnalyst } = usePosts();
   const navigate = useNavigate();
 
   const [client, setClient] = useState("");
   const [newClient, setNewClient] = useState("");
   const [analyst, setAnalyst] = useState("");
+  const [newAnalyst, setNewAnalyst] = useState("");
   const [postFormat, setPostFormat] = useState<PostFormat>("static");
   const [funnelStage, setFunnelStage] = useState<FunnelStage>("topo");
   const [date, setDate] = useState<Date>();
@@ -46,6 +47,7 @@ export default function CreatePost() {
   const [artPreview, setArtPreview] = useState<string | null>(null);
 
   const effectiveClient = client === "__new__" ? newClient.trim() : client;
+  const effectiveAnalyst = analyst === "__new__" ? newAnalyst.trim() : analyst;
 
   const addHashtag = () => {
     const tag = hashtagInput.trim().replace(/^#/, "");
@@ -69,7 +71,7 @@ export default function CreatePost() {
   };
 
   const handleSubmit = () => {
-    if (!effectiveClient || !analyst || !date || !title.trim()) {
+    if (!effectiveClient || !effectiveAnalyst || !date || !title.trim()) {
       toast({ title: "Preencha os campos obrigatórios", description: "Cliente, analista, data e título são obrigatórios.", variant: "destructive" });
       return;
     }
@@ -77,7 +79,7 @@ export default function CreatePost() {
     const post: Post = {
       id: `post-${Date.now()}`,
       client: effectiveClient,
-      analyst,
+      analyst: effectiveAnalyst,
       title: title.trim(),
       headline: title.trim(),
       format: postFormat,
@@ -87,6 +89,9 @@ export default function CreatePost() {
       legend: content.trim() || undefined,
     };
 
+    if (analyst === "__new__" && effectiveAnalyst) {
+      addAnalyst(effectiveAnalyst);
+    }
     addPost(post);
     toast({ title: "Post criado!", description: `"${post.title}" adicionado ao calendário em ${format(date, "dd/MM/yyyy")}.` });
     navigate("/calendario");
@@ -127,11 +132,15 @@ export default function CreatePost() {
             <Select value={analyst} onValueChange={setAnalyst}>
               <SelectTrigger><SelectValue placeholder="Selecione o analista" /></SelectTrigger>
               <SelectContent>
-                {ANALYSTS.map((a) => (
+                {analysts.map((a) => (
                   <SelectItem key={a} value={a}>{a}</SelectItem>
                 ))}
+                <SelectItem value="__new__">+ Novo analista</SelectItem>
               </SelectContent>
             </Select>
+            {analyst === "__new__" && (
+              <Input placeholder="Nome do novo analista" value={newAnalyst} onChange={(e) => setNewAnalyst(e.target.value)} />
+            )}
           </div>
         </div>
 

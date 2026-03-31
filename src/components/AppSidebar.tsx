@@ -3,6 +3,7 @@ import {
   PenTool,
   CalendarDays,
   Users,
+  UserCog,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -24,6 +25,7 @@ const items = [
   { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
   { title: "Calendário", url: "/calendario", icon: CalendarDays },
   { title: "Clientes", url: "/clientes", icon: Users },
+  { title: "Analistas", url: "/analistas", icon: UserCog },
 ];
 
 export function AppSidebar() {

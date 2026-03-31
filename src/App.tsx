@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import CreatePost from "./pages/CreatePost";
 import CalendarPage from "./pages/CalendarPage";
 import Clients from "./pages/Clients";
+import Analysts from "./pages/Analysts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
               <Route path="/criar" element={<CreatePost />} />
               <Route path="/calendario" element={<CalendarPage />} />
               <Route path="/clientes" element={<Clients />} />
+              <Route path="/analistas" element={<Analysts />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
