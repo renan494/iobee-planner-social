@@ -241,18 +241,29 @@ export async function parseFileToPost(
     throw new Error("Nenhuma pauta encontrada no arquivo. Verifique se o documento segue o formato de planejamento.");
   }
 
-  const dates = distributeDates(pautas.length, year, month);
+  // Use parsed dates from the document when available, otherwise distribute evenly
+  const fallbackDates = distributeDates(pautas.length, year, month);
 
-  return pautas.map((pauta, i) => ({
-    id: `import-${Date.now()}-${i}`,
-    client,
-    analyst,
-    title: pauta.title,
-    headline: pauta.headline,
-    format: pauta.format,
-    funnelStage: pauta.funnelStage,
-    date: dates[i] || format(new Date(year, month, i + 1), "yyyy-MM-dd"),
-    hashtags: pauta.hashtags,
-    legend: pauta.legend || undefined,
-  }));
+  return pautas.map((pauta, i) => {
+    let date: string;
+    if (pauta.parsedDate) {
+      const y = pauta.parsedDate.month !== month ? year : year;
+      date = format(new Date(year, pauta.parsedDate.month, pauta.parsedDate.day), "yyyy-MM-dd");
+    } else {
+      date = fallbackDates[i] || format(new Date(year, month, i + 1), "yyyy-MM-dd");
+    }
+
+    return {
+      id: `import-${Date.now()}-${i}`,
+      client,
+      analyst,
+      title: pauta.title,
+      headline: pauta.headline,
+      format: pauta.format,
+      funnelStage: pauta.funnelStage,
+      date,
+      hashtags: pauta.hashtags,
+      legend: pauta.legend || undefined,
+    };
+  });
 }
