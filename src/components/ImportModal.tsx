@@ -63,13 +63,12 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
         file,
         effectiveClient,
         analyst,
-        parseInt(year),
-        parseInt(month)
+        parseInt(year)
       );
       onImport(posts);
       toast({
         title: "Importação concluída!",
-        description: `${posts.length} pautas importadas para ${MONTHS[parseInt(month)]}.`,
+        description: `${posts.length} pautas importadas para o calendário.`,
       });
       // Reset
       setFile(null);
