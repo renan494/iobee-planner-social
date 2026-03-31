@@ -57,6 +57,7 @@ interface ParsedPauta {
   funnelStage: FunnelStage;
   legend: string;
   hashtags: string[];
+  parsedDate?: { day: number; month: number };
 }
 
 function detectFormat(text: string): PostFormat {
