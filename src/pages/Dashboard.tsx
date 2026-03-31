@@ -104,6 +104,45 @@ export default function Dashboard() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Activity Log */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Clock className="h-4 w-4" />
+            Atividades Recentes
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nenhuma atividade registrada ainda.</p>
+          ) : (
+            <div className="space-y-3">
+              {activities.slice(0, 15).map((act) => {
+                const Icon = act.action === "calendar_imported" ? Upload
+                  : act.action === "post_created" ? PenTool
+                  : act.action === "post_deleted" ? Trash2
+                  : Clock;
+                return (
+                  <div key={act.id} className="flex items-start gap-3 rounded-lg border bg-card p-3">
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      <Icon className="h-3.5 w-3.5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-foreground">{act.description}</p>
+                      <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                        {act.analyst && <span>{act.analyst}</span>}
+                        {act.analyst && <span>·</span>}
+                        <span>{formatDistanceToNow(new Date(act.timestamp), { addSuffix: true, locale: ptBR })}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
