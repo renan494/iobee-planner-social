@@ -64,10 +64,13 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
 
     setLoading(true);
     try {
+      if (analyst === "__new__" && effectiveAnalystVal) {
+        addAnalyst(effectiveAnalystVal);
+      }
       const posts = await parseFileToPost(
         file,
         effectiveClient,
-        analyst,
+        effectiveAnalystVal,
         parseInt(year)
       );
       onImport(posts);
