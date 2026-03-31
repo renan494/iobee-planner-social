@@ -47,14 +47,14 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        <div className="flex items-center gap-2 px-4 py-5">
+        <button onClick={() => navigate("/")} className="flex items-center gap-2 px-4 py-5 cursor-pointer">
           <img src={logo} alt="iOBEE" className="h-7 shrink-0" />
           {!collapsed && (
             <span className="text-sm font-bold tracking-tight text-sidebar-foreground/70">
               Planner
             </span>
           )}
-        </div>
+        </button>
 
         <SidebarGroup>
           <SidebarGroupContent>
