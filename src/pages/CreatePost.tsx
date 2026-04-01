@@ -107,6 +107,7 @@ export default function CreatePost() {
         artFile: null,
         artPreviews: [],
         artFiles: [],
+        channels: [],
         collapsed: false,
         draftId: data.id,
       }]);
