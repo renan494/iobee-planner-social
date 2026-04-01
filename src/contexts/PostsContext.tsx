@@ -10,6 +10,7 @@ interface PostsContextType {
   addPost: (post: Omit<Post, "id">) => Promise<void>;
   addPosts: (posts: Omit<Post, "id">[]) => Promise<void>;
   updatePostDate: (postId: string, newDate: string) => Promise<void>;
+  updatePostArt: (postId: string, artUrl: string | null) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
   addAnalyst: (name: string) => Promise<void>;
   updateAnalyst: (oldName: string, newName: string) => Promise<void>;
