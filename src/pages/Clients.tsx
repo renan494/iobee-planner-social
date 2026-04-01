@@ -17,9 +17,12 @@ export default function Clients() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClientName, setNewClientName] = useState("");
-  const [newMonthlyPosts, setNewMonthlyPosts] = useState("");
+  const [newInstagram, setNewInstagram] = useState("");
+  const [newFacebookUrl, setNewFacebookUrl] = useState("");
   const [newObjective, setNewObjective] = useState("");
-  const [newGoal, setNewGoal] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const clientStats = useMemo(() => {
     return clients.map((name) => {
