@@ -13,7 +13,7 @@ import {
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { usePosts } from "@/contexts/PostsContext";
-import { getClients, getAnalysts, type Post } from "@/data/posts";
+import { getClients, getAnalysts, type Post, FORMAT_LABELS, CHANNEL_OPTIONS, type PostFormat } from "@/data/posts";
 import { CalendarHeader } from "@/components/CalendarHeader";
 import { CalendarGrid } from "@/components/CalendarGrid";
 import { DayView } from "@/components/DayView";
@@ -28,6 +28,7 @@ import { ViewModeSwitcher } from "@/components/ViewModeSwitcher";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { ImportModal } from "@/components/ImportModal";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -51,6 +52,8 @@ export default function CalendarPage() {
   const [showCustomCalendars, setShowCustomCalendars] = useState(false);
   const [selectedClient, setSelectedClient] = useState("all");
   const [selectedAnalyst, setSelectedAnalyst] = useState("all");
+  const [selectedFormat, setSelectedFormat] = useState("all");
+  const [selectedChannel, setSelectedChannel] = useState("all");
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -111,11 +114,13 @@ export default function CalendarPage() {
     return posts.filter((p) => {
       if (selectedClient !== "all" && p.client !== selectedClient) return false;
       if (selectedAnalyst !== "all" && p.analyst !== selectedAnalyst) return false;
+      if (selectedFormat !== "all" && p.format !== selectedFormat) return false;
+      if (selectedChannel !== "all" && !(p.channels || []).includes(selectedChannel)) return false;
       if (dateFrom && p.date < format(dateFrom, "yyyy-MM-dd")) return false;
       if (dateTo && p.date > format(dateTo, "yyyy-MM-dd")) return false;
       return true;
     });
-  }, [posts, selectedClient, selectedAnalyst, dateFrom, dateTo]);
+  }, [posts, selectedClient, selectedAnalyst, selectedFormat, selectedChannel, dateFrom, dateTo]);
 
   const handlePostClick = useCallback((post: Post) => {
     setSelectedPost(post);
@@ -185,6 +190,28 @@ export default function CalendarPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <ClientFilter clients={availableClients} selected={selectedClient} onChange={setSelectedClient} />
           <AnalystFilter analysts={availableAnalysts} selected={selectedAnalyst} onChange={setSelectedAnalyst} />
+          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+            <SelectTrigger className="w-[160px] h-9 text-sm">
+              <SelectValue placeholder="Formato" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os formatos</SelectItem>
+              {(Object.entries(FORMAT_LABELS) as [PostFormat, string][]).map(([key, label]) => (
+                <SelectItem key={key} value={key}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={selectedChannel} onValueChange={setSelectedChannel}>
+            <SelectTrigger className="w-[160px] h-9 text-sm">
+              <SelectValue placeholder="Canal" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os canais</SelectItem>
+              {CHANNEL_OPTIONS.map((ch) => (
+                <SelectItem key={ch} value={ch}>{ch}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5">
             <Upload className="h-4 w-4" />
             <span className="hidden sm:inline">Importar</span>
