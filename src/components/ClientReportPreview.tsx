@@ -48,12 +48,18 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 16;
     const contentWidth = pageWidth - margin * 2;
+    const totalPosts = sortedPosts.length;
+    const rangeStart = sortedPosts[0]?.date;
+    const rangeEnd = sortedPosts[sortedPosts.length - 1]?.date;
 
     // Brand colors
     const yellow: [number, number, number] = [253, 182, 0];
     const dark: [number, number, number] = [20, 15, 0];
     const warmBg: [number, number, number] = [255, 249, 230];
     const gray: [number, number, number] = [120, 115, 100];
+    const soft: [number, number, number] = [248, 244, 234];
+    const line: [number, number, number] = [232, 224, 203];
+    const body: [number, number, number] = [70, 64, 52];
 
     // Convert SVG logo to a canvas-rendered PNG for reliable embedding
     let logoDataUrl: string | null = null;
@@ -80,100 +86,158 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       }
     };
 
-    const addHeader = () => {
-      // Top accent bar
+    const formatSummary = (Object.entries(byFormat) as [PostFormat, number][])
+      .filter(([, c]) => c > 0)
+      .map(([f, c]) => `${FORMAT_LABELS[f]} · ${c}`)
+      .join("  •  ") || "Nenhum formato registrado";
+
+    const dateSummary = rangeStart && rangeEnd
+      ? rangeStart === rangeEnd
+        ? format(new Date(rangeStart + "T12:00:00"), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+        : `${format(new Date(rangeStart + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })} — ${format(new Date(rangeEnd + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })}`
+      : "Período personalizado";
+
+    const subtitleText = hasFilters
+      ? "Relatório filtrado para apresentação e execução"
+      : "Planejamento editorial organizado para execução";
+
+    const drawLabelValue = (label: string, value: string, x: number, y: number, maxWidth: number) => {
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...gray);
+      doc.text(label.toUpperCase(), x, y);
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...dark);
+      const valueLines = doc.splitTextToSize(value, maxWidth);
+      doc.text(valueLines, x, y + 7);
+    };
+
+    const addHeader = (sectionTitle?: string, sectionSubtitle?: string) => {
       doc.setFillColor(...yellow);
       doc.rect(0, 0, pageWidth, 3, "F");
-      // Logo top-right
-      drawLogo(pageWidth - 40, 6, 30);
-      // Thin line under header area
-      doc.setDrawColor(240, 235, 220);
+
+      drawLogo(margin, 6, 28);
+
+      doc.setDrawColor(...line);
       doc.setLineWidth(0.3);
-      doc.line(margin, 18, pageWidth - margin, 18);
+      doc.line(margin, 19, pageWidth - margin, 19);
+
+      if (sectionTitle) {
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...dark);
+        doc.text(sectionTitle, pageWidth - margin, 11);
+      }
+
+      if (sectionSubtitle) {
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...gray);
+        doc.text(sectionSubtitle, pageWidth - margin, 16);
+      }
     };
 
     const addFooter = (pageNum: number, totalPages: number) => {
-      // Bottom bar
       doc.setFillColor(...dark);
       doc.rect(0, pageHeight - 10, pageWidth, 10, "F");
-      // Yellow accent line
+
       doc.setFillColor(...yellow);
       doc.rect(0, pageHeight - 10, pageWidth, 1.5, "F");
-      // Footer text
+
       doc.setFontSize(7);
       doc.setTextColor(200, 195, 180);
-      doc.text("iOBEE · Social Media Intelligence", margin, pageHeight - 4);
+      doc.text("iOBEE Social Lab · Relatório de Conteúdo", margin, pageHeight - 4);
       doc.text(`${pageNum}/${totalPages}`, pageWidth - margin, pageHeight - 4, { align: "right" });
     };
 
     // ==========================================
-    // PAGE 1: COVER (clean white with branded accents)
-    // ==========================================
-    // Top yellow accent line
+    // PAGE 1: COVER
     doc.setFillColor(...yellow);
     doc.rect(0, 0, pageWidth, 3, "F");
 
-    // Logo centered
-    drawLogo(pageWidth / 2 - 25, 20, 50);
+    drawLogo(pageWidth / 2 - 28, 18, 56);
 
-    // Yellow thin divider under logo
-    const logoBottom = 20 + 50 * logoAspect + 8;
-    doc.setFillColor(...yellow);
-    doc.rect(pageWidth / 2 - 30, logoBottom, 60, 1, "F");
+    const logoBottom = 18 + 56 * logoAspect;
+    doc.setDrawColor(...yellow);
+    doc.setLineWidth(0.5);
+    doc.line(margin + 8, logoBottom + 12, pageWidth - margin - 8, logoBottom + 12);
 
-    // Client name
-    doc.setFontSize(26);
+    doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...dark);
-    doc.text(clientName.toUpperCase(), pageWidth / 2, logoBottom + 16, { align: "center" });
+    doc.text(clientName, pageWidth / 2, logoBottom + 31, { align: "center" });
 
-    // Subtitle
+    doc.setFontSize(18);
+    doc.setTextColor(...yellow);
+    doc.text("Relatório de Conteúdo", pageWidth / 2, logoBottom + 45, { align: "center" });
+
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(...gray);
-    doc.text("RELATÓRIO DE CONTEÚDO", pageWidth / 2, logoBottom + 26, { align: "center" });
+    doc.setTextColor(...body);
+    const subtitleLines = doc.splitTextToSize(subtitleText, 120);
+    doc.text(subtitleLines, pageWidth / 2, logoBottom + 58, { align: "center" });
 
-    // Info box with left yellow border
-    const boxY = logoBottom + 38;
-    doc.setFillColor(250, 248, 243);
-    doc.roundedRect(margin, boxY, contentWidth, 34, 3, 3, "F");
+    const featureY = logoBottom + 72;
+    doc.setFillColor(...soft);
+    doc.roundedRect(margin + 6, featureY, contentWidth - 12, 26, 4, 4, "F");
     doc.setFillColor(...yellow);
-    doc.rect(margin, boxY, 2.5, 34, "F");
+    doc.rect(margin + 6, featureY, 2.5, 26, "F");
 
+    const featureLines = doc.splitTextToSize(
+      "Posts, headlines, formatos, analistas e artes organizados em um material pronto para apresentação.",
+      contentWidth - 32,
+    );
     doc.setFontSize(10);
     doc.setTextColor(...dark);
-    const infoCol1X = margin + 10;
-    const infoCol2X = pageWidth / 2 + 8;
+    doc.text(featureLines, pageWidth / 2, featureY + 10, { align: "center" });
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Total de posts:", infoCol1X, boxY + 11);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${posts.length}`, infoCol1X + 35, boxY + 11);
+    const statsY = featureY + 40;
+    const cardGap = 5;
+    const cardW = (contentWidth - cardGap * 2) / 3;
+    [margin, margin + cardW + cardGap, margin + (cardW + cardGap) * 2].forEach((x) => {
+      doc.setFillColor(...soft);
+      doc.roundedRect(x, statsY, cardW, 28, 4, 4, "F");
+    });
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Analista(s):", infoCol2X, boxY + 11);
-    doc.setFont("helvetica", "normal");
-    doc.text(analysts.join(", "), infoCol2X + 28, boxY + 11);
+    drawLabelValue("Posts no relatório", `${totalPosts}`, margin + 6, statsY + 8, cardW - 12);
+    drawLabelValue("Período", dateSummary, margin + cardW + cardGap + 6, statsY + 8, cardW - 12);
+    drawLabelValue("Analistas", analysts.join(", ") || "—", margin + (cardW + cardGap) * 2 + 6, statsY + 8, cardW - 12);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Formatos:", infoCol1X, boxY + 22);
-    doc.setFont("helvetica", "normal");
-    const fmtText = (Object.entries(byFormat) as [PostFormat, number][])
-      .filter(([, c]) => c > 0)
-      .map(([f, c]) => `${FORMAT_LABELS[f]}: ${c}`)
-      .join("  ·  ");
-    doc.text(fmtText, infoCol1X + 23, boxY + 22);
+    const formatsY = statsY + 38;
+    doc.setDrawColor(...yellow);
+    doc.setLineWidth(0.4);
+    doc.line(margin + 8, formatsY, pageWidth - margin - 8, formatsY);
 
+    doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.text("Gerado em:", infoCol2X, boxY + 22);
+    doc.setTextColor(...gray);
+    doc.text("DISTRIBUIÇÃO DE FORMATOS", pageWidth / 2, formatsY + 7, { align: "center" });
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...dark);
+    const formatLines = doc.splitTextToSize(formatSummary, contentWidth - 20);
+    doc.text(formatLines, pageWidth / 2, formatsY + 17, { align: "center" });
+
+    const footerInfoY = pageHeight - 28;
+    doc.setDrawColor(...yellow);
+    doc.setLineWidth(0.4);
+    doc.line(margin + 8, footerInfoY - 10, pageWidth - margin - 8, footerInfoY - 10);
+
+    doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    doc.text(format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }), infoCol2X + 26, boxY + 22);
+    doc.setTextColor(...body);
+    doc.text(`Base: ${totalPosts} posts • ${analysts.length} analista(s)`, pageWidth / 2, footerInfoY, { align: "center" });
+    doc.setTextColor(...yellow);
+    doc.text(format(new Date(), "MMMM 'de' yyyy", { locale: ptBR }), pageWidth / 2, footerInfoY + 8, { align: "center" });
 
     // ==========================================
     // PAGE 2: SUMMARY TABLE
     // ==========================================
     doc.addPage();
-    addHeader();
+    addHeader("Resumo editorial", clientName);
 
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
@@ -196,7 +260,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         (p.channels || []).join(", ") || "—",
         p.analyst,
       ]),
-      styles: { fontSize: 8, cellPadding: 4, textColor: dark },
+      styles: { fontSize: 8, cellPadding: 4, textColor: body, lineColor: line, lineWidth: 0.2 },
       headStyles: { fillColor: dark, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8 },
       alternateRowStyles: { fillColor: warmBg },
       margin: { left: margin, right: margin },
@@ -204,6 +268,9 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         0: { cellWidth: 22 },
         3: { cellWidth: 22 },
         4: { cellWidth: 18 },
+      },
+      didDrawPage: () => {
+        addHeader("Resumo editorial", clientName);
       },
     });
 
@@ -308,7 +375,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
 
     sortedPosts.forEach((post, idx) => {
       doc.addPage();
-      addHeader();
+      addHeader("Peça detalhada", `${clientName} · ${FORMAT_LABELS[post.format]}`);
 
       const images = artImages.get(post.id) || [];
       const isCarousel = post.format === "carousel" && images.length > 1;
@@ -319,6 +386,11 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       const phoneInternalPad = 8;
 
       let y = 24;
+
+      doc.setFontSize(7);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...gray);
+      doc.text("PLANEJAMENTO VISUAL", margin, y - 1);
 
       // Post number badge
       doc.setFillColor(...yellow);
@@ -380,9 +452,14 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
 
       // Draw detail box background
       doc.setFillColor(...warmBg);
-      doc.roundedRect(margin, detailBoxY, contentWidth, detailBoxH, 2, 2, "F");
+      doc.roundedRect(margin, detailBoxY, contentWidth, detailBoxH, 3, 3, "F");
       doc.setFillColor(...yellow);
       doc.rect(margin, detailBoxY, 2, detailBoxH, "F");
+
+      doc.setFontSize(7);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...gray);
+      doc.text("VISÃO GERAL DA PEÇA", margin + 8, detailBoxY + 7);
 
       // Draw phone mockup inside the box (right side)
       if (hasArt) {
@@ -394,7 +471,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
 
       // Draw title, headline and details (left side, vertically centered)
       const textColWidth = hasArt ? contentWidth - phoneWidth - phoneInternalPad * 2 - 10 : contentWidth - 14;
-      let detailY = detailBoxY + (detailBoxH - detailTextH) / 2 + 8;
+      let detailY = detailBoxY + (detailBoxH - detailTextH) / 2 + 11;
 
       // Title inside box
       doc.setFontSize(14);
@@ -444,13 +521,13 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         const boxH = combinedLines.length * 4.5 + 8;
 
         doc.setFillColor(...warmBg);
-        doc.roundedRect(margin, y - 3, contentWidth, boxH, 2, 2, "F");
+        doc.roundedRect(margin, y - 3, contentWidth, boxH, 3, 3, "F");
         doc.setFillColor(...yellow);
         doc.rect(margin, y - 3, 2.5, boxH, "F");
 
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(50, 45, 35);
+        doc.setTextColor(...body);
         doc.text(combinedLines, margin + 7, y + 2);
         y += boxH + 4;
       }
