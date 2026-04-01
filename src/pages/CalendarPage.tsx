@@ -214,20 +214,40 @@ export default function CalendarPage() {
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="gap-1.5">
               <CalendarIcon className="h-4 w-4" />
-              {dateFrom || dateTo
-                ? `${dateFrom ? format(dateFrom, "dd/MM/yy") : "..."} – ${dateTo ? format(dateTo, "dd/MM/yy") : "..."}`
-                : "Filtrar por data"}
+              {datePreset === "all" ? "Filtrar por data"
+                : datePreset === "day" ? "Hoje"
+                : datePreset === "month" ? "Este mês"
+                : datePreset === "quarter" ? "Este trimestre"
+                : datePreset === "year" ? "Este ano"
+                : `${dateFrom ? format(dateFrom, "dd/MM/yy") : "..."} – ${dateTo ? format(dateTo, "dd/MM/yy") : "..."}`}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-4 space-y-3" align="start">
-            <p className="text-xs font-medium text-muted-foreground">De</p>
-            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
-            <p className="text-xs font-medium text-muted-foreground">Até</p>
-            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
-            {(dateFrom || dateTo) && (
-              <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}>
-                Limpar filtros
+          <PopoverContent className="w-auto p-2 space-y-1" align="start">
+            {([
+              ["all", "Todos"],
+              ["day", "Dia"],
+              ["month", "Mês"],
+              ["quarter", "Trimestre"],
+              ["year", "Ano"],
+              ["custom", "Personalizado"],
+            ] as [DatePreset, string][]).map(([key, label]) => (
+              <Button
+                key={key}
+                variant={datePreset === key ? "default" : "ghost"}
+                size="sm"
+                className="w-full justify-start"
+                onClick={() => applyPreset(key)}
+              >
+                {label}
               </Button>
+            ))}
+            {showCustomCalendars && (
+              <div className="border-t border-border pt-3 mt-2 space-y-3">
+                <p className="text-xs font-medium text-muted-foreground">De</p>
+                <Calendar mode="single" selected={dateFrom} onSelect={(d) => { setDateFrom(d); }} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
+                <p className="text-xs font-medium text-muted-foreground">Até</p>
+                <Calendar mode="single" selected={dateTo} onSelect={(d) => { setDateTo(d); }} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
+              </div>
             )}
           </PopoverContent>
         </Popover>
