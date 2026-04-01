@@ -29,7 +29,7 @@ export default function Clients() {
   const clientStats = useMemo(() => {
     return clients.map((name) => {
       const clientPosts = posts.filter((p) => p.client === name);
-      const analysts = [...new Set(clientPosts.map((p) => p.analyst))];
+      const analysts = [...new Set(clientPosts.map((p) => p.analyst))].filter((a) => a && a.trim() !== "" && a.trim() !== "-");
       const byFormat: Record<PostFormat, number> = { static: 0, carousel: 0, reels: 0, stories: 0 };
       clientPosts.forEach((p) => byFormat[p.format]++);
       return { name, total: clientPosts.length, analysts, byFormat };
