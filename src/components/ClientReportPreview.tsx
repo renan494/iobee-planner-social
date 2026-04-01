@@ -356,7 +356,13 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         phoneH = screenHeight + 12;
       }
 
-      const detailTextH = detailPairs.length * 8 + 6;
+      // Calculate title/headline height inside the box
+      const titleInsideLines = doc.splitTextToSize(post.title, hasArt ? contentWidth - phoneWidth - phoneInternalPad * 2 - 10 : contentWidth - 14);
+      const titleInsideH = titleInsideLines.length * 7 + 4;
+      const headlineInsideLines = doc.splitTextToSize(post.headline, hasArt ? contentWidth - phoneWidth - phoneInternalPad * 2 - 10 : contentWidth - 14);
+      const headlineInsideH = headlineInsideLines.length * 5 + 4;
+
+      const detailTextH = titleInsideH + headlineInsideH + detailPairs.length * 8 + 10;
       const detailBoxH = Math.max(detailTextH, hasArt ? phoneH + phoneInternalPad * 2 : detailTextH);
       const detailBoxY = y - 3;
 
@@ -374,9 +380,25 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         drawPhoneMockup(doc, firstImg.src, firstImg.width, firstImg.height, phoneXPos, phoneYPos, phoneWidth);
       }
 
-      // Draw detail text (left side, vertically centered)
+      // Draw title, headline and details (left side, vertically centered)
       const textColWidth = hasArt ? contentWidth - phoneWidth - phoneInternalPad * 2 - 10 : contentWidth - 14;
-      let detailY = detailBoxY + (detailBoxH - detailTextH) / 2 + 6;
+      let detailY = detailBoxY + (detailBoxH - detailTextH) / 2 + 8;
+
+      // Title inside box
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...dark);
+      doc.text(titleInsideLines, margin + 8, detailY);
+      detailY += titleInsideH;
+
+      // Headline inside box
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...gray);
+      doc.text(headlineInsideLines, margin + 8, detailY);
+      detailY += headlineInsideH;
+
+      // Detail pairs
       doc.setFontSize(9);
       detailPairs.forEach(([label, value]) => {
         doc.setFont("helvetica", "bold");
