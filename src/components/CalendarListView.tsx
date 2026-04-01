@@ -4,8 +4,9 @@ import { ptBR } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FORMAT_LABELS, FUNNEL_LABELS, type Post } from "@/data/posts";
-import { Eye, Pencil } from "lucide-react";
+import { FORMAT_LABELS, FUNNEL_LABELS, type Post, type PostFormat } from "@/data/posts";
+import { PostBadge } from "@/components/PostBadge";
+import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface CalendarListViewProps {
@@ -53,7 +54,7 @@ export function CalendarListView({ posts, onPostClick }: CalendarListViewProps) 
                   <TableCell className="font-medium">{post.client}</TableCell>
                   <TableCell className="font-medium">{post.title}</TableCell>
                   <TableCell className="text-muted-foreground">{post.headline}</TableCell>
-                  <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
+                  <TableCell><PostBadge format={post.format as PostFormat} /></TableCell>
                   <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
