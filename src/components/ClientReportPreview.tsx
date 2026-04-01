@@ -193,8 +193,8 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     // ==========================================
     // POST DETAIL PAGES (1 per page)
     // ==========================================
-    // Pre-load post art images
-    const artImages: Map<string, string> = new Map();
+    // Pre-load post art images with dimensions
+    const artImages: Map<string, { src: string; width: number; height: number }> = new Map();
     await Promise.all(
       sortedPosts
         .filter((p) => p.artUrl)
@@ -211,7 +211,11 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             c.width = img.naturalWidth;
             c.height = img.naturalHeight;
             c.getContext("2d")!.drawImage(img, 0, 0);
-            artImages.set(p.id, c.toDataURL("image/jpeg", 0.85));
+            artImages.set(p.id, {
+              src: c.toDataURL("image/jpeg", 0.9),
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+            });
           } catch { /* skip */ }
         })
     );
@@ -219,6 +223,12 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     sortedPosts.forEach((post, idx) => {
       doc.addPage();
       addHeader();
+
+      const art = artImages.get(post.id);
+      const artBlockWidth = art ? 40 : 0;
+      const textWidth = contentWidth - artBlockWidth - (art ? 8 : 0);
+      const artX = pageWidth - margin - artBlockWidth;
+      const artY = 22;
 
       let y = 24;
 
@@ -241,16 +251,32 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...gray);
-      const headlineLines = doc.splitTextToSize(post.headline, contentWidth - (artImages.has(post.id) ? 45 : 0));
+      const headlineLines = doc.splitTextToSize(post.headline, textWidth);
       doc.text(headlineLines, margin, y);
+      const headlineBottom = y + headlineLines.length * 5.5;
 
-      // Art image (top-right area)
-      if (artImages.has(post.id)) {
-        const artSize = 35;
-        doc.addImage(artImages.get(post.id)!, "JPEG", pageWidth - margin - artSize, 22, artSize, artSize);
+      // Art image in its own reserved block
+      let artBottom = y;
+      if (art) {
+        const maxArtHeight = 46;
+        const aspectRatio = art.width / art.height;
+        let drawWidth = artBlockWidth;
+        let drawHeight = drawWidth / aspectRatio;
+
+        if (drawHeight > maxArtHeight) {
+          drawHeight = maxArtHeight;
+          drawWidth = drawHeight * aspectRatio;
+        }
+
+        const centeredArtX = artX + (artBlockWidth - drawWidth) / 2;
+
+        doc.setFillColor(248, 246, 240);
+        doc.roundedRect(artX - 1, artY - 1, artBlockWidth + 2, maxArtHeight + 2, 2, 2, "F");
+        doc.addImage(art.src, "JPEG", centeredArtX, artY, drawWidth, drawHeight);
+        artBottom = artY + maxArtHeight;
       }
 
-      y += headlineLines.length * 5.5 + 6;
+      y = Math.max(headlineBottom, artBottom) + 8;
 
       // Yellow divider
       doc.setFillColor(...yellow);
@@ -271,7 +297,6 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
 
       const detailBoxH = detailPairs.length * 8 + 6;
       doc.roundedRect(margin, y - 3, contentWidth, detailBoxH, 2, 2, "F");
-      // Yellow left accent on detail box
       doc.setFillColor(...yellow);
       doc.rect(margin, y - 3, 2, detailBoxH, "F");
 
