@@ -123,13 +123,14 @@ export default function Analysts() {
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" size="icon" onClick={() => { setEditingName(a); setEditValue(a); }}>
+                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setEditingName(a); setEditValue(a); }}>
                       <Pencil className="h-4 w-4 text-muted-foreground" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         removeAnalyst(a);
                         toast({ title: `${a} removido(a).` });
                       }}
