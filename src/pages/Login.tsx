@@ -69,11 +69,11 @@ export default function Login() {
           <div className="space-y-8">
             <div>
               <h2 className="text-4xl font-bold leading-tight text-white">
-                Planeje, organize e<br />
-                <span style={{ color: "#FDB600" }}>conquiste resultados.</span>
+                Planeje, crie e<br />
+                <span style={{ color: "#FDB600" }}>escale seus resultados.</span>
               </h2>
               <p className="mt-4 text-base text-white/60 max-w-md leading-relaxed">
-                A plataforma completa para gestão de conteúdo em redes sociais da sua agência.
+                Seu laboratório completo de gestão de conteúdo — do calendário editorial ao relatório de performance, tudo em um só lugar.
               </p>
             </div>
 
