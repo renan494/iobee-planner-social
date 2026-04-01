@@ -24,6 +24,12 @@ export default function ClientDetail() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showReport, setShowReport] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editInstagram, setEditInstagram] = useState("");
+  const [editFacebookUrl, setEditFacebookUrl] = useState("");
+  const [editObjective, setEditObjective] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
   const clientPosts = useMemo(() => posts.filter((p) => p.client === clientName), [posts, clientName]);
