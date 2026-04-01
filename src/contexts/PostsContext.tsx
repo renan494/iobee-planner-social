@@ -104,6 +104,11 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (!error) await fetchPosts();
   }, [fetchPosts]);
 
+  const updatePostArt = useCallback(async (postId: string, artUrl: string | null) => {
+    const { error } = await supabase.from("posts").update({ art_url: artUrl } as any).eq("id", postId);
+    if (!error) await fetchPosts();
+  }, [fetchPosts]);
+
   const deletePost = useCallback(async (postId: string) => {
     const { error } = await supabase.from("posts").delete().eq("id", postId);
     if (!error) await fetchPosts();
