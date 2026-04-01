@@ -204,6 +204,7 @@ export default function CreatePost() {
         legend: entry.content.trim() || undefined,
         artUrl,
         artUrls,
+        channels: entry.channels,
       });
     }
 
