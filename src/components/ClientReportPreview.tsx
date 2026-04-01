@@ -1,7 +1,8 @@
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Trash2, PenTool } from "lucide-react";
 import logoSvg from "@/assets/logo-iobee.svg";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
@@ -26,6 +27,7 @@ function formatDate(dateStr: string) {
 }
 
 export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick, onEditPost, onDeletePost }: ClientReportPreviewProps) {
+  const navigate = useNavigate();
   const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
 
   const handleDownloadPDF = async () => {
@@ -493,10 +495,16 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground">Preview do Relatório</h2>
-        <Button onClick={handleDownloadPDF} className="gap-2">
-          <Download className="h-4 w-4" />
-          Baixar PDF
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate(`/criar?client=${encodeURIComponent(clientName)}`)} className="gap-2">
+            <PenTool className="h-4 w-4" />
+            Produzir Conteúdo
+          </Button>
+          <Button onClick={handleDownloadPDF} className="gap-2">
+            <Download className="h-4 w-4" />
+            Baixar PDF
+          </Button>
+        </div>
       </div>
 
       {/* Preview document */}
