@@ -46,6 +46,7 @@ interface PostEntry {
   artFile: File | null;
   artPreviews: string[];
   artFiles: File[];
+  channels: string[];
   collapsed: boolean;
   draftId?: string;
 }
