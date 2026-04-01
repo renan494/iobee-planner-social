@@ -182,7 +182,7 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
 
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) { setEditingDate(false); setEditing(false); } }}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between pr-8">
             {editing ? (
