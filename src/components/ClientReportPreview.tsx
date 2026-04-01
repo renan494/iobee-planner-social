@@ -1,13 +1,16 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Download, Trash2, PenTool, Eye } from "lucide-react";
+import { Download, Trash2, PenTool, Eye, Calendar as CalendarIcon, Filter } from "lucide-react";
 import logoSvg from "@/assets/logo-iobee.svg";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { PostBadge } from "./PostBadge";
 import { FUNNEL_LABELS, FORMAT_LABELS, type Post, type PostFormat } from "@/data/posts";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -28,7 +31,16 @@ function formatDate(dateStr: string) {
 
 export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick, onEditPost, onDeletePost }: ClientReportPreviewProps) {
   const navigate = useNavigate();
-  const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
+
+  const allSorted = [...posts].sort((a, b) => a.date.localeCompare(b.date));
+  const sortedPosts = allSorted.filter((p) => {
+    if (dateFrom && p.date < format(dateFrom, "yyyy-MM-dd")) return false;
+    if (dateTo && p.date > format(dateTo, "yyyy-MM-dd")) return false;
+    return true;
+  });
+  const hasFilters = dateFrom || dateTo;
 
   const handleDownloadPDF = async () => {
     const doc = new jsPDF();
@@ -539,6 +551,38 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             Baixar PDF
           </Button>
         </div>
+      </div>
+
+      {/* Date filters */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <CalendarIcon className="h-4 w-4" />
+              {dateFrom ? format(dateFrom, "dd/MM/yy") : "De"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={ptBR} className={cn("p-3 pointer-events-auto")} />
+          </PopoverContent>
+        </Popover>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <CalendarIcon className="h-4 w-4" />
+              {dateTo ? format(dateTo, "dd/MM/yy") : "Até"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={ptBR} className={cn("p-3 pointer-events-auto")} />
+          </PopoverContent>
+        </Popover>
+        {hasFilters && (
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}>
+            Limpar filtros
+          </Button>
+        )}
       </div>
 
       {/* Preview document */}
