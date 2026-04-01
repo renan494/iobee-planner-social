@@ -61,7 +61,7 @@ export default function Login() {
             <img src={logo} alt="iOBEE" className="h-12 brightness-0 invert" />
             <p className="mt-2 text-sm font-medium tracking-wider uppercase"
               style={{ color: "#FDB600" }}>
-              Planner
+              Social Lab
             </p>
           </div>
 
