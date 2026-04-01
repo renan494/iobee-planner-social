@@ -86,6 +86,8 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       }
     };
 
+    const cleanAnalysts = analysts.map((name) => name.trim()).filter(Boolean);
+
     const formatSummary = (Object.entries(byFormat) as [PostFormat, number][])
       .filter(([, c]) => c > 0)
       .map(([f, c]) => `${FORMAT_LABELS[f]} · ${c}`)
@@ -140,14 +142,14 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     };
 
     const addFooter = (pageNum: number, totalPages: number) => {
-      doc.setFillColor(...dark);
+      doc.setFillColor(...body);
       doc.rect(0, pageHeight - 10, pageWidth, 10, "F");
 
       doc.setFillColor(...yellow);
       doc.rect(0, pageHeight - 10, pageWidth, 1.5, "F");
 
       doc.setFontSize(7);
-      doc.setTextColor(200, 195, 180);
+      doc.setTextColor(255, 249, 230);
       doc.text("iOBEE Social Lab · Relatório de Conteúdo", margin, pageHeight - 4);
       doc.text(`${pageNum}/${totalPages}`, pageWidth - margin, pageHeight - 4, { align: "right" });
     };
@@ -203,7 +205,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
 
     drawLabelValue("Posts no relatório", `${totalPosts}`, margin + 6, statsY + 8, cardW - 12);
     drawLabelValue("Período", dateSummary, margin + cardW + cardGap + 6, statsY + 8, cardW - 12);
-    drawLabelValue("Analistas", analysts.join(", ") || "—", margin + (cardW + cardGap) * 2 + 6, statsY + 8, cardW - 12);
+    drawLabelValue("Analistas", cleanAnalysts.join(", ") || "—", margin + (cardW + cardGap) * 2 + 6, statsY + 8, cardW - 12);
 
     const formatsY = statsY + 38;
     doc.setDrawColor(...yellow);
@@ -229,7 +231,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...body);
-    doc.text(`Base: ${totalPosts} posts • ${analysts.length} analista(s)`, pageWidth / 2, footerInfoY, { align: "center" });
+    doc.text(`Base: ${totalPosts} posts • ${cleanAnalysts.length} analista(s)`, pageWidth / 2, footerInfoY, { align: "center" });
     doc.setTextColor(...yellow);
     doc.text(format(new Date(), "MMMM 'de' yyyy", { locale: ptBR }), pageWidth / 2, footerInfoY + 8, { align: "center" });
 
