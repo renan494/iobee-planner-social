@@ -123,9 +123,14 @@ export default function Clients() {
         {clientStats.map((c) => (
           <Card key={c.name} className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => navigate(`/clientes/${encodeURIComponent(c.name)}`)}>
             <CardHeader className="flex flex-row items-center gap-3 pb-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
-                <User className="h-5 w-5 text-muted-foreground" />
-              </div>
+              <Avatar className="h-10 w-10">
+                {avatarUrls[c.name] ? (
+                  <AvatarImage src={avatarUrls[c.name]} alt={c.name} />
+                ) : null}
+                <AvatarFallback className="bg-secondary">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <CardTitle className="text-base">{c.name}</CardTitle>
                 <p className="text-xs text-muted-foreground">{c.total} posts</p>
