@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, FUNNEL_LABELS, type Post } from "@/data/posts";
+import { PostBadge } from "@/components/PostBadge";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
