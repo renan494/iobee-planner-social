@@ -433,6 +433,36 @@ function PostEntryForm({
             </div>
           </div>
 
+          {/* Channels */}
+          <div className="space-y-2">
+            <Label>Canais</Label>
+            <div className="flex flex-wrap gap-2">
+              {CHANNEL_OPTIONS.map((channel) => {
+                const selected = entry.channels.includes(channel);
+                return (
+                  <button
+                    key={channel}
+                    type="button"
+                    onClick={() => {
+                      const newChannels = selected
+                        ? entry.channels.filter((c) => c !== channel)
+                        : [...entry.channels, channel];
+                      onUpdate({ channels: newChannels });
+                    }}
+                    className={cn(
+                      "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                      selected
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                    )}
+                  >
+                    {channel}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Title */}
           <div className="space-y-2">
             <Label>Título *</Label>
