@@ -35,6 +35,10 @@ function getLabel(date: Date, viewMode: ViewMode): string {
       const qNum = Math.ceil((qs.getMonth() + 1) / 3);
       return `${qNum}º Trimestre ${format(qs, "yyyy")}`;
     }
+    case "semester": {
+      const semNum = date.getMonth() < 6 ? 1 : 2;
+      return `${semNum}º Semestre ${format(date, "yyyy")}`;
+    }
     case "year":
       return format(date, "yyyy");
   }
