@@ -101,56 +101,68 @@ export default function ClientDetail() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        {(Object.entries(byFormat) as [PostFormat, number][]).map(([fmt, count]) =>
-          count > 0 ? (
-            <Badge key={fmt} variant="secondary">{FORMAT_LABELS[fmt]}: {count}</Badge>
-          ) : null
-        )}
-        <span className="mx-2 text-muted-foreground">|</span>
-        {analysts.map((a) => (
-          <Badge key={a} variant="outline">{a}</Badge>
-        ))}
-      </div>
+      {showReport ? (
+        <ClientReportPreview
+          clientName={clientName}
+          posts={clientPosts}
+          analysts={analysts}
+          byFormat={byFormat}
+          avatarUrl={avatarUrl}
+        />
+      ) : (
+        <>
+          {/* Stats */}
+          <div className="mb-6 flex flex-wrap gap-2">
+            {(Object.entries(byFormat) as [PostFormat, number][]).map(([fmt, count]) =>
+              count > 0 ? (
+                <Badge key={fmt} variant="secondary">{FORMAT_LABELS[fmt]}: {count}</Badge>
+              ) : null
+            )}
+            <span className="mx-2 text-muted-foreground">|</span>
+            {analysts.map((a) => (
+              <Badge key={a} variant="outline">{a}</Badge>
+            ))}
+          </div>
 
-      {/* Posts table */}
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Título</TableHead>
-                <TableHead>Headline</TableHead>
-                <TableHead>Formato</TableHead>
-                <TableHead>Funil</TableHead>
-                <TableHead>Analista</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clientPosts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    Nenhum post encontrado para este cliente.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                clientPosts.map((post) => (
-                  <TableRow key={post.id}>
-                    <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
-                    <TableCell className="font-medium">{post.title}</TableCell>
-                    <TableCell className="text-muted-foreground">{post.headline}</TableCell>
-                    <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
-                    <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
-                    <TableCell>{post.analyst}</TableCell>
+          {/* Posts table */}
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Título</TableHead>
+                    <TableHead>Headline</TableHead>
+                    <TableHead>Formato</TableHead>
+                    <TableHead>Funil</TableHead>
+                    <TableHead>Analista</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {clientPosts.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                        Nenhum post encontrado para este cliente.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    clientPosts.map((post) => (
+                      <TableRow key={post.id}>
+                        <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
+                        <TableCell className="font-medium">{post.title}</TableCell>
+                        <TableCell className="text-muted-foreground">{post.headline}</TableCell>
+                        <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
+                        <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
+                        <TableCell>{post.analyst}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
