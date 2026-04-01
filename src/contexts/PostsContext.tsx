@@ -99,6 +99,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       art_url: post.artUrl || null,
       art_urls: post.artUrls || [],
       channels: post.channels || [],
+      reference: post.reference || null,
     } as any);
     if (!error) await fetchPosts();
   }, [fetchPosts]);
