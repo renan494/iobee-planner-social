@@ -400,9 +400,9 @@ function PostEntryForm({
           {/* Format, Funnel & Date */}
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label>Tipo do Post *</Label>
+              <Label>Formato *</Label>
               <Select value={entry.postFormat} onValueChange={(v) => onUpdate({ postFormat: v as PostFormat })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione o formato" /></SelectTrigger>
                 <SelectContent>
                   {(Object.entries(FORMAT_LABELS) as [PostFormat, string][]).map(([k, v]) => (
                     <SelectItem key={k} value={k}>{v}</SelectItem>
