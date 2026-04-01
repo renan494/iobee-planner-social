@@ -38,13 +38,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid } from "lucide-react";
+import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid, Plus } from "lucide-react";
 import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
+import { useNavigate } from "react-router-dom";
 import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
 import { cn } from "@/lib/utils";
 
 export default function CalendarPage() {
+  const routerNavigate = useNavigate();
   const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost, deletePost } = usePosts();
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
   const [viewMode, setViewMode] = useState<ViewMode>("month");
@@ -189,30 +191,10 @@ export default function CalendarPage() {
           onNext={() => navigate(1)}
           onToday={() => setCurrentDate(new Date())}
         />
-        <div className="flex items-center gap-2">
-          <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5">
-            <Upload className="h-4 w-4" />
-            <span className="hidden sm:inline">Importar</span>
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="outline" className="gap-1.5">
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Exportar</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => exportToPDF(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
-                <FileText className="mr-2 h-4 w-4" />
-                Exportar PDF
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => exportToExcel(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
-                <FileSpreadsheet className="mr-2 h-4 w-4" />
-                Exportar Excel
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <Button onClick={() => routerNavigate("/criar")} className="gap-2 font-semibold">
+          <Plus className="h-4 w-4" />
+          Produzir Conteúdo
+        </Button>
       </div>
 
       {/* Row 2: Filters */}
@@ -273,9 +255,33 @@ export default function CalendarPage() {
         renderView()
       )}
 
-      {/* Legend below calendar */}
-      <div className="flex items-center pt-2">
+      {/* Legend + Import/Export below calendar */}
+      <div className="flex items-center justify-between pt-2">
         <FormatLegend />
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5">
+            <Upload className="h-4 w-4" />
+            Importar
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="outline" className="gap-1.5">
+                <Download className="h-4 w-4" />
+                Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => exportToPDF(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Exportar PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportToExcel(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                Exportar Excel
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} onDeletePost={async (id) => { await deletePost(id); setModalOpen(false); }} />
