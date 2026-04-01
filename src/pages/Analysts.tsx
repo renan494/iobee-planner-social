@@ -92,7 +92,8 @@ export default function Analysts() {
           return (
             <div
               key={a}
-              className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm"
+              className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
+              onClick={() => !isEditing && navigate(`/analistas/${encodeURIComponent(a)}`)}
             >
               {isEditing ? (
                 <Input
