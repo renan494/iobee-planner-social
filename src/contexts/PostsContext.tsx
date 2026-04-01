@@ -48,6 +48,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
         artUrl: (row as any).art_url ?? undefined,
         artUrls: (row as any).art_urls ?? [],
         channels: (row as any).channels ?? [],
+        reference: (row as any).reference ?? undefined,
       }));
       setPosts(mapped);
     }
