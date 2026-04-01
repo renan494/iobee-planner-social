@@ -54,7 +54,7 @@ export function CalendarListView({ posts, onPostClick }: CalendarListViewProps) 
                   <TableCell className="font-medium">{post.client}</TableCell>
                   <TableCell className="font-medium">{post.title}</TableCell>
                   <TableCell className="text-muted-foreground">{post.headline}</TableCell>
-                  <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
+                  <TableCell><PostBadge format={post.format as PostFormat} /></TableCell>
                   <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
