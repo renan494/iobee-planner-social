@@ -29,71 +29,139 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 16;
+    const contentWidth = pageWidth - margin * 2;
 
     // Brand colors
-    const brandYellow: [number, number, number] = [253, 182, 0]; // #FDB600
-    const brandDark: [number, number, number] = [20, 15, 0]; // #140F00
+    const yellow: [number, number, number] = [253, 182, 0];
+    const dark: [number, number, number] = [20, 15, 0];
+    const warmBg: [number, number, number] = [255, 249, 230];
+    const gray: [number, number, number] = [120, 115, 100];
 
-    // Load logo as image
-    let logoImg: HTMLImageElement | null = null;
+    // Convert SVG logo to a canvas-rendered PNG for reliable embedding
+    let logoDataUrl: string | null = null;
+    let logoAspect = 1;
     try {
       const img = new Image();
-      img.crossOrigin = "anonymous";
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = reject;
         img.src = logoSvg;
       });
-      logoImg = img;
+      const canvas = document.createElement("canvas");
+      canvas.width = 600;
+      canvas.height = Math.round(600 * (img.naturalHeight / img.naturalWidth));
+      logoAspect = img.naturalHeight / img.naturalWidth;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      logoDataUrl = canvas.toDataURL("image/png");
     } catch { /* proceed without logo */ }
 
-    const addHeader = (doc: jsPDF) => {
-      // Yellow top bar
-      doc.setFillColor(...brandYellow);
-      doc.rect(0, 0, pageWidth, 8, "F");
-
-      // Logo on top-right
-      if (logoImg) {
-        const logoW = 35;
-        const logoH = logoW * (logoImg.naturalHeight / logoImg.naturalWidth);
-        doc.addImage(logoImg, "SVG", pageWidth - logoW - 14, 12, logoW, logoH);
+    const drawLogo = (x: number, y: number, w: number) => {
+      if (logoDataUrl) {
+        doc.addImage(logoDataUrl, "PNG", x, y, w, w * logoAspect);
       }
     };
 
-    const addFooter = (doc: jsPDF, pageNum: number, totalPages: number) => {
-      doc.setFillColor(...brandYellow);
-      doc.rect(0, pageHeight - 6, pageWidth, 6, "F");
-      doc.setFontSize(7);
-      doc.setTextColor(...brandDark);
-      doc.text(`iOBEE · Relatório de ${clientName}`, 14, pageHeight - 9);
-      doc.text(`Página ${pageNum} de ${totalPages}`, pageWidth - 14, pageHeight - 9, { align: "right" });
+    const addHeader = () => {
+      // Top accent bar
+      doc.setFillColor(...yellow);
+      doc.rect(0, 0, pageWidth, 3, "F");
+      // Logo top-right
+      drawLogo(pageWidth - 40, 6, 30);
+      // Thin line under header area
+      doc.setDrawColor(240, 235, 220);
+      doc.setLineWidth(0.3);
+      doc.line(margin, 18, pageWidth - margin, 18);
     };
 
-    // --- PAGE 1: Cover + Summary Table ---
-    addHeader(doc);
+    const addFooter = (pageNum: number, totalPages: number) => {
+      // Bottom bar
+      doc.setFillColor(...dark);
+      doc.rect(0, pageHeight - 10, pageWidth, 10, "F");
+      // Yellow accent line
+      doc.setFillColor(...yellow);
+      doc.rect(0, pageHeight - 10, pageWidth, 1.5, "F");
+      // Footer text
+      doc.setFontSize(7);
+      doc.setTextColor(200, 195, 180);
+      doc.text("iOBEE · Social Media Intelligence", margin, pageHeight - 4);
+      doc.text(`${pageNum}/${totalPages}`, pageWidth - margin, pageHeight - 4, { align: "right" });
+    };
 
-    doc.setFontSize(22);
+    // ==========================================
+    // PAGE 1: COVER
+    // ==========================================
+    // Full yellow header block
+    doc.setFillColor(...yellow);
+    doc.rect(0, 0, pageWidth, 80, "F");
+
+    // Logo centered on yellow
+    drawLogo(pageWidth / 2 - 25, 15, 50);
+
+    // Client name on the yellow band
+    doc.setFontSize(28);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(...brandDark);
-    doc.text(clientName, 14, 35);
+    doc.setTextColor(...dark);
+    doc.text(clientName.toUpperCase(), pageWidth / 2, 62, { align: "center" });
+
+    // Subtitle below yellow
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...gray);
+    doc.text("RELATÓRIO DE CONTEÚDO", pageWidth / 2, 92, { align: "center" });
+
+    // Info box
+    const boxY = 105;
+    doc.setFillColor(...warmBg);
+    doc.roundedRect(margin, boxY, contentWidth, 30, 3, 3, "F");
 
     doc.setFontSize(10);
+    doc.setTextColor(...dark);
+    const infoCol1X = margin + 8;
+    const infoCol2X = pageWidth / 2 + 8;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Total de posts:", infoCol1X, boxY + 10);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 100, 100);
-    doc.text(`${posts.length} posts · ${analysts.length} analista(s)`, 14, 43);
-    doc.text(`Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, 14, 49);
+    doc.text(`${posts.length}`, infoCol1X + 35, boxY + 10);
 
-    doc.setTextColor(...brandDark);
-    doc.setFontSize(9);
-    const statsLine = (Object.entries(byFormat) as [PostFormat, number][])
-      .filter(([, count]) => count > 0)
-      .map(([fmt, count]) => `${FORMAT_LABELS[fmt]}: ${count}`)
+    doc.setFont("helvetica", "bold");
+    doc.text("Analista(s):", infoCol2X, boxY + 10);
+    doc.setFont("helvetica", "normal");
+    doc.text(analysts.join(", "), infoCol2X + 28, boxY + 10);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Formatos:", infoCol1X, boxY + 20);
+    doc.setFont("helvetica", "normal");
+    const fmtText = (Object.entries(byFormat) as [PostFormat, number][])
+      .filter(([, c]) => c > 0)
+      .map(([f, c]) => `${FORMAT_LABELS[f]}: ${c}`)
       .join("  ·  ");
-    doc.text(statsLine, 14, 58);
+    doc.text(fmtText, infoCol1X + 23, boxY + 20);
 
-    // Summary table
+    doc.setFont("helvetica", "bold");
+    doc.text("Gerado em:", infoCol2X, boxY + 20);
+    doc.setFont("helvetica", "normal");
+    doc.text(format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }), infoCol2X + 26, boxY + 20);
+
+    // ==========================================
+    // PAGE 2: SUMMARY TABLE
+    // ==========================================
+    doc.addPage();
+    addHeader();
+
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...dark);
+    doc.text("RESUMO DE POSTS", margin, 28);
+
+    // Yellow underline for section title
+    doc.setFillColor(...yellow);
+    doc.rect(margin, 30, 45, 1.5, "F");
+
     autoTable(doc, {
-      startY: 65,
+      startY: 38,
       head: [["Data", "Título", "Headline", "Formato", "Funil", "Analista"]],
       body: sortedPosts.map((p) => [
         formatDate(p.date),
@@ -103,98 +171,122 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         FUNNEL_LABELS[p.funnelStage],
         p.analyst,
       ]),
-      styles: { fontSize: 8, cellPadding: 4 },
-      headStyles: { fillColor: brandDark, textColor: 255, fontStyle: "bold" },
-      alternateRowStyles: { fillColor: [255, 251, 235] },
-      margin: { left: 14, right: 14 },
+      styles: { fontSize: 8, cellPadding: 4, textColor: dark },
+      headStyles: { fillColor: dark, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8 },
+      alternateRowStyles: { fillColor: warmBg },
+      margin: { left: margin, right: margin },
+      columnStyles: {
+        0: { cellWidth: 22 },
+        3: { cellWidth: 22 },
+        4: { cellWidth: 18 },
+      },
     });
 
-    // --- 1 POST PER PAGE ---
-    const totalPages = 1 + sortedPosts.length;
-
-    sortedPosts.forEach((post) => {
+    // ==========================================
+    // POST DETAIL PAGES (1 per page)
+    // ==========================================
+    sortedPosts.forEach((post, idx) => {
       doc.addPage();
-      addHeader(doc);
+      addHeader();
 
-      let y = 30;
+      let y = 24;
+
+      // Post number badge
+      doc.setFillColor(...yellow);
+      doc.roundedRect(margin, y - 4, 18, 8, 2, 2, "F");
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...dark);
+      doc.text(`${idx + 1}/${sortedPosts.length}`, margin + 9, y + 1, { align: "center" });
 
       // Title
-      doc.setFontSize(16);
+      doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(...brandDark);
-      doc.text(post.title, 14, y);
-      y += 9;
+      doc.setTextColor(...dark);
+      doc.text(post.title, margin + 22, y + 1);
+      y += 12;
 
       // Headline
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(100, 100, 100);
-      const headlineLines = doc.splitTextToSize(post.headline, pageWidth - 28);
-      doc.text(headlineLines, 14, y);
-      y += headlineLines.length * 6 + 6;
+      doc.setTextColor(...gray);
+      const headlineLines = doc.splitTextToSize(post.headline, contentWidth);
+      doc.text(headlineLines, margin, y);
+      y += headlineLines.length * 5.5 + 6;
 
-      // Divider
-      doc.setDrawColor(...brandYellow);
-      doc.setLineWidth(0.8);
-      doc.line(14, y, pageWidth - 14, y);
+      // Yellow divider
+      doc.setFillColor(...yellow);
+      doc.rect(margin, y, contentWidth, 1, "F");
       y += 8;
 
-      // Details
-      doc.setFontSize(9);
-      doc.setTextColor(...brandDark);
-      doc.setFont("helvetica", "bold");
-
-      const detailPairs = [
-        ["Data", formatDate(post.date)],
-        ["Formato", FORMAT_LABELS[post.format]],
-        ["Funil", FUNNEL_LABELS[post.funnelStage]],
-        ["Analista", post.analyst],
+      // Details in a styled grid
+      doc.setFillColor(...warmBg);
+      const detailPairs: [string, string][] = [
+        ["📅  Data", formatDate(post.date)],
+        ["📋  Formato", FORMAT_LABELS[post.format]],
+        ["🎯  Funil", FUNNEL_LABELS[post.funnelStage]],
+        ["👤  Analista", post.analyst],
       ];
       if (post.channels && post.channels.length > 0) {
-        detailPairs.push(["Canais", post.channels.join(", ")]);
+        detailPairs.push(["📱  Canais", post.channels.join(", ")]);
       }
 
+      const detailBoxH = detailPairs.length * 8 + 6;
+      doc.roundedRect(margin, y - 3, contentWidth, detailBoxH, 2, 2, "F");
+
+      doc.setFontSize(9);
       detailPairs.forEach(([label, value]) => {
         doc.setFont("helvetica", "bold");
-        doc.text(`${label}:`, 14, y);
+        doc.setTextColor(...dark);
+        doc.text(label, margin + 5, y + 3);
         doc.setFont("helvetica", "normal");
-        doc.text(value, 45, y);
-        y += 7;
+        doc.setTextColor(...gray);
+        doc.text(value, margin + 42, y + 3);
+        y += 8;
       });
+      y += 6;
 
       // Hashtags
       if (post.hashtags.length > 0) {
-        y += 3;
         doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(...brandYellow);
+        doc.setTextColor(...yellow);
         const hashText = post.hashtags.map((h) => "#" + h).join("  ");
-        const hashLines = doc.splitTextToSize(hashText, pageWidth - 28);
-        doc.text(hashLines, 14, y);
+        const hashLines = doc.splitTextToSize(hashText, contentWidth);
+        doc.text(hashLines, margin, y);
         y += hashLines.length * 5 + 6;
       }
 
-      // Legend
+      // Legend / copy
       if (post.legend) {
         y += 2;
-        // Background box
-        doc.setFillColor(255, 251, 235);
-        const legendLines = doc.splitTextToSize(post.legend, pageWidth - 36);
-        const boxH = legendLines.length * 5 + 10;
-        doc.roundedRect(14, y - 4, pageWidth - 28, boxH, 2, 2, "F");
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...dark);
+        doc.text("LEGENDA / CONTEÚDO", margin, y);
+        y += 5;
+
+        // Yellow left-border accent box
+        const legendLines = doc.splitTextToSize(post.legend, contentWidth - 14);
+        const boxH = legendLines.length * 4.5 + 8;
+
+        doc.setFillColor(...warmBg);
+        doc.roundedRect(margin, y - 3, contentWidth, boxH, 2, 2, "F");
+        doc.setFillColor(...yellow);
+        doc.rect(margin, y - 3, 2.5, boxH, "F");
 
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(60, 55, 40);
-        doc.text(legendLines, 18, y + 2);
+        doc.setTextColor(50, 45, 35);
+        doc.text(legendLines, margin + 7, y + 2);
       }
     });
 
-    // Add footers to all pages
+    // Add headers & footers to all pages (skip cover header)
     const total = doc.getNumberOfPages();
     for (let i = 1; i <= total; i++) {
       doc.setPage(i);
-      addFooter(doc, i, total);
+      addFooter(i, total);
     }
 
     doc.save(`relatorio-${clientName.toLowerCase().replace(/\s+/g, "-")}.pdf`);
