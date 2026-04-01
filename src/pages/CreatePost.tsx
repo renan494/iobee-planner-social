@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { usePosts } from "@/contexts/PostsContext";
-import { FORMAT_LABELS, FUNNEL_LABELS } from "@/data/posts";
+import { FORMAT_LABELS, FUNNEL_LABELS, CHANNEL_OPTIONS } from "@/data/posts";
 import type { PostFormat, FunnelStage } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { useActivity } from "@/contexts/ActivityContext";
