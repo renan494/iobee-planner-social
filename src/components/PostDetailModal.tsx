@@ -61,6 +61,26 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
   const postDate = new Date(post.date + "T12:00:00");
   const dateFormatted = format(postDate, "dd 'de' MMMM, yyyy", { locale: ptBR });
 
+  const handleArtUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !onUpdateArt) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${post.id}-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("post-arts").upload(path, file);
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from("post-arts").getPublicUrl(path);
+      await onUpdateArt(post.id, urlData.publicUrl);
+      toast({ title: "Arte atualizada", description: "A arte do post foi alterada com sucesso." });
+    } catch {
+      toast({ title: "Erro", description: "Não foi possível enviar a arte.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const handleDateChange = (newDate: Date | undefined) => {
     if (!newDate || !onUpdateDate) return;
     const formatted = format(newDate, "yyyy-MM-dd");
