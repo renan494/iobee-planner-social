@@ -12,11 +12,11 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { PostFormat } from "@/data/posts";
 
-const FORMAT_CONFIG: Record<PostFormat, { label: string; icon: typeof Image; color: string }> = {
-  static: { label: "Estáticos", icon: Image, color: "bg-[hsl(var(--format-static))]" },
-  carousel: { label: "Carrosséis", icon: BarChart3, color: "bg-[hsl(var(--format-carousel))]" },
-  reels: { label: "Reels", icon: Clapperboard, color: "bg-[hsl(var(--format-reels))]" },
-  stories: { label: "Stories", icon: MessageCircle, color: "bg-[hsl(var(--format-stories))]" },
+const FORMAT_CONFIG: Record<PostFormat, { label: string; subtitle: string; icon: typeof Image; color: string }> = {
+  static: { label: "Estáticos", subtitle: "posts criados", icon: Image, color: "bg-[hsl(var(--format-static))]" },
+  carousel: { label: "Carrosséis", subtitle: "carrosséis criados", icon: BarChart3, color: "bg-[hsl(var(--format-carousel))]" },
+  reels: { label: "Reels", subtitle: "reels criados", icon: Clapperboard, color: "bg-[hsl(var(--format-reels))]" },
+  stories: { label: "Stories", subtitle: "stories criados", icon: MessageCircle, color: "bg-[hsl(var(--format-stories))]" },
 };
 
 export default function Dashboard() {
@@ -85,7 +85,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-foreground">{formatCounts[key]}</div>
-                <p className="mt-1 text-xs text-muted-foreground">posts criados</p>
+                <p className="mt-1 text-xs text-muted-foreground">{cfg.subtitle}</p>
               </CardContent>
             </Card>
           );
