@@ -163,7 +163,21 @@ export default function CreatePost() {
     const posts = [];
     for (const entry of entries) {
       let artUrl: string | undefined;
-      if (entry.artFile) {
+      let artUrls: string[] = [];
+
+      if (entry.postFormat === "carousel" && entry.artFiles.length > 0) {
+        // Upload multiple carousel arts
+        for (const file of entry.artFiles) {
+          const ext = file.name.split(".").pop();
+          const path = `${crypto.randomUUID()}.${ext}`;
+          const { error: uploadErr } = await supabase.storage.from("post-arts").upload(path, file);
+          if (!uploadErr) {
+            const { data: urlData } = supabase.storage.from("post-arts").getPublicUrl(path);
+            artUrls.push(urlData.publicUrl);
+          }
+        }
+        artUrl = artUrls[0]; // First image as main art
+      } else if (entry.artFile) {
         const ext = entry.artFile.name.split(".").pop();
         const path = `${crypto.randomUUID()}.${ext}`;
         const { error: uploadErr } = await supabase.storage.from("post-arts").upload(path, entry.artFile);
@@ -172,6 +186,7 @@ export default function CreatePost() {
           artUrl = urlData.publicUrl;
         }
       }
+
       posts.push({
         client: entry.client === "__new__" ? entry.newClient.trim() : entry.client,
         analyst: entry.analyst === "__new__" ? entry.newAnalyst.trim() : entry.analyst,
@@ -183,6 +198,7 @@ export default function CreatePost() {
         hashtags: entry.hashtags,
         legend: entry.content.trim() || undefined,
         artUrl,
+        artUrls,
       });
     }
 
