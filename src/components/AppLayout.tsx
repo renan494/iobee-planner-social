@@ -14,6 +14,10 @@ export function AppLayout() {
           <main className="flex-1 overflow-auto">
             <Outlet />
           </main>
+          <footer className="border-t bg-card/60 px-6 py-3 text-xs text-muted-foreground flex items-center justify-between">
+            <span>iOBEE © {new Date().getFullYear()}</span>
+            <span>© {new Date().getFullYear()} iOBEE – Agência de Marketing Digital e Growth. Todos os direitos reservados.</span>
+          </footer>
         </div>
       </div>
     </SidebarProvider>
