@@ -46,6 +46,7 @@ import type { ViewMode } from "@/types/calendar";
 import { cn } from "@/lib/utils";
 
 export default function CalendarPage() {
+  const navigate = useNavigate();
   const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost, deletePost } = usePosts();
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
   const [viewMode, setViewMode] = useState<ViewMode>("month");
