@@ -14,13 +14,14 @@ interface ClientReportPreviewProps {
   analysts: string[];
   byFormat: Record<PostFormat, number>;
   avatarUrl: string | null;
+  onPostClick?: (post: Post) => void;
 }
 
 function formatDate(dateStr: string) {
   return format(new Date(dateStr + "T12:00:00"), "dd/MM/yyyy");
 }
 
-export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl }: ClientReportPreviewProps) {
+export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick }: ClientReportPreviewProps) {
   const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
 
   const handleDownloadPDF = () => {
@@ -161,7 +162,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
                 </thead>
                 <tbody>
                   {sortedPosts.map((post, i) => (
-                    <tr key={post.id} className={i % 2 === 0 ? "bg-white" : "bg-muted/20"}>
+                    <tr key={post.id} className={`${i % 2 === 0 ? "bg-white" : "bg-muted/20"} ${onPostClick ? "cursor-pointer hover:bg-muted/40" : ""}`} onClick={() => onPostClick?.(post)}>
                       <td className="px-3 py-2 whitespace-nowrap">{formatDate(post.date)}</td>
                       <td className="px-3 py-2 font-medium">{post.title}</td>
                       <td className="px-3 py-2"><PostBadge format={post.format} /></td>
@@ -181,7 +182,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Detalhes por Post</h3>
             <div className="space-y-6">
               {sortedPosts.map((post) => (
-                <div key={post.id} className="rounded-lg border border-border p-5 space-y-3">
+                <div key={post.id} className={`rounded-lg border border-border p-5 space-y-3 ${onPostClick ? "cursor-pointer hover:border-primary/50 transition-colors" : ""}`} onClick={() => onPostClick?.(post)}>
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h4 className="font-semibold text-foreground">{post.title}</h4>

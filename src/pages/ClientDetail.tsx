@@ -8,15 +8,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { usePosts } from "@/contexts/PostsContext";
 import { supabase } from "@/integrations/supabase/client";
-import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage } from "@/data/posts";
+import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage, type Post } from "@/data/posts";
 import { toast } from "sonner";
 import { ClientReportPreview } from "@/components/ClientReportPreview";
+import { PostDetailModal } from "@/components/PostDetailModal";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
-  const { posts } = usePosts();
+  const { posts, updatePostDate, updatePostArt, updatePost } = usePosts();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showReport, setShowReport] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
@@ -108,6 +110,7 @@ export default function ClientDetail() {
           analysts={analysts}
           byFormat={byFormat}
           avatarUrl={avatarUrl}
+          onPostClick={(post) => setSelectedPost(post)}
         />
       ) : (
         <>
@@ -147,7 +150,7 @@ export default function ClientDetail() {
                     </TableRow>
                   ) : (
                     clientPosts.map((post) => (
-                      <TableRow key={post.id}>
+                      <TableRow key={post.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedPost(post)}>
                         <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
                         <TableCell className="font-medium">{post.title}</TableCell>
                         <TableCell className="text-muted-foreground">{post.headline}</TableCell>
@@ -163,6 +166,15 @@ export default function ClientDetail() {
           </Card>
         </>
       )}
+
+      <PostDetailModal
+        post={selectedPost}
+        open={!!selectedPost}
+        onOpenChange={(o) => { if (!o) setSelectedPost(null); }}
+        onUpdateDate={(id, date) => { updatePostDate(id, date); setSelectedPost((p) => p ? { ...p, date } : null); }}
+        onUpdateArt={async (id, url) => { await updatePostArt(id, url); setSelectedPost((p) => p ? { ...p, artUrl: url ?? undefined } : null); }}
+        onUpdatePost={async (id, fields) => { await updatePost(id, fields); setSelectedPost((p) => p ? { ...p, ...fields } : null); }}
+      />
     </div>
   );
 }
