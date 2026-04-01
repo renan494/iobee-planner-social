@@ -23,6 +23,7 @@ interface PostDetailModalProps {
   onUpdateDate?: (postId: string, newDate: string) => void;
   onUpdateArt?: (postId: string, artUrl: string | null) => Promise<void>;
   onUpdatePost?: (postId: string, fields: Partial<Omit<Post, "id">>) => Promise<void>;
+  onDeletePost?: (postId: string) => Promise<void>;
 }
 
 function PhoneMockup({
