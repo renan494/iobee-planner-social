@@ -70,7 +70,7 @@ export default function ClientDetail() {
         </Button>
         {!showReport && clientPosts.length > 0 && (
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setShowReport(true)}>
-            <FileText className="h-4 w-4" /> Gerar Relatório
+            <Eye className="h-4 w-4" /> Ver Posts
           </Button>
         )}
       </div>
