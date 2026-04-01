@@ -244,9 +244,9 @@ export default function CalendarPage() {
       </div>
 
       {/* Row 3: View mode + Legend + Layout toggle */}
+      {/* Row 3: View mode + Layout toggle */}
       <div className="flex items-center gap-3">
         <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
-        <FormatLegend />
         <div className="ml-auto flex items-center rounded-lg border border-border p-0.5">
           <Button
             variant={layoutMode === "calendar" ? "default" : "ghost"}
@@ -272,6 +272,11 @@ export default function CalendarPage() {
       ) : (
         renderView()
       )}
+
+      {/* Legend below calendar */}
+      <div className="flex items-center justify-center pt-2">
+        <FormatLegend />
+      </div>
 
       <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} onDeletePost={async (id) => { await deletePost(id); setModalOpen(false); }} />
       <ImportModal
