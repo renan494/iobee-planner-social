@@ -46,6 +46,9 @@ export default function CalendarPage() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
+  const [layoutMode, setLayoutMode] = useState<"calendar" | "list">("calendar");
 
   const availableClients = useMemo(() => {
     if (selectedAnalyst === "all") return clients;
