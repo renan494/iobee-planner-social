@@ -37,6 +37,24 @@ export default function Clients() {
 
   const [saving, setSaving] = useState(false);
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("client-avatars").upload(path, file);
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("client-avatars").getPublicUrl(path);
+      setAvatarPreview(urlData.publicUrl);
+    } catch {
+      toast({ title: "Erro", description: "Não foi possível enviar a foto.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleAddClient = async () => {
     const trimmed = newClientName.trim();
     if (!trimmed) return;
@@ -48,15 +66,17 @@ export default function Clients() {
     try {
       await addClient({
         name: trimmed,
-        monthlyPosts: parseInt(newMonthlyPosts) || 0,
+        instagramHandle: newInstagram.trim() || undefined,
+        facebookUrl: newFacebookUrl.trim() || undefined,
         objective: newObjective.trim() || undefined,
-        goal: newGoal.trim() || undefined,
+        avatarUrl: avatarPreview || undefined,
       });
       toast({ title: "Cliente cadastrado", description: `"${trimmed}" foi adicionado com sucesso.` });
       setNewClientName("");
-      setNewMonthlyPosts("");
+      setNewInstagram("");
+      setNewFacebookUrl("");
       setNewObjective("");
-      setNewGoal("");
+      setAvatarPreview(null);
       setDialogOpen(false);
     } catch (err) {
       toast({ title: "Erro", description: "Não foi possível cadastrar o cliente.", variant: "destructive" });
