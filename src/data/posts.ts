@@ -20,6 +20,7 @@ export interface Post {
 export const CHANNEL_OPTIONS = [
   "Instagram",
   "Facebook",
+  "GMB",
   "TikTok",
   "LinkedIn",
   "X",
