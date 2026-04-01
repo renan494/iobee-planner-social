@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Download } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import logoSvg from "@/assets/logo-iobee.svg";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
@@ -17,13 +17,15 @@ interface ClientReportPreviewProps {
   byFormat: Record<PostFormat, number>;
   avatarUrl: string | null;
   onPostClick?: (post: Post) => void;
+  onEditPost?: (post: Post) => void;
+  onDeletePost?: (postId: string) => Promise<void>;
 }
 
 function formatDate(dateStr: string) {
   return format(new Date(dateStr + "T12:00:00"), "dd/MM/yyyy");
 }
 
-export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick }: ClientReportPreviewProps) {
+export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick, onEditPost, onDeletePost }: ClientReportPreviewProps) {
   const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
 
   const handleDownloadPDF = async () => {
@@ -555,8 +557,35 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             <div className="space-y-6">
               {sortedPosts.map((post) => (
                 <div key={post.id} className={`group relative rounded-lg border border-border p-5 space-y-3 ${onPostClick ? "cursor-pointer hover:border-primary/50 hover:shadow-md transition-all" : ""}`} onClick={() => onPostClick?.(post)}>
-                  {onPostClick && (
-                    <Pencil className="absolute -left-6 top-4 h-3.5 w-3.5 text-muted-foreground/25 group-hover:text-primary transition-colors" />
+                  {/* Edit & Delete buttons */}
+                  {(onEditPost || onDeletePost) && (
+                    <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                      {onEditPost && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => { e.stopPropagation(); onEditPost(post); }}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {onDeletePost && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (window.confirm("Tem certeza que deseja excluir este post?")) {
+                              await onDeletePost(post.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   )}
                   <div className="flex items-start justify-between gap-4">
                     <div>

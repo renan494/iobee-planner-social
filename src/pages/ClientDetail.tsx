@@ -159,6 +159,8 @@ export default function ClientDetail() {
           byFormat={byFormat}
           avatarUrl={avatarUrl}
           onPostClick={(post) => setSelectedPost(post)}
+          onEditPost={(post) => setSelectedPost(post)}
+          onDeletePost={async (id) => { await deletePost(id); }}
         />
       ) : (
         <>
