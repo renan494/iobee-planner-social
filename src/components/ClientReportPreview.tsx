@@ -194,42 +194,113 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     // ==========================================
     // POST DETAIL PAGES (1 per page)
     // ==========================================
-    // Pre-load post art images with dimensions
-    const artImages: Map<string, { src: string; width: number; height: number }> = new Map();
+    // Pre-load ALL art images (single + carousel) with high quality
+    const artImages: Map<string, { src: string; width: number; height: number }[]> = new Map();
     await Promise.all(
-      sortedPosts
-        .filter((p) => p.artUrl)
-        .map(async (p) => {
+      sortedPosts.map(async (p) => {
+        const urls: string[] = [];
+        if (p.format === "carousel" && p.artUrls && p.artUrls.length > 0) {
+          urls.push(...p.artUrls);
+        } else if (p.artUrl) {
+          urls.push(p.artUrl);
+        }
+        if (urls.length === 0) return;
+
+        const loaded: { src: string; width: number; height: number }[] = [];
+        for (const url of urls) {
           try {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise<void>((resolve, reject) => {
               img.onload = () => resolve();
               img.onerror = reject;
-              img.src = p.artUrl!;
+              img.src = url;
             });
+            // High-res canvas for quality
+            const scale = 2;
             const c = document.createElement("canvas");
-            c.width = img.naturalWidth;
-            c.height = img.naturalHeight;
-            c.getContext("2d")!.drawImage(img, 0, 0);
-            artImages.set(p.id, {
-              src: c.toDataURL("image/jpeg", 0.9),
+            c.width = img.naturalWidth * scale;
+            c.height = img.naturalHeight * scale;
+            const ctx = c.getContext("2d")!;
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+            loaded.push({
+              src: c.toDataURL("image/png"),
               width: img.naturalWidth,
               height: img.naturalHeight,
             });
           } catch { /* skip */ }
-        })
+        }
+        if (loaded.length > 0) artImages.set(p.id, loaded);
+      })
     );
+
+    // Helper: draw phone mockup frame
+    const drawPhoneMockup = (
+      doc: jsPDF,
+      imgSrc: string,
+      imgW: number,
+      imgH: number,
+      phoneX: number,
+      phoneY: number,
+      phoneWidth: number
+    ): number => {
+      const aspectRatio = imgH / imgW;
+      const screenWidth = phoneWidth - 4; // padding inside phone frame
+      const screenHeight = screenWidth * (16 / 9); // 9:16 aspect
+      const phoneHeight = screenHeight + 12; // top notch + bottom indicator
+
+      // Phone body (dark rounded rect)
+      doc.setFillColor(30, 30, 30);
+      doc.roundedRect(phoneX, phoneY, phoneWidth, phoneHeight, 4, 4, "F");
+
+      // Screen area (clip image into it)
+      const screenX = phoneX + 2;
+      const screenY = phoneY + 6;
+
+      // Fit image to screen
+      const imgAspect = imgW / imgH;
+      let drawW = screenWidth;
+      let drawH = drawW / imgAspect;
+      if (drawH < screenHeight) {
+        // Image is wider, fill height
+        drawH = screenHeight;
+        drawW = drawH * imgAspect;
+      }
+      const drawX = screenX + (screenWidth - drawW) / 2;
+      const drawY = screenY + (screenHeight - drawH) / 2;
+
+      // Background for screen
+      doc.setFillColor(200, 200, 200);
+      doc.rect(screenX, screenY, screenWidth, screenHeight, "F");
+
+      doc.addImage(imgSrc, "PNG", drawX, drawY, drawW, drawH);
+
+      // Notch
+      const notchW = phoneWidth * 0.4;
+      doc.setFillColor(30, 30, 30);
+      doc.roundedRect(phoneX + (phoneWidth - notchW) / 2, phoneY, notchW, 4, 1.5, 1.5, "F");
+
+      // Home indicator
+      const indicatorW = phoneWidth * 0.35;
+      doc.setFillColor(180, 180, 180);
+      doc.roundedRect(phoneX + (phoneWidth - indicatorW) / 2, phoneY + phoneHeight - 3.5, indicatorW, 1.2, 0.6, 0.6, "F");
+
+      return phoneHeight;
+    };
 
     sortedPosts.forEach((post, idx) => {
       doc.addPage();
       addHeader();
 
-      const art = artImages.get(post.id);
-      const artBlockWidth = art ? 40 : 0;
-      const textWidth = contentWidth - artBlockWidth - (art ? 8 : 0);
-      const artX = pageWidth - margin - artBlockWidth;
-      const artY = 22;
+      const images = artImages.get(post.id) || [];
+      const isCarousel = post.format === "carousel" && images.length > 1;
+      const hasArt = images.length > 0;
+
+      // Phone mockup dimensions
+      const phoneWidth = 36;
+      const phoneX = pageWidth - margin - phoneWidth;
 
       let y = 24;
 
@@ -241,50 +312,41 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       doc.setTextColor(...dark);
       doc.text(`${idx + 1}/${sortedPosts.length}`, margin + 9, y + 1, { align: "center" });
 
-      // Title
+      // Title (leave room for phone mockup)
+      const titleMaxWidth = hasArt ? contentWidth - phoneWidth - 12 : contentWidth - 22;
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...dark);
-      doc.text(post.title, margin + 22, y + 1);
-      y += 12;
+      const titleLines = doc.splitTextToSize(post.title, titleMaxWidth);
+      doc.text(titleLines, margin + 22, y + 1);
+      y += titleLines.length * 8 + 4;
 
       // Headline
+      const headlineMaxWidth = hasArt ? contentWidth - phoneWidth - 12 : contentWidth;
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...gray);
-      const headlineLines = doc.splitTextToSize(post.headline, textWidth);
+      const headlineLines = doc.splitTextToSize(post.headline, headlineMaxWidth);
       doc.text(headlineLines, margin, y);
       const headlineBottom = y + headlineLines.length * 5.5;
 
-      // Art image in its own reserved block
-      let artBottom = y;
-      if (art) {
-        const maxArtHeight = 46;
-        const aspectRatio = art.width / art.height;
-        let drawWidth = artBlockWidth;
-        let drawHeight = drawWidth / aspectRatio;
-
-        if (drawHeight > maxArtHeight) {
-          drawHeight = maxArtHeight;
-          drawWidth = drawHeight * aspectRatio;
-        }
-
-        const centeredArtX = artX + (artBlockWidth - drawWidth) / 2;
-
-        doc.setFillColor(248, 246, 240);
-        doc.roundedRect(artX - 1, artY - 1, artBlockWidth + 2, maxArtHeight + 2, 2, 2, "F");
-        doc.addImage(art.src, "JPEG", centeredArtX, artY, drawWidth, drawHeight);
-        artBottom = artY + maxArtHeight;
+      // Draw phone mockup with first image
+      let artBottom = headlineBottom;
+      if (hasArt) {
+        const firstImg = images[0];
+        const phoneY = 22;
+        const phoneH = drawPhoneMockup(doc, firstImg.src, firstImg.width, firstImg.height, phoneX, phoneY, phoneWidth);
+        artBottom = Math.max(artBottom, phoneY + phoneH + 4);
       }
 
-      y = Math.max(headlineBottom, artBottom) + 8;
+      y = Math.max(headlineBottom, artBottom) + 6;
 
       // Yellow divider
       doc.setFillColor(...yellow);
       doc.rect(margin, y, contentWidth, 1, "F");
       y += 8;
 
-      // Details in a styled grid (no emojis)
+      // Details grid
       doc.setFillColor(...warmBg);
       const detailPairs: [string, string][] = [
         ["Data", formatDate(post.date)],
@@ -345,6 +407,76 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         doc.setFont("helvetica", "normal");
         doc.setTextColor(50, 45, 35);
         doc.text(legendLines, margin + 7, y + 2);
+        y += boxH + 4;
+      }
+
+      // Carousel: show remaining slides in a row below
+      if (isCarousel && images.length > 1) {
+        const remainingImages = images.slice(1);
+        const thumbSize = 28;
+        const gap = 4;
+        const maxPerRow = Math.floor((contentWidth + gap) / (thumbSize + gap));
+
+        // Check if we need a new page
+        if (y + thumbSize + 14 > pageHeight - 16) {
+          doc.addPage();
+          addHeader();
+          y = 28;
+        }
+
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...dark);
+        doc.text(`SLIDES DO CARROSSEL (${images.length} slides)`, margin, y);
+        y += 5;
+
+        let thumbX = margin;
+        let rowIdx = 0;
+        remainingImages.forEach((img, i) => {
+          if (rowIdx >= maxPerRow) {
+            rowIdx = 0;
+            thumbX = margin;
+            y += thumbSize + gap;
+          }
+
+          // Mini phone frame
+          const miniPhoneW = thumbSize * 0.9;
+          const miniPhoneH = miniPhoneW * (16 / 9) + 4;
+          const mpX = thumbX + (thumbSize - miniPhoneW) / 2;
+
+          doc.setFillColor(50, 50, 50);
+          doc.roundedRect(mpX, y, miniPhoneW, miniPhoneH, 1.5, 1.5, "F");
+
+          const screenW = miniPhoneW - 2;
+          const screenH = miniPhoneW * (16 / 9) - 2;
+          const screenX = mpX + 1;
+          const screenY = y + 2;
+
+          doc.setFillColor(200, 200, 200);
+          doc.rect(screenX, screenY, screenW, screenH, "F");
+
+          const imgAspect = img.width / img.height;
+          let dw = screenW;
+          let dh = dw / imgAspect;
+          if (dh < screenH) {
+            dh = screenH;
+            dw = dh * imgAspect;
+          }
+          const dx = screenX + (screenW - dw) / 2;
+          const dy = screenY + (screenH - dh) / 2;
+          doc.addImage(img.src, "PNG", dx, dy, dw, dh);
+
+          // Slide number
+          doc.setFillColor(...yellow);
+          doc.setFontSize(6);
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(...dark);
+          const numY = y + miniPhoneH + 3;
+          doc.text(`${i + 2}`, mpX + miniPhoneW / 2, numY, { align: "center" });
+
+          thumbX += thumbSize + gap;
+          rowIdx++;
+        });
       }
     });
 
