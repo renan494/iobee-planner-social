@@ -110,6 +110,7 @@ export type Database = {
       posts: {
         Row: {
           analyst: string
+          art_url: string | null
           client: string
           created_at: string
           date: string
@@ -124,6 +125,7 @@ export type Database = {
         }
         Insert: {
           analyst: string
+          art_url?: string | null
           client: string
           created_at?: string
           date: string
@@ -138,6 +140,7 @@ export type Database = {
         }
         Update: {
           analyst?: string
+          art_url?: string | null
           client?: string
           created_at?: string
           date?: string
