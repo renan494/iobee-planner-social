@@ -85,7 +85,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-foreground">{formatCounts[key]}</div>
-                <p className="mt-1 text-xs text-muted-foreground">posts agendados</p>
+                <p className="mt-1 text-xs text-muted-foreground">posts criados</p>
               </CardContent>
             </Card>
           );
