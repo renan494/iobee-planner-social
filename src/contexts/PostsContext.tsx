@@ -16,7 +16,7 @@ interface PostsContextType {
   addAnalyst: (name: string) => Promise<void>;
   updateAnalyst: (oldName: string, newName: string) => Promise<void>;
   removeAnalyst: (name: string) => Promise<void>;
-  addClient: (data: { name: string; monthlyPosts?: number; objective?: string; goal?: string }) => Promise<void>;
+  addClient: (data: { name: string; instagramHandle?: string; facebookUrl?: string; objective?: string; avatarUrl?: string }) => Promise<void>;
 }
 
 const PostsContext = createContext<PostsContextType | null>(null);
