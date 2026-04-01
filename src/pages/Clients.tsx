@@ -144,8 +144,25 @@ export default function Clients() {
             <DialogTitle>Cadastrar Novo Cliente</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            <div className="flex items-center gap-4">
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-secondary border-2 border-dashed border-border hover:border-primary/50 transition-colors overflow-hidden"
+              >
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <User className="h-6 w-6 text-muted-foreground" />
+                )}
+              </button>
+              <div className="text-sm text-muted-foreground">
+                {uploading ? "Enviando..." : "Clique para adicionar foto de perfil"}
+              </div>
+            </div>
             <div className="space-y-2">
-              <Label htmlFor="client-name">Nome do cliente *</Label>
+              <Label htmlFor="client-name">Nome *</Label>
               <Input
                 id="client-name"
                 placeholder="Ex: iOBEE"
@@ -155,14 +172,21 @@ export default function Clients() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="monthly-posts">Quantidade de posts mensais</Label>
+              <Label htmlFor="instagram">@ do Instagram</Label>
               <Input
-                id="monthly-posts"
-                type="number"
-                min="0"
-                placeholder="Ex: 20"
-                value={newMonthlyPosts}
-                onChange={(e) => setNewMonthlyPosts(e.target.value)}
+                id="instagram"
+                placeholder="@iobee.digital"
+                value={newInstagram}
+                onChange={(e) => setNewInstagram(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="facebook-url">URL do Facebook</Label>
+              <Input
+                id="facebook-url"
+                placeholder="https://facebook.com/iobee"
+                value={newFacebookUrl}
+                onChange={(e) => setNewFacebookUrl(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -173,15 +197,6 @@ export default function Clients() {
                 value={newObjective}
                 onChange={(e) => setNewObjective(e.target.value)}
                 rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="goal">Meta</Label>
-              <Input
-                id="goal"
-                placeholder="Ex: 10k seguidores até dezembro"
-                value={newGoal}
-                onChange={(e) => setNewGoal(e.target.value)}
               />
             </div>
           </div>
