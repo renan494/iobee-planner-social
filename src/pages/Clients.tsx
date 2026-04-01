@@ -86,6 +86,8 @@ export default function Clients() {
         name: trimmed,
         instagramHandle: newInstagram.trim() || undefined,
         facebookUrl: newFacebookUrl.trim() || undefined,
+        linkedinUrl: newLinkedinUrl.trim() || undefined,
+        gmbUrl: newGmbUrl.trim() || undefined,
         objective: newObjective.trim() || undefined,
         avatarUrl: avatarPreview || undefined,
       });
@@ -93,6 +95,8 @@ export default function Clients() {
       setNewClientName("");
       setNewInstagram("");
       setNewFacebookUrl("");
+      setNewLinkedinUrl("");
+      setNewGmbUrl("");
       setNewObjective("");
       setAvatarPreview(null);
       setDialogOpen(false);
