@@ -170,13 +170,14 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
 
     autoTable(doc, {
       startY: 38,
-      head: [["Data", "Título", "Headline", "Formato", "Funil", "Analista"]],
+      head: [["Data", "Título", "Headline", "Formato", "Funil", "Canais", "Analista"]],
       body: sortedPosts.map((p) => [
         formatDate(p.date),
         p.title,
         p.headline,
         FORMAT_LABELS[p.format],
         FUNNEL_LABELS[p.funnelStage],
+        (p.channels || []).join(", ") || "—",
         p.analyst,
       ]),
       styles: { fontSize: 8, cellPadding: 4, textColor: dark },
