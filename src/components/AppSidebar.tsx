@@ -53,7 +53,7 @@ export function AppSidebar() {
           <img src={logo} alt="iOBEE" className="h-7 shrink-0" />
           {!collapsed && (
             <span className="text-sm font-bold tracking-tight text-sidebar-foreground/70">
-              Planner
+              Social Lab
             </span>
           )}
         </button>

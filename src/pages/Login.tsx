@@ -151,7 +151,7 @@ export default function Login() {
           </form>
 
           <p className="text-center text-xs text-muted-foreground">
-            iOBEE Planner · Todos os direitos reservados
+            iOBEE Social Lab · Todos os direitos reservados
           </p>
         </div>
       </div>
