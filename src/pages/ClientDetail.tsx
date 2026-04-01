@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { usePosts } from "@/contexts/PostsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage, type Post } from "@/data/posts";
+import { PostBadge } from "@/components/PostBadge";
 import { toast } from "sonner";
 import { ClientReportPreview } from "@/components/ClientReportPreview";
 import { PostDetailModal } from "@/components/PostDetailModal";
