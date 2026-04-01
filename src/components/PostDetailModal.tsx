@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,20 +8,22 @@ import { PostBadge } from "./PostBadge";
 import { FUNNEL_LABELS, type Post } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PostDetailModalProps {
   post: Post | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdateDate?: (postId: string, newDate: string) => void;
+  onUpdateArt?: (postId: string, artUrl: string | null) => Promise<void>;
 }
 
-function PhoneMockup({ artUrl, title }: { artUrl?: string; title: string }) {
+function PhoneMockup({ artUrl, title, onEditArt }: { artUrl?: string; title: string; onEditArt?: () => void }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-2">
       <div className="relative w-[200px] rounded-[2rem] border-[6px] border-foreground/80 bg-background shadow-xl overflow-hidden">
         {/* Notch */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-foreground/80 rounded-b-xl z-10" />
@@ -39,17 +41,45 @@ function PhoneMockup({ artUrl, title }: { artUrl?: string; title: string }) {
         {/* Home indicator */}
         <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full bg-foreground/40" />
       </div>
+      {onEditArt && (
+        <Button variant="outline" size="sm" className="gap-1.5" onClick={onEditArt}>
+          <ImagePlus className="h-3.5 w-3.5" />
+          {artUrl ? "Trocar arte" : "Adicionar arte"}
+        </Button>
+      )}
     </div>
   );
 }
 
-export function PostDetailModal({ post, open, onOpenChange, onUpdateDate }: PostDetailModalProps) {
+export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpdateArt }: PostDetailModalProps) {
   const [editingDate, setEditingDate] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!post) return null;
 
   const postDate = new Date(post.date + "T12:00:00");
   const dateFormatted = format(postDate, "dd 'de' MMMM, yyyy", { locale: ptBR });
+
+  const handleArtUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !onUpdateArt) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${post.id}-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("post-arts").upload(path, file);
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from("post-arts").getPublicUrl(path);
+      await onUpdateArt(post.id, urlData.publicUrl);
+      toast({ title: "Arte atualizada", description: "A arte do post foi alterada com sucesso." });
+    } catch {
+      toast({ title: "Erro", description: "Não foi possível enviar a arte.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const handleDateChange = (newDate: Date | undefined) => {
     if (!newDate || !onUpdateDate) return;
@@ -72,7 +102,19 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate }: Post
         <div className="flex gap-6">
           {/* Phone mockup on left */}
           <div className="hidden sm:flex flex-shrink-0">
-            <PhoneMockup artUrl={post.artUrl} title={post.title} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleArtUpload}
+              disabled={uploading}
+            />
+            <PhoneMockup
+              artUrl={post.artUrl}
+              title={post.title}
+              onEditArt={onUpdateArt ? () => fileInputRef.current?.click() : undefined}
+            />
           </div>
 
           {/* Details on right */}
