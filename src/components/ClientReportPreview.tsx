@@ -21,7 +21,7 @@ function formatDate(dateStr: string) {
   return format(new Date(dateStr + "T12:00:00"), "dd/MM/yyyy");
 }
 
-export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl }: ClientReportPreviewProps) {
+export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick }: ClientReportPreviewProps) {
   const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
 
   const handleDownloadPDF = () => {
