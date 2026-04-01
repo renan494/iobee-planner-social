@@ -43,6 +43,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
         hashtags: row.hashtags || [],
         legend: row.legend ?? undefined,
         artUrl: (row as any).art_url ?? undefined,
+        artUrls: (row as any).art_urls ?? [],
       }));
       setPosts(mapped);
     }
