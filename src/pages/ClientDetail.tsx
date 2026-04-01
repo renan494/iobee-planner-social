@@ -82,6 +82,8 @@ export default function ClientDetail() {
     setEditName(clientName);
     setEditInstagram((data as any)?.instagram_handle || "");
     setEditFacebookUrl((data as any)?.facebook_url || "");
+    setEditLinkedinUrl((data as any)?.linkedin_url || "");
+    setEditGmbUrl((data as any)?.gmb_url || "");
     setEditObjective((data as any)?.objective || "");
     setEditOpen(true);
   };
