@@ -320,8 +320,8 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
                 value={editFields.legend}
                 onChange={(e) => setEditFields((f) => ({ ...f, legend: e.target.value }))}
                 placeholder="Legenda / conteúdo do post"
-                rows={3}
-                className="text-sm"
+                rows={8}
+                className="text-sm leading-relaxed"
               />
             ) : (
               post.legend && (
