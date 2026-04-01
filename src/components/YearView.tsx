@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   startOfYear,
   endOfYear,
@@ -6,12 +7,13 @@ import {
   endOfMonth,
   eachDayOfInterval,
   format,
-  isSameMonth,
   isToday,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Post } from "@/data/posts";
 import { cn } from "@/lib/utils";
+import { getCommemorativeDatesForDay } from "@/data/commemorativeDates";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface YearViewProps {
   currentDate: Date;
@@ -31,7 +33,6 @@ export function YearView({ currentDate, posts, onPostClick, onNavigateToMonth }:
     postsByDate.get(p.date)!.push(p);
   });
 
-  // Count posts per month
   const postsPerMonth = new Map<string, number>();
   posts.forEach((p) => {
     const monthKey = p.date.substring(0, 7);
@@ -76,20 +77,40 @@ export function YearView({ currentDate, posts, onPostClick, onNavigateToMonth }:
                   const dateKey = format(day, "yyyy-MM-dd");
                   const hasPosts = postsByDate.has(dateKey);
                   const today = isToday(day);
+                  const comDates = getCommemorativeDatesForDay(dateKey);
+                  const hasHoliday = comDates.length > 0;
 
-                  return (
+                  const dayEl = (
                     <div key={dateKey} className="flex flex-col items-center">
                       <span
                         className={cn(
                           "flex h-4 w-4 items-center justify-center rounded-full text-[8px]",
                           today && "bg-primary text-primary-foreground",
-                          hasPosts && !today && "bg-primary/20 font-bold"
+                          hasPosts && !today && "bg-primary/20 font-bold",
+                          hasHoliday && !today && !hasPosts && "bg-[hsl(var(--commemorative))]/30 ring-1 ring-[hsl(var(--commemorative))]"
                         )}
                       >
                         {format(day, "d")}
                       </span>
                     </div>
                   );
+
+                  if (hasHoliday) {
+                    return (
+                      <Tooltip key={dateKey}>
+                        <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
+                          {dayEl}
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="text-xs">
+                          {comDates.map((cd, i) => (
+                            <div key={i}>{cd.icon} {cd.label}</div>
+                          ))}
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }
+
+                  return dayEl;
                 })}
               </div>
             </button>

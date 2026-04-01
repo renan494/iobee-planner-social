@@ -32,6 +32,7 @@ export const FIXED_COMMEMORATIVE_DATES: CommemorativeDate[] = [
   { month: 6, day: 20, label: "Dia do Amigo", icon: "🤝", type: "comercial" },
   { month: 7, day: 11, label: "Dia dos Pais", icon: "👨", type: "comercial" },
   { month: 8, day: 15, label: "Dia do Cliente", icon: "🤩", type: "comercial" },
+  { month: 9, day: 12, label: "Dia das Crianças", icon: "👧", type: "comercial" },
   { month: 9, day: 15, label: "Dia do Professor", icon: "📚", type: "comercial" },
   { month: 9, day: 31, label: "Halloween", icon: "🎃", type: "comercial" },
   { month: 10, day: 19, label: "Dia do Empreendedor", icon: "🚀", type: "comercial" },
