@@ -43,6 +43,7 @@ export function AppSidebar() {
     { title: "Clientes", url: "/clientes", icon: Users },
     { title: "Analistas", url: "/analistas", icon: UserCog },
     ...(isAdmin ? [{ title: "Gerenciar Acessos", url: "/admin", icon: Shield }] : []),
+    { title: "Meus Dados", url: "/meus-dados", icon: UserCircle },
   ];
 
   return (
