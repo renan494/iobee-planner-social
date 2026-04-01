@@ -240,6 +240,38 @@ export default function ClientDetail() {
         onUpdateArt={async (id, url) => { await updatePostArt(id, url); setSelectedPost((p) => p ? { ...p, artUrl: url ?? undefined } : null); }}
         onUpdatePost={async (id, fields) => { await updatePost(id, fields); setSelectedPost((p) => p ? { ...p, ...fields } : null); }}
       />
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Cliente</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Nome</Label>
+              <Input value={editName} disabled className="opacity-60" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-instagram">@ do Instagram</Label>
+              <Input id="edit-instagram" placeholder="@iobee.digital" value={editInstagram} onChange={(e) => setEditInstagram(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-facebook">URL do Facebook</Label>
+              <Input id="edit-facebook" placeholder="https://facebook.com/iobee" value={editFacebookUrl} onChange={(e) => setEditFacebookUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-objective">Objetivo</Label>
+              <Textarea id="edit-objective" placeholder="Descreva o objetivo..." value={editObjective} onChange={(e) => setEditObjective(e.target.value)} rows={3} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancelar</Button>
+            <Button onClick={handleSaveEdit} disabled={editSaving}>
+              {editSaving ? "Salvando..." : "Salvar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
