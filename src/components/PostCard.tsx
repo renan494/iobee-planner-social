@@ -1,7 +1,14 @@
 import { useMemo } from "react";
-import type { Post } from "@/data/posts";
+import type { Post, PostFormat } from "@/data/posts";
 import { PostBadge } from "./PostBadge";
 import { cn } from "@/lib/utils";
+
+const FORMAT_BG: Record<PostFormat, string> = {
+  static: "border-l-format-static",
+  carousel: "border-l-format-carousel",
+  reels: "border-l-format-reels",
+  stories: "border-l-format-stories",
+};
 
 // Deterministic color based on client name
 const CLIENT_COLORS = [
