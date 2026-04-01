@@ -44,6 +44,8 @@ interface PostEntry {
   hashtags: string[];
   artPreview: string | null;
   artFile: File | null;
+  artPreviews: string[];
+  artFiles: File[];
   collapsed: boolean;
   draftId?: string;
 }
@@ -64,6 +66,8 @@ function createEmptyEntry(): PostEntry {
     hashtags: [],
     artPreview: null,
     artFile: null,
+    artPreviews: [],
+    artFiles: [],
     collapsed: false,
   };
 }
@@ -99,6 +103,8 @@ export default function CreatePost() {
         hashtags: data.hashtags || [],
         artPreview: null,
         artFile: null,
+        artPreviews: [],
+        artFiles: [],
         collapsed: false,
         draftId: data.id,
       }]);
@@ -157,7 +163,21 @@ export default function CreatePost() {
     const posts = [];
     for (const entry of entries) {
       let artUrl: string | undefined;
-      if (entry.artFile) {
+      let artUrls: string[] = [];
+
+      if (entry.postFormat === "carousel" && entry.artFiles.length > 0) {
+        // Upload multiple carousel arts
+        for (const file of entry.artFiles) {
+          const ext = file.name.split(".").pop();
+          const path = `${crypto.randomUUID()}.${ext}`;
+          const { error: uploadErr } = await supabase.storage.from("post-arts").upload(path, file);
+          if (!uploadErr) {
+            const { data: urlData } = supabase.storage.from("post-arts").getPublicUrl(path);
+            artUrls.push(urlData.publicUrl);
+          }
+        }
+        artUrl = artUrls[0]; // First image as main art
+      } else if (entry.artFile) {
         const ext = entry.artFile.name.split(".").pop();
         const path = `${crypto.randomUUID()}.${ext}`;
         const { error: uploadErr } = await supabase.storage.from("post-arts").upload(path, entry.artFile);
@@ -166,6 +186,7 @@ export default function CreatePost() {
           artUrl = urlData.publicUrl;
         }
       }
+
       posts.push({
         client: entry.client === "__new__" ? entry.newClient.trim() : entry.client,
         analyst: entry.analyst === "__new__" ? entry.newAnalyst.trim() : entry.analyst,
@@ -177,6 +198,7 @@ export default function CreatePost() {
         hashtags: entry.hashtags,
         legend: entry.content.trim() || undefined,
         artUrl,
+        artUrls,
       });
     }
 
@@ -450,27 +472,79 @@ function PostEntryForm({
 
           {/* Art upload */}
           <div className="space-y-2">
-            <Label>Arte</Label>
-            <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-6 transition-colors hover:border-primary/60 hover:bg-primary/10">
-              {entry.artPreview ? (
-                <img src={entry.artPreview} alt="Preview" className="max-h-48 rounded-lg object-contain" />
-              ) : (
-                <>
+            <Label>{entry.postFormat === "carousel" ? `Artes do Carrossel (máx. 10)` : "Arte"}</Label>
+            {entry.postFormat === "carousel" ? (
+              <>
+                <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-6 transition-colors hover:border-primary/60 hover:bg-primary/10">
                   <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Clique para importar a arte</span>
-                  <span className="text-xs text-muted-foreground">PNG, JPG, WEBP</span>
-                </>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) onUpdate({ artPreview: URL.createObjectURL(f), artFile: f });
-                }}
-                className="hidden"
-              />
-            </label>
+                  <span className="text-sm text-muted-foreground">Clique para importar as artes do carrossel</span>
+                  <span className="text-xs text-muted-foreground">PNG, JPG, WEBP — Selecione até 10 imagens</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      const remaining = 10 - entry.artFiles.length;
+                      const toAdd = files.slice(0, remaining);
+                      if (toAdd.length > 0) {
+                        onUpdate({
+                          artFiles: [...entry.artFiles, ...toAdd],
+                          artPreviews: [...entry.artPreviews, ...toAdd.map((f) => URL.createObjectURL(f))],
+                          artFile: null,
+                          artPreview: null,
+                        });
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
+                {entry.artPreviews.length > 0 && (
+                  <div className="grid grid-cols-5 gap-2 pt-2">
+                    {entry.artPreviews.map((preview, i) => (
+                      <div key={i} className="relative group">
+                        <img src={preview} alt={`Slide ${i + 1}`} className="h-24 w-full rounded-lg object-cover border" />
+                        <span className="absolute top-1 left-1 rounded-full bg-foreground/70 text-background text-[10px] font-bold w-5 h-5 flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newFiles = entry.artFiles.filter((_, j) => j !== i);
+                            const newPreviews = entry.artPreviews.filter((_, j) => j !== i);
+                            onUpdate({ artFiles: newFiles, artPreviews: newPreviews });
+                          }}
+                          className="absolute top-1 right-1 rounded-full bg-destructive text-destructive-foreground p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-6 transition-colors hover:border-primary/60 hover:bg-primary/10">
+                {entry.artPreview ? (
+                  <img src={entry.artPreview} alt="Preview" className="max-h-48 rounded-lg object-contain" />
+                ) : (
+                  <>
+                    <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Clique para importar a arte</span>
+                    <span className="text-xs text-muted-foreground">PNG, JPG, WEBP</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) onUpdate({ artPreview: URL.createObjectURL(f), artFile: f });
+                  }}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
         </div>
       )}

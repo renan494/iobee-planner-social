@@ -13,6 +13,7 @@ export interface Post {
   hashtags: string[];
   legend?: string;
   artUrl?: string;
+  artUrls?: string[];
 }
 
 export const FORMAT_LABELS: Record<PostFormat, string> = {

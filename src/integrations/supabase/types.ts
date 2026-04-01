@@ -111,6 +111,7 @@ export type Database = {
         Row: {
           analyst: string
           art_url: string | null
+          art_urls: string[] | null
           client: string
           created_at: string
           date: string
@@ -126,6 +127,7 @@ export type Database = {
         Insert: {
           analyst: string
           art_url?: string | null
+          art_urls?: string[] | null
           client: string
           created_at?: string
           date: string
@@ -141,6 +143,7 @@ export type Database = {
         Update: {
           analyst?: string
           art_url?: string | null
+          art_urls?: string[] | null
           client?: string
           created_at?: string
           date?: string

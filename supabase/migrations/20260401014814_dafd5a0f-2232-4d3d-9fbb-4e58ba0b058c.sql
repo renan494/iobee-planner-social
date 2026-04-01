@@ -1,0 +1,1 @@
+ALTER TABLE public.posts ADD COLUMN art_urls TEXT[] DEFAULT '{}'::text[];
