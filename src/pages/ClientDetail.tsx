@@ -152,7 +152,7 @@ export default function ClientDetail() {
                     </TableRow>
                   ) : (
                     clientPosts.map((post) => (
-                      <TableRow key={post.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedPost(post)}>
+                      <TableRow key={post.id} className="group cursor-pointer hover:bg-accent/40 transition-colors" onClick={() => setSelectedPost(post)}>
                         <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
                         <TableCell className="font-medium">{post.title}</TableCell>
                         <TableCell className="text-muted-foreground">{post.headline}</TableCell>
@@ -160,14 +160,24 @@ export default function ClientDetail() {
                         <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
-                            {(post.channels || []).map((ch) => (
-                              <span key={ch} className="rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{ch}</span>
-                            ))}
+                            {(post.channels || []).length > 0 ? (
+                              (post.channels || []).map((ch) => (
+                                <span key={ch} className="rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{ch}</span>
+                              ))
+                            ) : (
+                              <span className="text-xs text-muted-foreground/50">—</span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>{post.analyst}</TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); setSelectedPost(post); }}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-primary"
+                            onClick={(e) => { e.stopPropagation(); setSelectedPost(post); }}
+                            title="Editar post"
+                          >
                             <Pencil className="h-3.5 w-3.5" />
                           </Button>
                         </TableCell>
