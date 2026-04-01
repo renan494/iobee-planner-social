@@ -51,8 +51,10 @@ function PhoneMockup({ artUrl, title, onEditArt }: { artUrl?: string; title: str
   );
 }
 
-export function PostDetailModal({ post, open, onOpenChange, onUpdateDate }: PostDetailModalProps) {
+export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpdateArt }: PostDetailModalProps) {
   const [editingDate, setEditingDate] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!post) return null;
 
