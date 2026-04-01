@@ -41,6 +41,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
         date: row.date,
         hashtags: row.hashtags || [],
         legend: row.legend ?? undefined,
+        artUrl: (row as any).art_url ?? undefined,
       }));
       setPosts(mapped);
     }
@@ -75,7 +76,8 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       date: post.date,
       hashtags: post.hashtags,
       legend: post.legend || null,
-    });
+      art_url: post.artUrl || null,
+    } as any);
     if (!error) await fetchPosts();
   }, [fetchPosts]);
 
@@ -90,7 +92,8 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       date: p.date,
       hashtags: p.hashtags,
       legend: p.legend || null,
-    }));
+      art_url: p.artUrl || null,
+    } as any));
     const { error } = await supabase.from("posts").insert(rows);
     if (!error) await fetchPosts();
   }, [fetchPosts]);

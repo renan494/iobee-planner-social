@@ -12,6 +12,7 @@ export interface Post {
   date: string; // YYYY-MM-DD
   hashtags: string[];
   legend?: string;
+  artUrl?: string;
 }
 
 export const FORMAT_LABELS: Record<PostFormat, string> = {
