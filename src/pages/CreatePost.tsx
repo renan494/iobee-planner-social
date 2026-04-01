@@ -466,7 +466,7 @@ function PostEntryForm({
                 accept="image/*"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
-                  if (f) onUpdate({ artPreview: URL.createObjectURL(f) });
+                  if (f) onUpdate({ artPreview: URL.createObjectURL(f), artFile: f });
                 }}
                 className="hidden"
               />
