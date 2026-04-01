@@ -41,6 +41,9 @@ export default function CalendarPage() {
   const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost, deletePost } = usePosts();
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
   const [viewMode, setViewMode] = useState<ViewMode>("month");
+  type DatePreset = "all" | "day" | "month" | "quarter" | "year" | "custom";
+  const [datePreset, setDatePreset] = useState<DatePreset>("all");
+  const [showCustomCalendars, setShowCustomCalendars] = useState(false);
   const [selectedClient, setSelectedClient] = useState("all");
   const [selectedAnalyst, setSelectedAnalyst] = useState("all");
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
