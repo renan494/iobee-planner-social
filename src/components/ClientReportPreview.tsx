@@ -375,19 +375,11 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       });
       y += 6;
 
-      // Hashtags
-      if (post.hashtags.length > 0) {
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(...yellow);
-        const hashText = post.hashtags.map((h) => "#" + h).join("  ");
-        const hashLines = doc.splitTextToSize(hashText, contentWidth);
-        doc.text(hashLines, margin, y);
-        y += hashLines.length * 5 + 6;
-      }
+      // Legend / copy (with hashtags inside)
+      const hasLegend = !!post.legend;
+      const hasHashtags = post.hashtags.length > 0;
 
-      // Legend / copy
-      if (post.legend) {
+      if (hasLegend || hasHashtags) {
         y += 2;
         doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
@@ -395,8 +387,13 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         doc.text("LEGENDA / CONTEÚDO", margin, y);
         y += 5;
 
-        const legendLines = doc.splitTextToSize(post.legend, contentWidth - 14);
-        const boxH = legendLines.length * 4.5 + 8;
+        // Build combined content: legend + hashtags
+        const legendText = post.legend || "";
+        const hashText = hasHashtags ? "\n\n" + post.hashtags.map((h) => "#" + h).join(" ") : "";
+        const combinedText = (legendText + hashText).trim();
+
+        const combinedLines = doc.splitTextToSize(combinedText, contentWidth - 14);
+        const boxH = combinedLines.length * 4.5 + 8;
 
         doc.setFillColor(...warmBg);
         doc.roundedRect(margin, y - 3, contentWidth, boxH, 2, 2, "F");
@@ -406,7 +403,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(50, 45, 35);
-        doc.text(legendLines, margin + 7, y + 2);
+        doc.text(combinedLines, margin + 7, y + 2);
         y += boxH + 4;
       }
 
