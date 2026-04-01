@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, type PostFormat } from "@/data/posts";
@@ -15,7 +17,9 @@ export default function Clients() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClientName, setNewClientName] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [newMonthlyPosts, setNewMonthlyPosts] = useState("");
+  const [newObjective, setNewObjective] = useState("");
+  const [newGoal, setNewGoal] = useState("");
 
   const clientStats = useMemo(() => {
     return clients.map((name) => {
@@ -27,6 +31,8 @@ export default function Clients() {
     });
   }, [posts, clients]);
 
+  const [saving, setSaving] = useState(false);
+
   const handleAddClient = async () => {
     const trimmed = newClientName.trim();
     if (!trimmed) return;
@@ -36,9 +42,17 @@ export default function Clients() {
     }
     setSaving(true);
     try {
-      await addClient(trimmed);
+      await addClient({
+        name: trimmed,
+        monthlyPosts: parseInt(newMonthlyPosts) || 0,
+        objective: newObjective.trim() || undefined,
+        goal: newGoal.trim() || undefined,
+      });
       toast({ title: "Cliente cadastrado", description: `"${trimmed}" foi adicionado com sucesso.` });
       setNewClientName("");
+      setNewMonthlyPosts("");
+      setNewObjective("");
+      setNewGoal("");
       setDialogOpen(false);
     } catch (err) {
       toast({ title: "Erro", description: "Não foi possível cadastrar o cliente.", variant: "destructive" });
@@ -105,14 +119,47 @@ export default function Clients() {
           <DialogHeader>
             <DialogTitle>Cadastrar Novo Cliente</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <Input
-              placeholder="Nome do cliente"
-              value={newClientName}
-              onChange={(e) => setNewClientName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAddClient()}
-              autoFocus
-            />
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="client-name">Nome do cliente *</Label>
+              <Input
+                id="client-name"
+                placeholder="Ex: iOBEE"
+                value={newClientName}
+                onChange={(e) => setNewClientName(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="monthly-posts">Quantidade de posts mensais</Label>
+              <Input
+                id="monthly-posts"
+                type="number"
+                min="0"
+                placeholder="Ex: 20"
+                value={newMonthlyPosts}
+                onChange={(e) => setNewMonthlyPosts(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="objective">Objetivo</Label>
+              <Textarea
+                id="objective"
+                placeholder="Descreva o objetivo do cliente..."
+                value={newObjective}
+                onChange={(e) => setNewObjective(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="goal">Meta</Label>
+              <Input
+                id="goal"
+                placeholder="Ex: 10k seguidores até dezembro"
+                value={newGoal}
+                onChange={(e) => setNewGoal(e.target.value)}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>

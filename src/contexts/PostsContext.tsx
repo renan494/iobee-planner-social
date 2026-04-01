@@ -16,7 +16,7 @@ interface PostsContextType {
   addAnalyst: (name: string) => Promise<void>;
   updateAnalyst: (oldName: string, newName: string) => Promise<void>;
   removeAnalyst: (name: string) => Promise<void>;
-  addClient: (name: string) => Promise<void>;
+  addClient: (data: { name: string; monthlyPosts?: number; objective?: string; goal?: string }) => Promise<void>;
 }
 
 const PostsContext = createContext<PostsContextType | null>(null);
@@ -169,8 +169,13 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (!error) await fetchAnalysts();
   }, [fetchAnalysts]);
 
-  const addClient = useCallback(async (name: string) => {
-    const { error } = await supabase.from("clients").insert({ name } as any);
+  const addClient = useCallback(async (data: { name: string; monthlyPosts?: number; objective?: string; goal?: string }) => {
+    const { error } = await supabase.from("clients").insert({
+      name: data.name,
+      monthly_posts: data.monthlyPosts || 0,
+      objective: data.objective || null,
+      goal: data.goal || null,
+    } as any);
     if (error) throw error;
     await fetchClients();
   }, [fetchClients]);

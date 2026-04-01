@@ -63,20 +63,29 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          goal: string | null
           id: string
+          monthly_posts: number | null
           name: string
+          objective: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          goal?: string | null
           id?: string
+          monthly_posts?: number | null
           name: string
+          objective?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          goal?: string | null
           id?: string
+          monthly_posts?: number | null
           name?: string
+          objective?: string | null
         }
         Relationships: []
       }
