@@ -246,6 +246,7 @@ export default function ClientDetail() {
         onUpdateDate={(id, date) => { updatePostDate(id, date); setSelectedPost((p) => p ? { ...p, date } : null); }}
         onUpdateArt={async (id, url) => { await updatePostArt(id, url); setSelectedPost((p) => p ? { ...p, artUrl: url ?? undefined } : null); }}
         onUpdatePost={async (id, fields) => { await updatePost(id, fields); setSelectedPost((p) => p ? { ...p, ...fields } : null); }}
+        onDeletePost={async (id) => { await deletePost(id); setSelectedPost(null); }}
       />
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>

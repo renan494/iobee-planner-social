@@ -166,7 +166,7 @@ export default function CalendarPage() {
 
       {renderView()}
 
-      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} />
+      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} onDeletePost={async (id) => { await deletePost(id); setModalOpen(false); }} />
       <ImportModal
         open={importOpen}
         onOpenChange={setImportOpen}
