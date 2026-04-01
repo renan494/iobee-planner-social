@@ -20,6 +20,7 @@ import { DayView } from "@/components/DayView";
 import { WeekView } from "@/components/WeekView";
 import { QuarterView } from "@/components/QuarterView";
 import { YearView } from "@/components/YearView";
+import { SemesterView } from "@/components/SemesterView";
 import { CalendarListView } from "@/components/CalendarListView";
 import { ClientFilter } from "@/components/ClientFilter";
 import { AnalystFilter } from "@/components/AnalystFilter";
@@ -141,6 +142,7 @@ export default function CalendarPage() {
         case "week": return dir === 1 ? addWeeks(d, 1) : subWeeks(d, 1);
         case "month": return dir === 1 ? addMonths(d, 1) : subMonths(d, 1);
         case "quarter": return dir === 1 ? addQuarters(d, 1) : subQuarters(d, 1);
+        case "semester": return dir === 1 ? addMonths(d, 6) : addMonths(d, -6);
         case "year": return dir === 1 ? addYears(d, 1) : subYears(d, 1);
       }
     });
@@ -156,6 +158,8 @@ export default function CalendarPage() {
         return <CalendarGrid currentDate={currentDate} posts={filteredPosts} onPostClick={handlePostClick} />;
       case "quarter":
         return <QuarterView currentDate={currentDate} posts={filteredPosts} onPostClick={handlePostClick} />;
+      case "semester":
+        return <SemesterView currentDate={currentDate} posts={filteredPosts} onPostClick={handlePostClick} />;
       case "year":
         return (
           <YearView

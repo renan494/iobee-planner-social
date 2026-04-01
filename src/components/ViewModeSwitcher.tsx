@@ -6,7 +6,7 @@ interface ViewModeSwitcherProps {
   onChange: (value: ViewMode) => void;
 }
 
-const modes: ViewMode[] = ["day", "week", "month", "quarter", "year"];
+const modes: ViewMode[] = ["day", "week", "month", "quarter", "semester", "year"];
 
 export function ViewModeSwitcher({ value, onChange }: ViewModeSwitcherProps) {
   return (
