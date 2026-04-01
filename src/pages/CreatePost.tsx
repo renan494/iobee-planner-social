@@ -63,6 +63,7 @@ function createEmptyEntry(): PostEntry {
     hashtagInput: "",
     hashtags: [],
     artPreview: null,
+    artFile: null,
     collapsed: false,
   };
 }
