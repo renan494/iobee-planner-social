@@ -25,34 +25,75 @@ function formatDate(dateStr: string) {
 export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick }: ClientReportPreviewProps) {
   const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Title
-    doc.setFontSize(20);
+    // Brand colors
+    const brandYellow: [number, number, number] = [253, 182, 0]; // #FDB600
+    const brandDark: [number, number, number] = [20, 15, 0]; // #140F00
+
+    // Load logo as image
+    let logoImg: HTMLImageElement | null = null;
+    try {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = logoSvg;
+      });
+      logoImg = img;
+    } catch { /* proceed without logo */ }
+
+    const addHeader = (doc: jsPDF) => {
+      // Yellow top bar
+      doc.setFillColor(...brandYellow);
+      doc.rect(0, 0, pageWidth, 8, "F");
+
+      // Logo on top-right
+      if (logoImg) {
+        const logoW = 35;
+        const logoH = logoW * (logoImg.naturalHeight / logoImg.naturalWidth);
+        doc.addImage(logoImg, "SVG", pageWidth - logoW - 14, 12, logoW, logoH);
+      }
+    };
+
+    const addFooter = (doc: jsPDF, pageNum: number, totalPages: number) => {
+      doc.setFillColor(...brandYellow);
+      doc.rect(0, pageHeight - 6, pageWidth, 6, "F");
+      doc.setFontSize(7);
+      doc.setTextColor(...brandDark);
+      doc.text(`iOBEE · Relatório de ${clientName}`, 14, pageHeight - 9);
+      doc.text(`Página ${pageNum} de ${totalPages}`, pageWidth - 14, pageHeight - 9, { align: "right" });
+    };
+
+    // --- PAGE 1: Cover + Summary Table ---
+    addHeader(doc);
+
+    doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
-    doc.text(clientName, 14, 25);
+    doc.setTextColor(...brandDark);
+    doc.text(clientName, 14, 35);
 
-    // Subtitle
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(120, 120, 120);
-    doc.text(`${posts.length} posts · ${analysts.length} analista(s)`, 14, 33);
-    doc.text(`Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, 14, 39);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`${posts.length} posts · ${analysts.length} analista(s)`, 14, 43);
+    doc.text(`Gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, 14, 49);
 
-    // Stats line
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(...brandDark);
     doc.setFontSize(9);
     const statsLine = (Object.entries(byFormat) as [PostFormat, number][])
       .filter(([, count]) => count > 0)
       .map(([fmt, count]) => `${FORMAT_LABELS[fmt]}: ${count}`)
       .join("  ·  ");
-    doc.text(statsLine, 14, 48);
+    doc.text(statsLine, 14, 58);
 
-    // Table
+    // Summary table
     autoTable(doc, {
-      startY: 55,
+      startY: 65,
       head: [["Data", "Título", "Headline", "Formato", "Funil", "Analista"]],
       body: sortedPosts.map((p) => [
         formatDate(p.date),
@@ -63,55 +104,98 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         p.analyst,
       ]),
       styles: { fontSize: 8, cellPadding: 4 },
-      headStyles: { fillColor: [60, 60, 60], textColor: 255, fontStyle: "bold" },
-      alternateRowStyles: { fillColor: [248, 248, 248] },
+      headStyles: { fillColor: brandDark, textColor: 255, fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [255, 251, 235] },
       margin: { left: 14, right: 14 },
     });
 
-    // Post details pages
+    // --- 1 POST PER PAGE ---
+    const totalPages = 1 + sortedPosts.length;
+
     sortedPosts.forEach((post) => {
       doc.addPage();
-      let y = 20;
+      addHeader(doc);
 
-      doc.setFontSize(14);
+      let y = 30;
+
+      // Title
+      doc.setFontSize(16);
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(0, 0, 0);
+      doc.setTextColor(...brandDark);
       doc.text(post.title, 14, y);
-      y += 8;
+      y += 9;
 
-      doc.setFontSize(10);
+      // Headline
+      doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(100, 100, 100);
-      doc.text(post.headline, 14, y);
-      y += 10;
+      const headlineLines = doc.splitTextToSize(post.headline, pageWidth - 28);
+      doc.text(headlineLines, 14, y);
+      y += headlineLines.length * 6 + 6;
 
+      // Divider
+      doc.setDrawColor(...brandYellow);
+      doc.setLineWidth(0.8);
+      doc.line(14, y, pageWidth - 14, y);
+      y += 8;
+
+      // Details
       doc.setFontSize(9);
-      doc.setTextColor(0, 0, 0);
-      const details = [
-        `Data: ${formatDate(post.date)}`,
-        `Formato: ${FORMAT_LABELS[post.format]}`,
-        `Funil: ${FUNNEL_LABELS[post.funnelStage]}`,
-        `Analista: ${post.analyst}`,
+      doc.setTextColor(...brandDark);
+      doc.setFont("helvetica", "bold");
+
+      const detailPairs = [
+        ["Data", formatDate(post.date)],
+        ["Formato", FORMAT_LABELS[post.format]],
+        ["Funil", FUNNEL_LABELS[post.funnelStage]],
+        ["Analista", post.analyst],
       ];
-      details.forEach((d) => {
-        doc.text(d, 14, y);
-        y += 6;
+      if (post.channels && post.channels.length > 0) {
+        detailPairs.push(["Canais", post.channels.join(", ")]);
+      }
+
+      detailPairs.forEach(([label, value]) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(`${label}:`, 14, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(value, 45, y);
+        y += 7;
       });
 
+      // Hashtags
       if (post.hashtags.length > 0) {
-        y += 2;
-        doc.text(`Hashtags: ${post.hashtags.map((h) => "#" + h).join(" ")}`, 14, y);
-        y += 8;
+        y += 3;
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...brandYellow);
+        const hashText = post.hashtags.map((h) => "#" + h).join("  ");
+        const hashLines = doc.splitTextToSize(hashText, pageWidth - 28);
+        doc.text(hashLines, 14, y);
+        y += hashLines.length * 5 + 6;
       }
 
+      // Legend
       if (post.legend) {
         y += 2;
+        // Background box
+        doc.setFillColor(255, 251, 235);
+        const legendLines = doc.splitTextToSize(post.legend, pageWidth - 36);
+        const boxH = legendLines.length * 5 + 10;
+        doc.roundedRect(14, y - 4, pageWidth - 28, boxH, 2, 2, "F");
+
         doc.setFontSize(9);
-        doc.setTextColor(60, 60, 60);
-        const lines = doc.splitTextToSize(post.legend, pageWidth - 28);
-        doc.text(lines, 14, y);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(60, 55, 40);
+        doc.text(legendLines, 18, y + 2);
       }
     });
+
+    // Add footers to all pages
+    const total = doc.getNumberOfPages();
+    for (let i = 1; i <= total; i++) {
+      doc.setPage(i);
+      addFooter(doc, i, total);
+    }
 
     doc.save(`relatorio-${clientName.toLowerCase().replace(/\s+/g, "-")}.pdf`);
   };
