@@ -47,6 +47,7 @@ interface PostEntry {
   artPreviews: string[];
   artFiles: File[];
   channels: string[];
+  reference: string;
   collapsed: boolean;
   draftId?: string;
 }
