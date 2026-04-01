@@ -606,7 +606,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
                     </div>
                     <div className="flex flex-col items-end gap-2 flex-shrink-0">
                       {/* Edit & Delete buttons */}
-                      {(onEditPost || onDeletePost) && (
+                      {(onPostClick || onEditPost || onDeletePost) && (
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {onPostClick && (
                             <Button
