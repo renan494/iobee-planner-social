@@ -542,6 +542,27 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground">Preview do Relatório</h2>
         <div className="flex gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <CalendarIcon className="h-4 w-4" />
+                {dateFrom || dateTo
+                  ? `${dateFrom ? format(dateFrom, "dd/MM/yy") : "..."} – ${dateTo ? format(dateTo, "dd/MM/yy") : "..."}`
+                  : "Filtrar por data"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-4 space-y-3" align="end">
+              <p className="text-xs font-medium text-muted-foreground">De</p>
+              <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
+              <p className="text-xs font-medium text-muted-foreground">Até</p>
+              <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
+              {hasFilters && (
+                <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}>
+                  Limpar filtros
+                </Button>
+              )}
+            </PopoverContent>
+          </Popover>
           <Button variant="outline" onClick={() => navigate(`/criar?client=${encodeURIComponent(clientName)}`)} className="gap-2">
             <PenTool className="h-4 w-4" />
             Produzir Conteúdo
@@ -551,39 +572,6 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             Baixar PDF
           </Button>
         </div>
-      </div>
-
-      {/* Date filters */}
-      <div className="flex flex-wrap items-center gap-3">
-        <Filter className="h-4 w-4 text-muted-foreground" />
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <CalendarIcon className="h-4 w-4" />
-              {dateFrom ? format(dateFrom, "dd/MM/yy") : "De"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={ptBR} className={cn("p-3 pointer-events-auto")} />
-          </PopoverContent>
-        </Popover>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <CalendarIcon className="h-4 w-4" />
-              {dateTo ? format(dateTo, "dd/MM/yy") : "Até"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={ptBR} className={cn("p-3 pointer-events-auto")} />
-          </PopoverContent>
-        </Popover>
-        {hasFilters && (
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}>
-            Limpar filtros
-          </Button>
-        )}
-      </div>
 
       {/* Preview document */}
       <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
