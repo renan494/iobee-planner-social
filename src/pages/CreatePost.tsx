@@ -153,17 +153,32 @@ export default function CreatePost() {
       await addAnalyst(name);
     }
 
-    const posts = entries.map((entry) => ({
-      client: entry.client === "__new__" ? entry.newClient.trim() : entry.client,
-      analyst: entry.analyst === "__new__" ? entry.newAnalyst.trim() : entry.analyst,
-      title: entry.title.trim(),
-      headline: entry.title.trim(),
-      format: entry.postFormat,
-      funnelStage: entry.funnelStage,
-      date: format(entry.date!, "yyyy-MM-dd"),
-      hashtags: entry.hashtags,
-      legend: entry.content.trim() || undefined,
-    }));
+    // Upload arts and build posts
+    const posts = [];
+    for (const entry of entries) {
+      let artUrl: string | undefined;
+      if (entry.artFile) {
+        const ext = entry.artFile.name.split(".").pop();
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("post-arts").upload(path, entry.artFile);
+        if (!uploadErr) {
+          const { data: urlData } = supabase.storage.from("post-arts").getPublicUrl(path);
+          artUrl = urlData.publicUrl;
+        }
+      }
+      posts.push({
+        client: entry.client === "__new__" ? entry.newClient.trim() : entry.client,
+        analyst: entry.analyst === "__new__" ? entry.newAnalyst.trim() : entry.analyst,
+        title: entry.title.trim(),
+        headline: entry.title.trim(),
+        format: entry.postFormat,
+        funnelStage: entry.funnelStage,
+        date: format(entry.date!, "yyyy-MM-dd"),
+        hashtags: entry.hashtags,
+        legend: entry.content.trim() || undefined,
+        artUrl,
+      });
+    }
 
     if (posts.length === 1) {
       await addPost(posts[0]);
