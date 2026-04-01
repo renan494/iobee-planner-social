@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Hash, ImagePlus, PenTool, X, Plus, Trash2, Save, ChevronDown, ChevronUp } from "lucide-react";
+import { CalendarIcon, Hash, ImagePlus, PenTool, X, Plus, Trash2, Save, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
