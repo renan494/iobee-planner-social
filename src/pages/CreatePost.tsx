@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Hash, ImagePlus, PenTool, X, Plus, Trash2, Save, ChevronDown, ChevronUp } from "lucide-react";
+import { CalendarIcon, Hash, ImagePlus, PenTool, X, Plus, Trash2, Save, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -277,6 +277,11 @@ export default function CreatePost() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <div className="mb-4">
+        <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4" /> Voltar
+        </Button>
+      </div>
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
           <PenTool className="h-5 w-5 text-primary" />
