@@ -57,6 +57,37 @@ export default function CalendarPage() {
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [layoutMode, setLayoutMode] = useState<"calendar" | "list">("calendar");
 
+  const applyPreset = useCallback((preset: DatePreset) => {
+    setDatePreset(preset);
+    setShowCustomCalendars(false);
+    const now = new Date();
+    switch (preset) {
+      case "all":
+        setDateFrom(undefined);
+        setDateTo(undefined);
+        break;
+      case "day":
+        setDateFrom(startOfDay(now));
+        setDateTo(endOfDay(now));
+        break;
+      case "month":
+        setDateFrom(startOfMonth(now));
+        setDateTo(endOfMonth(now));
+        break;
+      case "quarter":
+        setDateFrom(startOfQuarter(now));
+        setDateTo(endOfQuarter(now));
+        break;
+      case "year":
+        setDateFrom(startOfYear(now));
+        setDateTo(endOfYear(now));
+        break;
+      case "custom":
+        setShowCustomCalendars(true);
+        break;
+    }
+  }, []);
+
   const availableClients = useMemo(() => {
     if (selectedAnalyst === "all") return clients;
     return getClients(posts.filter((p) => p.analyst === selectedAnalyst));
