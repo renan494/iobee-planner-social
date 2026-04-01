@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Camera, FileText } from "lucide-react";
+import { ArrowLeft, User, Camera, FileText, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -138,13 +138,15 @@ export default function ClientDetail() {
                     <TableHead>Headline</TableHead>
                     <TableHead>Formato</TableHead>
                     <TableHead>Funil</TableHead>
+                    <TableHead>Canais</TableHead>
                     <TableHead>Analista</TableHead>
+                    <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {clientPosts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                         Nenhum post encontrado para este cliente.
                       </TableCell>
                     </TableRow>
@@ -156,7 +158,19 @@ export default function ClientDetail() {
                         <TableCell className="text-muted-foreground">{post.headline}</TableCell>
                         <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
                         <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {(post.channels || []).map((ch) => (
+                              <span key={ch} className="rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{ch}</span>
+                            ))}
+                          </div>
+                        </TableCell>
                         <TableCell>{post.analyst}</TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); setSelectedPost(post); }}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))
                   )}
