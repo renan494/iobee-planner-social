@@ -273,6 +273,51 @@ export default function ClientDetail() {
               <Label htmlFor="edit-objective">Objetivo</Label>
               <Textarea id="edit-objective" placeholder="Descreva o objetivo..." value={editObjective} onChange={(e) => setEditObjective(e.target.value)} rows={3} />
             </div>
+            <div className="space-y-2">
+              <Label>Analistas</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {analysts.map((a) => (
+                  <span key={a} className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                    {a}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm(`Remover "${a}" dos posts deste cliente? Isso não exclui os posts, apenas desvincula o analista.`)) {
+                          // Update all posts from this analyst to remove them
+                          const analystPosts = clientPosts.filter((p) => p.analyst === a);
+                          analystPosts.forEach((p) => updatePost(p.id, { analyst: "" }));
+                        }
+                      }}
+                      className="ml-0.5 rounded-full p-0.5 hover:bg-destructive/10 hover:text-destructive transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+                {analysts.length === 0 && (
+                  <span className="text-xs text-muted-foreground">Nenhum analista vinculado</span>
+                )}
+              </div>
+              {allAnalysts.filter((a) => !analysts.includes(a)).length > 0 && (
+                <select
+                  className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                  value=""
+                  onChange={(e) => {
+                    const analyst = e.target.value;
+                    if (!analyst) return;
+                    // No direct "add analyst to client" — analysts are linked via posts
+                    // Show info toast
+                    navigate(`/criar?client=${encodeURIComponent(clientName)}`);
+                    setEditOpen(false);
+                  }}
+                >
+                  <option value="">+ Adicionar analista...</option>
+                  {allAnalysts.filter((a) => !analysts.includes(a)).map((a) => (
+                    <option key={a} value={a}>{a}</option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>Cancelar</Button>
