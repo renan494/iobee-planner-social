@@ -6,6 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { usePosts } from "@/contexts/PostsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage, type Post } from "@/data/posts";
@@ -20,6 +24,12 @@ export default function ClientDetail() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showReport, setShowReport] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editInstagram, setEditInstagram] = useState("");
+  const [editFacebookUrl, setEditFacebookUrl] = useState("");
+  const [editObjective, setEditObjective] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
   const clientPosts = useMemo(() => posts.filter((p) => p.client === clientName), [posts, clientName]);
@@ -62,6 +72,34 @@ export default function ClientDetail() {
     }
   };
 
+  const openEditDialog = async () => {
+    // Load client data from DB
+    const { data } = await supabase.from("clients").select("*").eq("name", clientName).maybeSingle();
+    setEditName(clientName);
+    setEditInstagram((data as any)?.instagram_handle || "");
+    setEditFacebookUrl((data as any)?.facebook_url || "");
+    setEditObjective((data as any)?.objective || "");
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    setEditSaving(true);
+    try {
+      const { error } = await supabase.from("clients").update({
+        instagram_handle: editInstagram.trim() || null,
+        facebook_url: editFacebookUrl.trim() || null,
+        objective: editObjective.trim() || null,
+      } as any).eq("name", clientName);
+      if (error) throw error;
+      toast.success("Dados do cliente atualizados!");
+      setEditOpen(false);
+    } catch {
+      toast.error("Erro ao salvar dados do cliente.");
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
       <div className="mb-4 flex items-center justify-between">
@@ -97,10 +135,13 @@ export default function ClientDetail() {
             disabled={uploading}
           />
         </div>
-        <div>
+        <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold text-foreground">{clientName}</h1>
-          <p className="text-sm text-muted-foreground">{clientPosts.length} posts · {analysts.length} analista(s)</p>
+          <button onClick={openEditDialog} className="rounded-full p-1.5 text-muted-foreground/40 hover:text-primary hover:bg-primary/10 transition-colors">
+            <Pencil className="h-4 w-4" />
+          </button>
         </div>
+          <p className="text-sm text-muted-foreground">{clientPosts.length} posts · {analysts.length} analista(s)</p>
       </div>
 
       {showReport ? (
@@ -199,6 +240,38 @@ export default function ClientDetail() {
         onUpdateArt={async (id, url) => { await updatePostArt(id, url); setSelectedPost((p) => p ? { ...p, artUrl: url ?? undefined } : null); }}
         onUpdatePost={async (id, fields) => { await updatePost(id, fields); setSelectedPost((p) => p ? { ...p, ...fields } : null); }}
       />
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Cliente</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Nome</Label>
+              <Input value={editName} disabled className="opacity-60" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-instagram">@ do Instagram</Label>
+              <Input id="edit-instagram" placeholder="@iobee.digital" value={editInstagram} onChange={(e) => setEditInstagram(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-facebook">URL do Facebook</Label>
+              <Input id="edit-facebook" placeholder="https://facebook.com/iobee" value={editFacebookUrl} onChange={(e) => setEditFacebookUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-objective">Objetivo</Label>
+              <Textarea id="edit-objective" placeholder="Descreva o objetivo..." value={editObjective} onChange={(e) => setEditObjective(e.target.value)} rows={3} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancelar</Button>
+            <Button onClick={handleSaveEdit} disabled={editSaving}>
+              {editSaving ? "Salvando..." : "Salvar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
