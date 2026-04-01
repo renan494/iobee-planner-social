@@ -413,7 +413,7 @@ function PostEntryForm({
             <div className="space-y-2">
               <Label>Etapa do Funil</Label>
               <Select value={entry.funnelStage} onValueChange={(v) => onUpdate({ funnelStage: v as FunnelStage })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione a etapa" /></SelectTrigger>
                 <SelectContent>
                   {(Object.entries(FUNNEL_LABELS) as [FunnelStage, string][]).map(([k, v]) => (
                     <SelectItem key={k} value={k}>{v}</SelectItem>
