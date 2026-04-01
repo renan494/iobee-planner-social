@@ -124,7 +124,7 @@ export default function CreatePost() {
   const addHashtag = (idx: number) => {
     const entry = entries[idx];
     const tag = entry.hashtagInput.trim().replace(/^#/, "");
-    if (tag && !entry.hashtags.includes(tag)) {
+    if (tag && !entry.hashtags.includes(tag) && entry.hashtags.length < 5) {
       updateEntry(idx, { hashtags: [...entry.hashtags, tag], hashtagInput: "" });
     }
   };
