@@ -31,6 +31,8 @@ export default function Clients() {
     });
   }, [posts, clients]);
 
+  const [saving, setSaving] = useState(false);
+
   const handleAddClient = async () => {
     const trimmed = newClientName.trim();
     if (!trimmed) return;
