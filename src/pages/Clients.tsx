@@ -21,6 +21,8 @@ export default function Clients() {
   const [newClientName, setNewClientName] = useState("");
   const [newInstagram, setNewInstagram] = useState("");
   const [newFacebookUrl, setNewFacebookUrl] = useState("");
+  const [newLinkedinUrl, setNewLinkedinUrl] = useState("");
+  const [newGmbUrl, setNewGmbUrl] = useState("");
   const [newObjective, setNewObjective] = useState("");
   const [uploading, setUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -84,6 +86,8 @@ export default function Clients() {
         name: trimmed,
         instagramHandle: newInstagram.trim() || undefined,
         facebookUrl: newFacebookUrl.trim() || undefined,
+        linkedinUrl: newLinkedinUrl.trim() || undefined,
+        gmbUrl: newGmbUrl.trim() || undefined,
         objective: newObjective.trim() || undefined,
         avatarUrl: avatarPreview || undefined,
       });
@@ -91,6 +95,8 @@ export default function Clients() {
       setNewClientName("");
       setNewInstagram("");
       setNewFacebookUrl("");
+      setNewLinkedinUrl("");
+      setNewGmbUrl("");
       setNewObjective("");
       setAvatarPreview(null);
       setDialogOpen(false);
@@ -208,6 +214,24 @@ export default function Clients() {
                 placeholder="https://facebook.com/iobee"
                 value={newFacebookUrl}
                 onChange={(e) => setNewFacebookUrl(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="linkedin-url">URL do LinkedIn</Label>
+              <Input
+                id="linkedin-url"
+                placeholder="https://linkedin.com/company/iobee"
+                value={newLinkedinUrl}
+                onChange={(e) => setNewLinkedinUrl(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="gmb-url">URL do Google Meu Negócio</Label>
+              <Input
+                id="gmb-url"
+                placeholder="https://g.page/iobee"
+                value={newGmbUrl}
+                onChange={(e) => setNewGmbUrl(e.target.value)}
               />
             </div>
             <div className="space-y-2">

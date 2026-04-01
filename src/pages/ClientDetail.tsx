@@ -30,6 +30,8 @@ export default function ClientDetail() {
   const [editName, setEditName] = useState("");
   const [editInstagram, setEditInstagram] = useState("");
   const [editFacebookUrl, setEditFacebookUrl] = useState("");
+  const [editLinkedinUrl, setEditLinkedinUrl] = useState("");
+  const [editGmbUrl, setEditGmbUrl] = useState("");
   const [editObjective, setEditObjective] = useState("");
   const [editSaving, setEditSaving] = useState(false);
 
@@ -80,6 +82,8 @@ export default function ClientDetail() {
     setEditName(clientName);
     setEditInstagram((data as any)?.instagram_handle || "");
     setEditFacebookUrl((data as any)?.facebook_url || "");
+    setEditLinkedinUrl((data as any)?.linkedin_url || "");
+    setEditGmbUrl((data as any)?.gmb_url || "");
     setEditObjective((data as any)?.objective || "");
     setEditOpen(true);
   };
@@ -90,6 +94,8 @@ export default function ClientDetail() {
       const { error } = await supabase.from("clients").update({
         instagram_handle: editInstagram.trim() || null,
         facebook_url: editFacebookUrl.trim() || null,
+        linkedin_url: editLinkedinUrl.trim() || null,
+        gmb_url: editGmbUrl.trim() || null,
         objective: editObjective.trim() || null,
       } as any).eq("name", clientName);
       if (error) throw error;
@@ -344,6 +350,14 @@ export default function ClientDetail() {
             <div className="space-y-2">
               <Label htmlFor="edit-facebook">URL do Facebook</Label>
               <Input id="edit-facebook" placeholder="https://facebook.com/iobee" value={editFacebookUrl} onChange={(e) => setEditFacebookUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-linkedin">URL do LinkedIn</Label>
+              <Input id="edit-linkedin" placeholder="https://linkedin.com/company/iobee" value={editLinkedinUrl} onChange={(e) => setEditLinkedinUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-gmb">URL do Google Meu Negócio</Label>
+              <Input id="edit-gmb" placeholder="https://g.page/iobee" value={editGmbUrl} onChange={(e) => setEditGmbUrl(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-objective">Objetivo</Label>

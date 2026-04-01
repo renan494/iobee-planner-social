@@ -64,8 +64,10 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           facebook_url: string | null
+          gmb_url: string | null
           id: string
           instagram_handle: string | null
+          linkedin_url: string | null
           name: string
           objective: string | null
         }
@@ -73,8 +75,10 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           facebook_url?: string | null
+          gmb_url?: string | null
           id?: string
           instagram_handle?: string | null
+          linkedin_url?: string | null
           name: string
           objective?: string | null
         }
@@ -82,8 +86,10 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           facebook_url?: string | null
+          gmb_url?: string | null
           id?: string
           instagram_handle?: string | null
+          linkedin_url?: string | null
           name?: string
           objective?: string | null
         }
