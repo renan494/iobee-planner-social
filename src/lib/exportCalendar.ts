@@ -75,7 +75,7 @@ export async function exportToPDF(posts: Post[], title: string) {
   // Table
   autoTable(doc, {
     startY: 43,
-    head: [["Data", "Cliente", "Analista", "Formato", "Funil", "Título", "Headline"]],
+    head: [["Data", "Cliente", "Analista", "Formato", "Funil", "Título", "Canais", "Headline"]],
     body: sorted.map((p) => [
       formatDate(p.date),
       p.client,
@@ -83,19 +83,21 @@ export async function exportToPDF(posts: Post[], title: string) {
       FORMAT_LABELS[p.format],
       FUNNEL_LABELS[p.funnelStage],
       p.title,
+      (p.channels || []).join(", ") || "—",
       p.headline,
     ]),
     styles: { fontSize: 8, cellPadding: 3 },
     headStyles: { fillColor: [253, 182, 0], textColor: [20, 15, 0], fontStyle: "bold" },
     alternateRowStyles: { fillColor: [245, 243, 235] },
     columnStyles: {
-      0: { cellWidth: 22 },
-      1: { cellWidth: 30 },
-      2: { cellWidth: 25 },
-      3: { cellWidth: 22 },
-      4: { cellWidth: 18 },
-      5: { cellWidth: 50 },
-      6: { cellWidth: "auto" },
+      0: { cellWidth: 20 },
+      1: { cellWidth: 25 },
+      2: { cellWidth: 22 },
+      3: { cellWidth: 20 },
+      4: { cellWidth: 16 },
+      5: { cellWidth: 45 },
+      6: { cellWidth: 30 },
+      7: { cellWidth: "auto" },
     },
     // Footer with iOBEE branding on each page
     didDrawPage: (data) => {
