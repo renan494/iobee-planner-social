@@ -207,7 +207,6 @@ export default function CalendarPage() {
       </div>
 
       <div className="mb-3 flex items-center gap-3">
-        <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
 
         {/* Date filter */}
         <Popover>
