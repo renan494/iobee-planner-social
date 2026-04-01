@@ -557,44 +557,46 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             <div className="space-y-6">
               {sortedPosts.map((post) => (
                 <div key={post.id} className={`group relative rounded-lg border border-border p-5 space-y-3 ${onPostClick ? "cursor-pointer hover:border-primary/50 hover:shadow-md transition-all" : ""}`} onClick={() => onPostClick?.(post)}>
-                  {/* Edit & Delete buttons */}
-                  {(onEditPost || onDeletePost) && (
-                    <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                      {onEditPost && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={(e) => { e.stopPropagation(); onEditPost(post); }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {onDeletePost && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            if (window.confirm("Tem certeza que deseja excluir este post?")) {
-                              await onDeletePost(post.id);
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  )}
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h4 className="font-semibold text-foreground">{post.title}</h4>
                       <p className="text-sm text-muted-foreground">{post.headline}</p>
                     </div>
-                    {post.artUrl && (
-                      <img src={post.artUrl} alt={post.title} className="h-20 w-20 rounded-lg object-cover flex-shrink-0" />
-                    )}
+                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                      {/* Edit & Delete buttons */}
+                      {(onEditPost || onDeletePost) && (
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {onEditPost && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
+                              onClick={(e) => { e.stopPropagation(); onEditPost(post); }}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                          {onDeletePost && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                if (window.confirm("Tem certeza que deseja excluir este post?")) {
+                                  await onDeletePost(post.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                      {post.artUrl && (
+                        <img src={post.artUrl} alt={post.title} className="h-20 w-20 rounded-lg object-cover" />
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
