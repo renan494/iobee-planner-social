@@ -152,7 +152,7 @@ export default function ClientDetail() {
                     </TableRow>
                   ) : (
                     clientPosts.map((post) => (
-                      <TableRow key={post.id} className="group cursor-pointer hover:bg-accent/40 transition-colors" onClick={() => setSelectedPost(post)}>
+                      <TableRow key={post.id} className="group cursor-pointer hover:bg-[hsl(var(--primary)/0.08)] transition-colors" onClick={() => setSelectedPost(post)}>
                         <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
                         <TableCell className="font-medium">{post.title}</TableCell>
                         <TableCell className="text-muted-foreground">{post.headline}</TableCell>
