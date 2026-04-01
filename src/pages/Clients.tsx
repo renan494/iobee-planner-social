@@ -1,14 +1,21 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, User } from "lucide-react";
+import { Users, User, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, type PostFormat } from "@/data/posts";
+import { toast } from "@/hooks/use-toast";
 
 export default function Clients() {
-  const { posts, clients } = usePosts();
+  const { posts, clients, addClient } = usePosts();
   const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newClientName, setNewClientName] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const clientStats = useMemo(() => {
     return clients.map((name) => {
@@ -20,16 +27,42 @@ export default function Clients() {
     });
   }, [posts, clients]);
 
+  const handleAddClient = async () => {
+    const trimmed = newClientName.trim();
+    if (!trimmed) return;
+    if (clients.includes(trimmed)) {
+      toast({ title: "Cliente já existe", description: `"${trimmed}" já está cadastrado.`, variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    try {
+      await addClient(trimmed);
+      toast({ title: "Cliente cadastrado", description: `"${trimmed}" foi adicionado com sucesso.` });
+      setNewClientName("");
+      setDialogOpen(false);
+    } catch (err) {
+      toast({ title: "Erro", description: "Não foi possível cadastrar o cliente.", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-          <Users className="h-5 w-5 text-primary" />
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <Users className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
+            <p className="text-sm text-muted-foreground">Gerencie seus clientes e veja a produção de cada um.</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
-          <p className="text-sm text-muted-foreground">Gerencie seus clientes e veja a produção de cada um.</p>
-        </div>
+        <Button onClick={() => setDialogOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" />
+          Cadastrar Cliente
+        </Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -54,16 +87,41 @@ export default function Clients() {
                   ) : null
                 )}
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span>Analistas:</span>
-                {c.analysts.map((a) => (
-                  <Badge key={a} variant="outline" className="text-xs">{a}</Badge>
-                ))}
-              </div>
+              {c.analysts.length > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span>Analistas:</span>
+                  {c.analysts.map((a) => (
+                    <Badge key={a} variant="outline" className="text-xs">{a}</Badge>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Cadastrar Novo Cliente</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="Nome do cliente"
+              value={newClientName}
+              onChange={(e) => setNewClientName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAddClient()}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleAddClient} disabled={saving || !newClientName.trim()}>
+              {saving ? "Salvando..." : "Cadastrar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
