@@ -25,6 +25,7 @@ import { CalendarListView } from "@/components/CalendarListView";
 import { ClientFilter } from "@/components/ClientFilter";
 import { AnalystFilter } from "@/components/AnalystFilter";
 import { ViewModeSwitcher } from "@/components/ViewModeSwitcher";
+import { FormatLegend } from "@/components/FormatLegend";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { ImportModal } from "@/components/ImportModal";
 import { Button } from "@/components/ui/button";
