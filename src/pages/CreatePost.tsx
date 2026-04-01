@@ -184,6 +184,8 @@ export default function CreatePost() {
         if (!uploadErr) {
           const { data: urlData } = supabase.storage.from("post-arts").getPublicUrl(path);
           artUrl = urlData.publicUrl;
+        } else {
+          console.error("Art upload error:", uploadErr);
         }
       }
 
