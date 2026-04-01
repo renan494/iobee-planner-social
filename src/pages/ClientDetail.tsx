@@ -191,7 +191,7 @@ export default function ClientDetail() {
                     <TableHead>Funil</TableHead>
                     <TableHead>Canais</TableHead>
                     <TableHead>Analista</TableHead>
-                    <TableHead className="w-10"></TableHead>
+                    <TableHead className="w-20"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
