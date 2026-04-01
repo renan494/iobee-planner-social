@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { usePosts } from "@/contexts/PostsContext";
-import { FORMAT_LABELS, FUNNEL_LABELS } from "@/data/posts";
+import { FORMAT_LABELS, FUNNEL_LABELS, CHANNEL_OPTIONS } from "@/data/posts";
 import type { PostFormat, FunnelStage } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { useActivity } from "@/contexts/ActivityContext";
@@ -46,6 +46,7 @@ interface PostEntry {
   artFile: File | null;
   artPreviews: string[];
   artFiles: File[];
+  channels: string[];
   collapsed: boolean;
   draftId?: string;
 }
@@ -68,6 +69,7 @@ function createEmptyEntry(): PostEntry {
     artFile: null,
     artPreviews: [],
     artFiles: [],
+    channels: [],
     collapsed: false,
   };
 }
@@ -105,6 +107,7 @@ export default function CreatePost() {
         artFile: null,
         artPreviews: [],
         artFiles: [],
+        channels: [],
         collapsed: false,
         draftId: data.id,
       }]);
@@ -201,6 +204,7 @@ export default function CreatePost() {
         legend: entry.content.trim() || undefined,
         artUrl,
         artUrls,
+        channels: entry.channels,
       });
     }
 
@@ -426,6 +430,36 @@ function PostEntryForm({
                   <Calendar mode="single" selected={entry.date} onSelect={(d) => onUpdate({ date: d })} locale={ptBR} initialFocus className={cn("p-3 pointer-events-auto")} />
                 </PopoverContent>
               </Popover>
+            </div>
+          </div>
+
+          {/* Channels */}
+          <div className="space-y-2">
+            <Label>Canais</Label>
+            <div className="flex flex-wrap gap-2">
+              {CHANNEL_OPTIONS.map((channel) => {
+                const selected = entry.channels.includes(channel);
+                return (
+                  <button
+                    key={channel}
+                    type="button"
+                    onClick={() => {
+                      const newChannels = selected
+                        ? entry.channels.filter((c) => c !== channel)
+                        : [...entry.channels, channel];
+                      onUpdate({ channels: newChannels });
+                    }}
+                    className={cn(
+                      "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                      selected
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                    )}
+                  >
+                    {channel}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -308,6 +308,17 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
               )}
             </div>
 
+            {/* Channels */}
+            {!editing && post.channels && post.channels.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {post.channels.map((ch) => (
+                  <span key={ch} className="rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    {ch}
+                  </span>
+                ))}
+              </div>
+            )}
+
             {editing ? (
               <Textarea
                 value={editFields.legend}

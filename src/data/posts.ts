@@ -14,7 +14,18 @@ export interface Post {
   legend?: string;
   artUrl?: string;
   artUrls?: string[];
+  channels?: string[];
 }
+
+export const CHANNEL_OPTIONS = [
+  "Instagram",
+  "Facebook",
+  "TikTok",
+  "LinkedIn",
+  "X",
+  "YouTube",
+  "Pinterest",
+] as const;
 
 export const FORMAT_LABELS: Record<PostFormat, string> = {
   static: "Estático",

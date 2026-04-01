@@ -112,6 +112,7 @@ export type Database = {
           analyst: string
           art_url: string | null
           art_urls: string[] | null
+          channels: string[] | null
           client: string
           created_at: string
           date: string
@@ -128,6 +129,7 @@ export type Database = {
           analyst: string
           art_url?: string | null
           art_urls?: string[] | null
+          channels?: string[] | null
           client: string
           created_at?: string
           date: string
@@ -144,6 +146,7 @@ export type Database = {
           analyst?: string
           art_url?: string | null
           art_urls?: string[] | null
+          channels?: string[] | null
           client?: string
           created_at?: string
           date?: string
