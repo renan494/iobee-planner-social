@@ -92,7 +92,8 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       date: p.date,
       hashtags: p.hashtags,
       legend: p.legend || null,
-    }));
+      art_url: p.artUrl || null,
+    } as any));
     const { error } = await supabase.from("posts").insert(rows);
     if (!error) await fetchPosts();
   }, [fetchPosts]);
