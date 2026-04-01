@@ -221,7 +221,7 @@ export default function CalendarPage() {
                 : `${dateFrom ? format(dateFrom, "dd/MM/yy") : "..."} – ${dateTo ? format(dateTo, "dd/MM/yy") : "..."}`}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-2 space-y-1" align="start">
+          <PopoverContent className="w-auto p-2 space-y-1 z-50" align="start">
             {([
               ["all", "Todos"],
               ["day", "Dia"],
