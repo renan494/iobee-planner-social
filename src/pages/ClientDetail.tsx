@@ -30,6 +30,8 @@ export default function ClientDetail() {
   const [editName, setEditName] = useState("");
   const [editInstagram, setEditInstagram] = useState("");
   const [editFacebookUrl, setEditFacebookUrl] = useState("");
+  const [editLinkedinUrl, setEditLinkedinUrl] = useState("");
+  const [editGmbUrl, setEditGmbUrl] = useState("");
   const [editObjective, setEditObjective] = useState("");
   const [editSaving, setEditSaving] = useState(false);
 
