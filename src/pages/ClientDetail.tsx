@@ -209,7 +209,7 @@ export default function ClientDetail() {
                         <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
                         <TableCell className="font-medium">{post.title}</TableCell>
                         <TableCell className="text-muted-foreground">{post.headline}</TableCell>
-                        <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
+                        <TableCell><PostBadge format={post.format} /></TableCell>
                         <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
