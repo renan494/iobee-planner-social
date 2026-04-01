@@ -44,6 +44,8 @@ interface PostEntry {
   hashtags: string[];
   artPreview: string | null;
   artFile: File | null;
+  artPreviews: string[];
+  artFiles: File[];
   collapsed: boolean;
   draftId?: string;
 }
