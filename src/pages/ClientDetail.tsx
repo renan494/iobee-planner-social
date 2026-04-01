@@ -20,7 +20,7 @@ import { PostDetailModal } from "@/components/PostDetailModal";
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
-  const { posts, updatePostDate, updatePostArt, updatePost, deletePost } = usePosts();
+  const { posts, updatePostDate, updatePostArt, updatePost, deletePost, analysts: allAnalysts } = usePosts();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showReport, setShowReport] = useState(false);
