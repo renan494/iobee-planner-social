@@ -7,6 +7,7 @@ import { usePosts } from "@/contexts/PostsContext";
 import { toast } from "@/hooks/use-toast";
 
 export default function Analysts() {
+  const navigate = useNavigate();
   const { analysts, posts, addAnalyst, updateAnalyst, removeAnalyst } = usePosts();
   const [name, setName] = useState("");
   const [editingName, setEditingName] = useState<string | null>(null);
