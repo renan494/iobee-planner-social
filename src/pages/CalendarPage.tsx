@@ -142,6 +142,7 @@ export default function CalendarPage() {
         case "week": return dir === 1 ? addWeeks(d, 1) : subWeeks(d, 1);
         case "month": return dir === 1 ? addMonths(d, 1) : subMonths(d, 1);
         case "quarter": return dir === 1 ? addQuarters(d, 1) : subQuarters(d, 1);
+        case "semester": return dir === 1 ? addMonths(d, 6) : addMonths(d, -6);
         case "year": return dir === 1 ? addYears(d, 1) : subYears(d, 1);
       }
     });
