@@ -106,11 +106,18 @@ export default function ClientDetail() {
         <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => showReport ? setShowReport(false) : navigate("/clientes")}>
           <ArrowLeft className="h-4 w-4" /> {showReport ? "Voltar" : "Voltar"}
         </Button>
-        {!showReport && clientPosts.length > 0 && (
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setShowReport(true)}>
-            <Eye className="h-4 w-4" /> Ver Posts
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {!showReport && (
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => navigate(`/criar?client=${encodeURIComponent(clientName)}`)}>
+              <PenTool className="h-4 w-4" /> Produzir Conteúdo
+            </Button>
+          )}
+          {!showReport && clientPosts.length > 0 && (
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setShowReport(true)}>
+              <Eye className="h-4 w-4" /> Ver Posts
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="mb-8 flex items-center gap-3">
