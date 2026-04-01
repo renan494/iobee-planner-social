@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Camera } from "lucide-react";
+import { ArrowLeft, User, Camera, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,12 +10,14 @@ import { usePosts } from "@/contexts/PostsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage } from "@/data/posts";
 import { toast } from "sonner";
+import { ClientReportPreview } from "@/components/ClientReportPreview";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const { posts } = usePosts();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showReport, setShowReport] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
   const clientPosts = useMemo(() => posts.filter((p) => p.client === clientName), [posts, clientName]);
@@ -60,9 +62,16 @@ export default function ClientDetail() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
-      <Button variant="ghost" size="sm" className="mb-4 gap-1.5" onClick={() => navigate("/clientes")}>
-        <ArrowLeft className="h-4 w-4" /> Voltar
-      </Button>
+      <div className="mb-4 flex items-center justify-between">
+        <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => showReport ? setShowReport(false) : navigate("/clientes")}>
+          <ArrowLeft className="h-4 w-4" /> {showReport ? "Voltar" : "Voltar"}
+        </Button>
+        {!showReport && clientPosts.length > 0 && (
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setShowReport(true)}>
+            <FileText className="h-4 w-4" /> Gerar Relatório
+          </Button>
+        )}
+      </div>
 
       <div className="mb-8 flex items-center gap-3">
         <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
@@ -92,56 +101,68 @@ export default function ClientDetail() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        {(Object.entries(byFormat) as [PostFormat, number][]).map(([fmt, count]) =>
-          count > 0 ? (
-            <Badge key={fmt} variant="secondary">{FORMAT_LABELS[fmt]}: {count}</Badge>
-          ) : null
-        )}
-        <span className="mx-2 text-muted-foreground">|</span>
-        {analysts.map((a) => (
-          <Badge key={a} variant="outline">{a}</Badge>
-        ))}
-      </div>
+      {showReport ? (
+        <ClientReportPreview
+          clientName={clientName}
+          posts={clientPosts}
+          analysts={analysts}
+          byFormat={byFormat}
+          avatarUrl={avatarUrl}
+        />
+      ) : (
+        <>
+          {/* Stats */}
+          <div className="mb-6 flex flex-wrap gap-2">
+            {(Object.entries(byFormat) as [PostFormat, number][]).map(([fmt, count]) =>
+              count > 0 ? (
+                <Badge key={fmt} variant="secondary">{FORMAT_LABELS[fmt]}: {count}</Badge>
+              ) : null
+            )}
+            <span className="mx-2 text-muted-foreground">|</span>
+            {analysts.map((a) => (
+              <Badge key={a} variant="outline">{a}</Badge>
+            ))}
+          </div>
 
-      {/* Posts table */}
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Título</TableHead>
-                <TableHead>Headline</TableHead>
-                <TableHead>Formato</TableHead>
-                <TableHead>Funil</TableHead>
-                <TableHead>Analista</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clientPosts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    Nenhum post encontrado para este cliente.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                clientPosts.map((post) => (
-                  <TableRow key={post.id}>
-                    <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
-                    <TableCell className="font-medium">{post.title}</TableCell>
-                    <TableCell className="text-muted-foreground">{post.headline}</TableCell>
-                    <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
-                    <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
-                    <TableCell>{post.analyst}</TableCell>
+          {/* Posts table */}
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Título</TableHead>
+                    <TableHead>Headline</TableHead>
+                    <TableHead>Formato</TableHead>
+                    <TableHead>Funil</TableHead>
+                    <TableHead>Analista</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {clientPosts.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                        Nenhum post encontrado para este cliente.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    clientPosts.map((post) => (
+                      <TableRow key={post.id}>
+                        <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
+                        <TableCell className="font-medium">{post.title}</TableCell>
+                        <TableCell className="text-muted-foreground">{post.headline}</TableCell>
+                        <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
+                        <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
+                        <TableCell>{post.analyst}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
