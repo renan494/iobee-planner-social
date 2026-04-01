@@ -20,6 +20,7 @@ import { DayView } from "@/components/DayView";
 import { WeekView } from "@/components/WeekView";
 import { QuarterView } from "@/components/QuarterView";
 import { YearView } from "@/components/YearView";
+import { SemesterView } from "@/components/SemesterView";
 import { CalendarListView } from "@/components/CalendarListView";
 import { ClientFilter } from "@/components/ClientFilter";
 import { AnalystFilter } from "@/components/AnalystFilter";
