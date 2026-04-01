@@ -179,8 +179,9 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 space-y-4">
+      {/* Row 1: Navigation + Import/Export */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <CalendarHeader
           currentDate={currentDate}
           viewMode={viewMode}
@@ -188,31 +189,7 @@ export default function CalendarPage() {
           onNext={() => navigate(1)}
           onToday={() => setCurrentDate(new Date())}
         />
-        <div className="flex items-center gap-2 flex-wrap">
-          <ClientFilter clients={availableClients} selected={selectedClient} onChange={setSelectedClient} />
-          <AnalystFilter analysts={availableAnalysts} selected={selectedAnalyst} onChange={setSelectedAnalyst} />
-          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-            <SelectTrigger className="w-[160px] h-9 text-sm">
-              <SelectValue placeholder="Formato" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os formatos</SelectItem>
-              {(Object.entries(FORMAT_LABELS) as [PostFormat, string][]).map(([key, label]) => (
-                <SelectItem key={key} value={key}>{label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={selectedChannel} onValueChange={setSelectedChannel}>
-            <SelectTrigger className="w-[160px] h-9 text-sm">
-              <SelectValue placeholder="Canal" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os canais</SelectItem>
-              {CHANNEL_OPTIONS.map((ch) => (
-                <SelectItem key={ch} value={ch}>{ch}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-2">
           <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5">
             <Upload className="h-4 w-4" />
             <span className="hidden sm:inline">Importar</span>
@@ -238,11 +215,38 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      <div className="mb-3 flex items-center gap-3">
+      {/* Row 2: Filters */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <ClientFilter clients={availableClients} selected={selectedClient} onChange={setSelectedClient} />
+        <AnalystFilter analysts={availableAnalysts} selected={selectedAnalyst} onChange={setSelectedAnalyst} />
+        <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+          <SelectTrigger className="w-[160px] h-9 text-sm">
+            <SelectValue placeholder="Formato" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os formatos</SelectItem>
+            {(Object.entries(FORMAT_LABELS) as [PostFormat, string][]).map(([key, label]) => (
+              <SelectItem key={key} value={key}>{label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={selectedChannel} onValueChange={setSelectedChannel}>
+          <SelectTrigger className="w-[160px] h-9 text-sm">
+            <SelectValue placeholder="Canal" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os canais</SelectItem>
+            {CHANNEL_OPTIONS.map((ch) => (
+              <SelectItem key={ch} value={ch}>{ch}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Row 3: View mode + Legend + Layout toggle */}
+      <div className="flex items-center gap-3">
         <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
         <FormatLegend />
-
-        {/* Layout toggle */}
         <div className="ml-auto flex items-center rounded-lg border border-border p-0.5">
           <Button
             variant={layoutMode === "calendar" ? "default" : "ghost"}
