@@ -119,14 +119,47 @@ export default function Clients() {
           <DialogHeader>
             <DialogTitle>Cadastrar Novo Cliente</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <Input
-              placeholder="Nome do cliente"
-              value={newClientName}
-              onChange={(e) => setNewClientName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAddClient()}
-              autoFocus
-            />
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="client-name">Nome do cliente *</Label>
+              <Input
+                id="client-name"
+                placeholder="Ex: iOBEE"
+                value={newClientName}
+                onChange={(e) => setNewClientName(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="monthly-posts">Quantidade de posts mensais</Label>
+              <Input
+                id="monthly-posts"
+                type="number"
+                min="0"
+                placeholder="Ex: 20"
+                value={newMonthlyPosts}
+                onChange={(e) => setNewMonthlyPosts(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="objective">Objetivo</Label>
+              <Textarea
+                id="objective"
+                placeholder="Descreva o objetivo do cliente..."
+                value={newObjective}
+                onChange={(e) => setNewObjective(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="goal">Meta</Label>
+              <Input
+                id="goal"
+                placeholder="Ex: 10k seguidores até dezembro"
+                value={newGoal}
+                onChange={(e) => setNewGoal(e.target.value)}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
