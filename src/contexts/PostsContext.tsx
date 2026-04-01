@@ -45,6 +45,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
         legend: row.legend ?? undefined,
         artUrl: (row as any).art_url ?? undefined,
         artUrls: (row as any).art_urls ?? [],
+        channels: (row as any).channels ?? [],
       }));
       setPosts(mapped);
     }
