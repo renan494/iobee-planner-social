@@ -36,6 +36,21 @@ export default function Clients() {
     });
   }, [posts, clients]);
 
+  // Fetch avatar URLs for each client from storage
+  const [avatarUrls, setAvatarUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    clients.forEach((name) => {
+      const storagePath = `${encodeURIComponent(name)}/avatar`;
+      const { data } = supabase.storage.from("client-avatars").getPublicUrl(storagePath);
+      fetch(data.publicUrl, { method: "HEAD" }).then((res) => {
+        if (res.ok) {
+          setAvatarUrls((prev) => ({ ...prev, [name]: data.publicUrl + "?t=" + Date.now() }));
+        }
+      }).catch(() => {});
+    });
+  }, [clients]);
+
   const [saving, setSaving] = useState(false);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
