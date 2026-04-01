@@ -8,7 +8,7 @@ import { PostBadge } from "./PostBadge";
 import { FUNNEL_LABELS, type Post } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User, UserCheck, Pencil } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
@@ -17,6 +17,30 @@ interface PostDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdateDate?: (postId: string, newDate: string) => void;
+}
+
+function PhoneMockup({ artUrl, title }: { artUrl?: string; title: string }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-[200px] rounded-[2rem] border-[6px] border-foreground/80 bg-background shadow-xl overflow-hidden">
+        {/* Notch */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-foreground/80 rounded-b-xl z-10" />
+        {/* Screen */}
+        <div className="aspect-[9/16] bg-muted flex items-center justify-center overflow-hidden">
+          {artUrl ? (
+            <img src={artUrl} alt={title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <ImageOff className="h-8 w-8" />
+              <span className="text-xs">Sem arte</span>
+            </div>
+          )}
+        </div>
+        {/* Home indicator */}
+        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full bg-foreground/40" />
+      </div>
+    </div>
+  );
 }
 
 export function PostDetailModal({ post, open, onOpenChange, onUpdateDate }: PostDetailModalProps) {
@@ -40,68 +64,76 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate }: Post
 
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setEditingDate(false); }}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold">{post.title}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <p className="text-base font-semibold text-foreground">{post.headline}</p>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>{dateFormatted}</span>
-              {onUpdateDate && (
-                <Popover open={editingDate} onOpenChange={setEditingDate}>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 ml-1">
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={postDate}
-                      onSelect={handleDateChange}
-                      initialFocus
-                      className={cn("p-3 pointer-events-auto")}
-                    />
-                  </PopoverContent>
-                </Popover>
-              )}
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <User className="h-4 w-4" />
-              <span>{post.client}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <UserCheck className="h-4 w-4" />
-              <span>{post.analyst}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Target className="h-4 w-4 text-muted-foreground" />
-              <Badge variant="secondary">{FUNNEL_LABELS[post.funnelStage]}</Badge>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <PostBadge format={post.format} />
-            </div>
+        <div className="flex gap-6">
+          {/* Phone mockup on left */}
+          <div className="hidden sm:flex flex-shrink-0">
+            <PhoneMockup artUrl={post.artUrl} title={post.title} />
           </div>
 
-          {post.legend && (
-            <div className="rounded-lg bg-secondary p-3">
-              <p className="text-sm leading-relaxed text-secondary-foreground">{post.legend}</p>
-            </div>
-          )}
+          {/* Details on right */}
+          <div className="flex-1 space-y-4 min-w-0">
+            <p className="text-base font-semibold text-foreground">{post.headline}</p>
 
-          {post.hashtags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              <Tag className="mr-1 h-4 w-4 text-muted-foreground" />
-              {post.hashtags.map((h) => (
-                <span key={h} className="text-xs font-medium text-accent">#{h}</span>
-              ))}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4 flex-shrink-0" />
+                <span>{dateFormatted}</span>
+                {onUpdateDate && (
+                  <Popover open={editingDate} onOpenChange={setEditingDate}>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 ml-1">
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={postDate}
+                        onSelect={handleDateChange}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4 flex-shrink-0" />
+                <span>{post.client}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <UserCheck className="h-4 w-4 flex-shrink-0" />
+                <span>{post.analyst}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <Badge variant="secondary">{FUNNEL_LABELS[post.funnelStage]}</Badge>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <PostBadge format={post.format} />
+              </div>
             </div>
-          )}
+
+            {post.legend && (
+              <div className="rounded-lg bg-secondary p-3">
+                <p className="text-sm leading-relaxed text-secondary-foreground">{post.legend}</p>
+              </div>
+            )}
+
+            {post.hashtags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                <Tag className="mr-1 h-4 w-4 text-muted-foreground" />
+                {post.hashtags.map((h) => (
+                  <span key={h} className="text-xs font-medium text-accent">#{h}</span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
