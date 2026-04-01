@@ -38,7 +38,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid, Plus } from "lucide-react";
+import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid, PenTool } from "lucide-react";
 import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
 import { useNavigate } from "react-router-dom";
 import { VIEW_LABELS } from "@/types/calendar";
@@ -192,7 +192,7 @@ export default function CalendarPage() {
           onToday={() => setCurrentDate(new Date())}
         />
         <Button onClick={() => routerNavigate("/criar")} className="gap-2 font-semibold">
-          <Plus className="h-4 w-4" />
+          <PenTool className="h-4 w-4" />
           Produzir Conteúdo
         </Button>
       </div>
