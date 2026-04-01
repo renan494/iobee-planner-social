@@ -62,9 +62,16 @@ export default function ClientDetail() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
-      <Button variant="ghost" size="sm" className="mb-4 gap-1.5" onClick={() => navigate("/clientes")}>
-        <ArrowLeft className="h-4 w-4" /> Voltar
-      </Button>
+      <div className="mb-4 flex items-center justify-between">
+        <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => showReport ? setShowReport(false) : navigate("/clientes")}>
+          <ArrowLeft className="h-4 w-4" /> {showReport ? "Voltar" : "Voltar"}
+        </Button>
+        {!showReport && clientPosts.length > 0 && (
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setShowReport(true)}>
+            <FileText className="h-4 w-4" /> Gerar Relatório
+          </Button>
+        )}
+      </div>
 
       <div className="mb-8 flex items-center gap-3">
         <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
