@@ -34,7 +34,7 @@ import type { ViewMode } from "@/types/calendar";
 import { useEffect } from "react";
 
 export default function CalendarPage() {
-  const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt } = usePosts();
+  const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost } = usePosts();
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [selectedClient, setSelectedClient] = useState("all");
