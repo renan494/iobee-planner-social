@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { BarChart3, Image, Film, Clapperboard, MessageCircle, TrendingUp, Clock, Upload, PenTool, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { DateRangePicker } from "@/components/DateRangePicker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { usePosts } from "@/contexts/PostsContext";
@@ -24,12 +25,16 @@ export default function Dashboard() {
   const isAdmin = useAdminCheck();
   const navigate = useNavigate();
 
-  const [selectedMonth, setSelectedMonth] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const filteredPosts = useMemo(() => {
-    if (!selectedMonth) return posts;
-    return posts.filter((p) => p.date.startsWith(selectedMonth));
-  }, [posts, selectedMonth]);
+    return posts.filter((p) => {
+      if (startDate && p.date < startDate) return false;
+      if (endDate && p.date > endDate) return false;
+      return true;
+    });
+  }, [posts, startDate, endDate]);
 
   const formatCounts = useMemo(() => {
     const counts: Record<PostFormat, number> = { static: 0, carousel: 0, reels: 0, stories: 0 };
@@ -57,18 +62,12 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Visão geral do planejamento de conteúdo.</p>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <input
-            type="month"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        <div className="ml-auto">
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onChange={(s, e) => { setStartDate(s); setEndDate(e); }}
           />
-          {selectedMonth && (
-            <Button variant="ghost" size="sm" onClick={() => setSelectedMonth("")} className="text-xs">
-              Todos
-            </Button>
-          )}
         </div>
        </div>
 
