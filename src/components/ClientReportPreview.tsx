@@ -495,10 +495,16 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-foreground">Preview do Relatório</h2>
-        <Button onClick={handleDownloadPDF} className="gap-2">
-          <Download className="h-4 w-4" />
-          Baixar PDF
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate(`/criar?client=${encodeURIComponent(clientName)}`)} className="gap-2">
+            <PenTool className="h-4 w-4" />
+            Produzir Conteúdo
+          </Button>
+          <Button onClick={handleDownloadPDF} className="gap-2">
+            <Download className="h-4 w-4" />
+            Baixar PDF
+          </Button>
+        </div>
       </div>
 
       {/* Preview document */}
