@@ -1,11 +1,13 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   addMonths, subMonths,
   addDays, subDays,
   addWeeks, subWeeks,
   addQuarters, subQuarters,
   addYears, subYears,
+  format,
 } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { usePosts } from "@/contexts/PostsContext";
 import { getClients, getAnalysts, type Post } from "@/data/posts";
 import { CalendarHeader } from "@/components/CalendarHeader";
@@ -14,24 +16,26 @@ import { DayView } from "@/components/DayView";
 import { WeekView } from "@/components/WeekView";
 import { QuarterView } from "@/components/QuarterView";
 import { YearView } from "@/components/YearView";
+import { CalendarListView } from "@/components/CalendarListView";
 import { ClientFilter } from "@/components/ClientFilter";
 import { AnalystFilter } from "@/components/AnalystFilter";
 import { ViewModeSwitcher } from "@/components/ViewModeSwitcher";
-import { FormatLegend } from "@/components/FormatLegend";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { ImportModal } from "@/components/ImportModal";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Upload, Download, FileText, FileSpreadsheet } from "lucide-react";
+import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid } from "lucide-react";
 import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
 import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
-import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export default function CalendarPage() {
   const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost, deletePost } = usePosts();
@@ -42,6 +46,9 @@ export default function CalendarPage() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
+  const [layoutMode, setLayoutMode] = useState<"calendar" | "list">("calendar");
 
   const availableClients = useMemo(() => {
     if (selectedAnalyst === "all") return clients;
@@ -65,9 +72,11 @@ export default function CalendarPage() {
     return posts.filter((p) => {
       if (selectedClient !== "all" && p.client !== selectedClient) return false;
       if (selectedAnalyst !== "all" && p.analyst !== selectedAnalyst) return false;
+      if (dateFrom && p.date < format(dateFrom, "yyyy-MM-dd")) return false;
+      if (dateTo && p.date > format(dateTo, "yyyy-MM-dd")) return false;
       return true;
     });
-  }, [posts, selectedClient, selectedAnalyst]);
+  }, [posts, selectedClient, selectedAnalyst, dateFrom, dateTo]);
 
   const handlePostClick = useCallback((post: Post) => {
     setSelectedPost(post);
@@ -161,10 +170,56 @@ export default function CalendarPage() {
 
       <div className="mb-3 flex items-center gap-3">
         <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
-        <FormatLegend />
+
+        {/* Date filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <CalendarIcon className="h-4 w-4" />
+              {dateFrom || dateTo
+                ? `${dateFrom ? format(dateFrom, "dd/MM/yy") : "..."} – ${dateTo ? format(dateTo, "dd/MM/yy") : "..."}`
+                : "Filtrar por data"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-4 space-y-3" align="start">
+            <p className="text-xs font-medium text-muted-foreground">De</p>
+            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
+            <p className="text-xs font-medium text-muted-foreground">Até</p>
+            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
+            {(dateFrom || dateTo) && (
+              <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}>
+                Limpar filtros
+              </Button>
+            )}
+          </PopoverContent>
+        </Popover>
+
+        {/* Layout toggle */}
+        <div className="ml-auto flex items-center rounded-lg border border-border p-0.5">
+          <Button
+            variant={layoutMode === "calendar" ? "default" : "ghost"}
+            size="sm"
+            className="h-7 px-2"
+            onClick={() => setLayoutMode("calendar")}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={layoutMode === "list" ? "default" : "ghost"}
+            size="sm"
+            className="h-7 px-2"
+            onClick={() => setLayoutMode("list")}
+          >
+            <List className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-      {renderView()}
+      {layoutMode === "list" ? (
+        <CalendarListView posts={filteredPosts} onPostClick={handlePostClick} />
+      ) : (
+        renderView()
+      )}
 
       <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} onDeletePost={async (id) => { await deletePost(id); setModalOpen(false); }} />
       <ImportModal
