@@ -351,6 +351,30 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
               </div>
             )}
           </div>
+
+          {/* Phone mockup on right */}
+          <div className="hidden sm:flex flex-shrink-0">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleArtUpload}
+              disabled={uploading}
+            />
+            <PhoneMockup
+              images={
+                post.format === "carousel" && post.artUrls && post.artUrls.length > 0
+                  ? post.artUrls
+                  : post.artUrl
+                    ? [post.artUrl]
+                    : []
+              }
+              title={post.title}
+              isCarousel={post.format === "carousel"}
+              onEditArt={onUpdateArt ? () => fileInputRef.current?.click() : undefined}
+            />
+          </div>
         </div>
       </DialogContent>
     </Dialog>
