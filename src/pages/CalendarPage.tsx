@@ -158,6 +158,8 @@ export default function CalendarPage() {
         return <CalendarGrid currentDate={currentDate} posts={filteredPosts} onPostClick={handlePostClick} />;
       case "quarter":
         return <QuarterView currentDate={currentDate} posts={filteredPosts} onPostClick={handlePostClick} />;
+      case "semester":
+        return <SemesterView currentDate={currentDate} posts={filteredPosts} onPostClick={handlePostClick} />;
       case "year":
         return (
           <YearView
