@@ -6,12 +6,7 @@ import {
   addQuarters, subQuarters,
   addYears, subYears,
   format,
-  startOfDay, endOfDay,
-  startOfMonth, endOfMonth,
-  startOfQuarter, endOfQuarter,
-  startOfYear, endOfYear,
 } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { usePosts } from "@/contexts/PostsContext";
 import { getClients, getAnalysts, type Post, FORMAT_LABELS, CHANNEL_OPTIONS, type PostFormat } from "@/data/posts";
 import { CalendarHeader } from "@/components/CalendarHeader";
