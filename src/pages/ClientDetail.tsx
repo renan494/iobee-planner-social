@@ -94,6 +94,8 @@ export default function ClientDetail() {
       const { error } = await supabase.from("clients").update({
         instagram_handle: editInstagram.trim() || null,
         facebook_url: editFacebookUrl.trim() || null,
+        linkedin_url: editLinkedinUrl.trim() || null,
+        gmb_url: editGmbUrl.trim() || null,
         objective: editObjective.trim() || null,
       } as any).eq("name", clientName);
       if (error) throw error;
