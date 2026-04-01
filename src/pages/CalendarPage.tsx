@@ -192,7 +192,7 @@ export default function CalendarPage() {
           onToday={() => setCurrentDate(new Date())}
         />
         <Button onClick={() => routerNavigate("/criar")} className="gap-2 font-semibold">
-          <Plus className="h-4 w-4" />
+          <PenTool className="h-4 w-4" />
           Produzir Conteúdo
         </Button>
       </div>
