@@ -38,8 +38,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid } from "lucide-react";
+import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid, Plus } from "lucide-react";
 import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
+import { useNavigate } from "react-router-dom";
 import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
 import { cn } from "@/lib/utils";
