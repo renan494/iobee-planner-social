@@ -4,8 +4,9 @@ import { ptBR } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FORMAT_LABELS, FUNNEL_LABELS, type Post } from "@/data/posts";
-import { Eye, Pencil } from "lucide-react";
+import { FORMAT_LABELS, FUNNEL_LABELS, type Post, type PostFormat } from "@/data/posts";
+import { PostBadge } from "@/components/PostBadge";
+import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface CalendarListViewProps {
