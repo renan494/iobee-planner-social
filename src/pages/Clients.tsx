@@ -217,6 +217,24 @@ export default function Clients() {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="linkedin-url">URL do LinkedIn</Label>
+              <Input
+                id="linkedin-url"
+                placeholder="https://linkedin.com/company/iobee"
+                value={newLinkedinUrl}
+                onChange={(e) => setNewLinkedinUrl(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="gmb-url">URL do Google Meu Negócio</Label>
+              <Input
+                id="gmb-url"
+                placeholder="https://g.page/iobee"
+                value={newGmbUrl}
+                onChange={(e) => setNewGmbUrl(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="objective">Objetivo</Label>
               <Textarea
                 id="objective"
