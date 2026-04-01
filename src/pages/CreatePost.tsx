@@ -59,8 +59,8 @@ function createEmptyEntry(): PostEntry {
     newClient: "",
     analyst: "",
     newAnalyst: "",
-    postFormat: "static",
-    funnelStage: "topo",
+    postFormat: "" as unknown as PostFormat,
+    funnelStage: "" as unknown as FunnelStage,
     date: undefined,
     title: "",
     content: "",
@@ -154,8 +154,8 @@ export default function CreatePost() {
     for (const entry of entries) {
       const ec = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
       const ea = entry.analyst === "__new__" ? entry.newAnalyst.trim() : entry.analyst;
-      if (!ec || !ea || !entry.date || !entry.title.trim()) {
-        toast({ title: "Preencha os campos obrigatórios", description: "Cliente, analista, data e título são obrigatórios em todos os posts.", variant: "destructive" });
+      if (!ec || !ea || !entry.date || !entry.title.trim() || !entry.postFormat || !entry.funnelStage) {
+        toast({ title: "Preencha os campos obrigatórios", description: "Cliente, analista, formato, etapa do funil, data e título são obrigatórios.", variant: "destructive" });
         return;
       }
       if (entry.analyst === "__new__" && ea) newAnalystsToAdd.add(ea);
@@ -400,9 +400,9 @@ function PostEntryForm({
           {/* Format, Funnel & Date */}
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label>Tipo do Post *</Label>
+              <Label>Formato *</Label>
               <Select value={entry.postFormat} onValueChange={(v) => onUpdate({ postFormat: v as PostFormat })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione o formato" /></SelectTrigger>
                 <SelectContent>
                   {(Object.entries(FORMAT_LABELS) as [PostFormat, string][]).map(([k, v]) => (
                     <SelectItem key={k} value={k}>{v}</SelectItem>
@@ -413,7 +413,7 @@ function PostEntryForm({
             <div className="space-y-2">
               <Label>Etapa do Funil</Label>
               <Select value={entry.funnelStage} onValueChange={(v) => onUpdate({ funnelStage: v as FunnelStage })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione a etapa" /></SelectTrigger>
                 <SelectContent>
                   {(Object.entries(FUNNEL_LABELS) as [FunnelStage, string][]).map(([k, v]) => (
                     <SelectItem key={k} value={k}>{v}</SelectItem>
