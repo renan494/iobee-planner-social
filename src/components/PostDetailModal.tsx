@@ -11,7 +11,7 @@ import { PostBadge } from "./PostBadge";
 import { FORMAT_LABELS, FUNNEL_LABELS, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight, Check, X, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +23,7 @@ interface PostDetailModalProps {
   onUpdateDate?: (postId: string, newDate: string) => void;
   onUpdateArt?: (postId: string, artUrl: string | null) => Promise<void>;
   onUpdatePost?: (postId: string, fields: Partial<Omit<Post, "id">>) => Promise<void>;
+  onDeletePost?: (postId: string) => Promise<void>;
 }
 
 function PhoneMockup({
@@ -109,7 +110,7 @@ function PhoneMockup({
   );
 }
 
-export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpdateArt, onUpdatePost }: PostDetailModalProps) {
+export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpdateArt, onUpdatePost, onDeletePost }: PostDetailModalProps) {
   const [editingDate, setEditingDate] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -193,11 +194,29 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
             ) : (
               <DialogTitle className="text-lg font-bold">{post.title}</DialogTitle>
             )}
-            {onUpdatePost && !editing && (
-              <Button variant="ghost" size="sm" className="gap-1.5 ml-2 flex-shrink-0" onClick={() => setEditing(true)}>
-                <Pencil className="h-3.5 w-3.5" /> Editar
-              </Button>
-            )}
+            <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+              {onUpdatePost && !editing && (
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(true)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
+              {onDeletePost && !editing && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={async () => {
+                    if (window.confirm("Tem certeza que deseja excluir este post?")) {
+                      await onDeletePost(post.id);
+                      onOpenChange(false);
+                      toast({ title: "Post excluído", description: "O post foi removido com sucesso." });
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </DialogHeader>
 

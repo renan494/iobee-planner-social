@@ -34,7 +34,7 @@ import type { ViewMode } from "@/types/calendar";
 import { useEffect } from "react";
 
 export default function CalendarPage() {
-  const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost } = usePosts();
+  const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost, deletePost } = usePosts();
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [selectedClient, setSelectedClient] = useState("all");
@@ -166,7 +166,7 @@ export default function CalendarPage() {
 
       {renderView()}
 
-      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} />
+      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} onDeletePost={async (id) => { await deletePost(id); setModalOpen(false); }} />
       <ImportModal
         open={importOpen}
         onOpenChange={setImportOpen}
