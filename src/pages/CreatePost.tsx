@@ -207,6 +207,7 @@ export default function CreatePost() {
         artUrl,
         artUrls,
         channels: entry.channels,
+        reference: entry.reference.trim() || undefined,
       });
     }
 
