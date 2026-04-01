@@ -48,6 +48,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
         artUrl: (row as any).art_url ?? undefined,
         artUrls: (row as any).art_urls ?? [],
         channels: (row as any).channels ?? [],
+        reference: (row as any).reference ?? undefined,
       }));
       setPosts(mapped);
     }
@@ -98,6 +99,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       art_url: post.artUrl || null,
       art_urls: post.artUrls || [],
       channels: post.channels || [],
+      reference: post.reference || null,
     } as any);
     if (!error) await fetchPosts();
   }, [fetchPosts]);
@@ -116,6 +118,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       art_url: p.artUrl || null,
       art_urls: p.artUrls || [],
       channels: p.channels || [],
+      reference: p.reference || null,
     } as any));
     const { error } = await supabase.from("posts").insert(rows);
     if (!error) await fetchPosts();
@@ -143,6 +146,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (fields.client !== undefined) dbFields.client = fields.client;
     if (fields.analyst !== undefined) dbFields.analyst = fields.analyst;
     if (fields.channels !== undefined) dbFields.channels = fields.channels;
+    if (fields.reference !== undefined) dbFields.reference = fields.reference || null;
     const { error } = await supabase.from("posts").update(dbFields).eq("id", postId);
     if (!error) await fetchPosts();
   }, [fetchPosts]);

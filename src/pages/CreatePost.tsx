@@ -47,6 +47,7 @@ interface PostEntry {
   artPreviews: string[];
   artFiles: File[];
   channels: string[];
+  reference: string;
   collapsed: boolean;
   draftId?: string;
 }
@@ -70,6 +71,7 @@ function createEmptyEntry(): PostEntry {
     artPreviews: [],
     artFiles: [],
     channels: [],
+    reference: "",
     collapsed: false,
   };
 }
@@ -108,6 +110,7 @@ export default function CreatePost() {
         artPreviews: [],
         artFiles: [],
         channels: [],
+        reference: "",
         collapsed: false,
         draftId: data.id,
       }]);
@@ -205,6 +208,7 @@ export default function CreatePost() {
         artUrl,
         artUrls,
         channels: entry.channels,
+        reference: entry.reference.trim() || undefined,
       });
     }
 
@@ -474,6 +478,12 @@ function PostEntryForm({
             <Label>Conteúdo / Legenda</Label>
             <Textarea placeholder="Escreva o conteúdo do post..." value={entry.content} onChange={(e) => onUpdate({ content: e.target.value })} rows={5} maxLength={2000} />
             <p className="text-xs text-muted-foreground text-right">{entry.content.length}/2000</p>
+          </div>
+
+          {/* Hashtags */}
+          <div className="space-y-2">
+            <Label>Referência</Label>
+            <Input placeholder="Ex: link, imagem de referência, briefing..." value={entry.reference} onChange={(e) => onUpdate({ reference: e.target.value })} />
           </div>
 
           {/* Hashtags */}
