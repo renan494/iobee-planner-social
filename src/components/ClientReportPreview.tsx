@@ -14,6 +14,7 @@ interface ClientReportPreviewProps {
   analysts: string[];
   byFormat: Record<PostFormat, number>;
   avatarUrl: string | null;
+  onPostClick?: (post: Post) => void;
 }
 
 function formatDate(dateStr: string) {
