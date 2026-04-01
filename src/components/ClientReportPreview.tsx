@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { PostBadge } from "./PostBadge";
 import { FUNNEL_LABELS, FORMAT_LABELS, type Post, type PostFormat } from "@/data/posts";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
