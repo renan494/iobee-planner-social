@@ -11,6 +11,7 @@ interface PostsContextType {
   addPosts: (posts: Omit<Post, "id">[]) => Promise<void>;
   updatePostDate: (postId: string, newDate: string) => Promise<void>;
   updatePostArt: (postId: string, artUrl: string | null) => Promise<void>;
+  updatePost: (postId: string, fields: Partial<Omit<Post, "id">>) => Promise<void>;
   deletePost: (postId: string) => Promise<void>;
   addAnalyst: (name: string) => Promise<void>;
   updateAnalyst: (oldName: string, newName: string) => Promise<void>;
@@ -112,6 +113,21 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (!error) await fetchPosts();
   }, [fetchPosts]);
 
+  const updatePost = useCallback(async (postId: string, fields: Partial<Omit<Post, "id">>) => {
+    const dbFields: Record<string, any> = {};
+    if (fields.title !== undefined) dbFields.title = fields.title;
+    if (fields.headline !== undefined) dbFields.headline = fields.headline;
+    if (fields.legend !== undefined) dbFields.legend = fields.legend || null;
+    if (fields.format !== undefined) dbFields.format = fields.format;
+    if (fields.funnelStage !== undefined) dbFields.funnel_stage = fields.funnelStage;
+    if (fields.date !== undefined) dbFields.date = fields.date;
+    if (fields.hashtags !== undefined) dbFields.hashtags = fields.hashtags;
+    if (fields.client !== undefined) dbFields.client = fields.client;
+    if (fields.analyst !== undefined) dbFields.analyst = fields.analyst;
+    const { error } = await supabase.from("posts").update(dbFields).eq("id", postId);
+    if (!error) await fetchPosts();
+  }, [fetchPosts]);
+
   const deletePost = useCallback(async (postId: string) => {
     const { error } = await supabase.from("posts").delete().eq("id", postId);
     if (!error) await fetchPosts();
@@ -135,7 +151,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
   }, [fetchAnalysts]);
 
   return (
-    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, updatePostArt, deletePost, addAnalyst, updateAnalyst, removeAnalyst }}>
+    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, updatePostArt, updatePost, deletePost, addAnalyst, updateAnalyst, removeAnalyst }}>
       {children}
     </PostsContext.Provider>
   );
