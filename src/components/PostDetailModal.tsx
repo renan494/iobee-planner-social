@@ -8,7 +8,7 @@ import { PostBadge } from "./PostBadge";
 import { FUNNEL_LABELS, type Post } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,20 +21,74 @@ interface PostDetailModalProps {
   onUpdateArt?: (postId: string, artUrl: string | null) => Promise<void>;
 }
 
-function PhoneMockup({ artUrl, title, onEditArt }: { artUrl?: string; title: string; onEditArt?: () => void }) {
+function PhoneMockup({
+  images,
+  title,
+  onEditArt,
+  isCarousel,
+}: {
+  images: string[];
+  title: string;
+  onEditArt?: () => void;
+  isCarousel?: boolean;
+}) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const total = images.length;
+
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="relative w-[200px] rounded-[2rem] border-[6px] border-foreground/80 bg-background shadow-xl overflow-hidden">
         {/* Notch */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-foreground/80 rounded-b-xl z-10" />
         {/* Screen */}
-        <div className="aspect-[9/16] bg-muted flex items-center justify-center overflow-hidden">
-          {artUrl ? (
-            <img src={artUrl} alt={title} className="w-full h-full object-cover" />
+        <div className="aspect-[9/16] bg-muted flex items-center justify-center overflow-hidden relative">
+          {total > 0 ? (
+            <img src={images[currentSlide]} alt={`${title} - slide ${currentSlide + 1}`} className="w-full h-full object-cover" />
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <ImageOff className="h-8 w-8" />
               <span className="text-xs">Sem arte</span>
+            </div>
+          )}
+
+          {/* Carousel navigation arrows */}
+          {isCarousel && total > 1 && (
+            <>
+              <button
+                onClick={() => setCurrentSlide((p) => (p - 1 + total) % total)}
+                className="absolute left-1 top-1/2 -translate-y-1/2 rounded-full bg-background/70 p-1 shadow hover:bg-background/90 transition-colors z-10"
+              >
+                <ChevronLeft className="h-3.5 w-3.5 text-foreground" />
+              </button>
+              <button
+                onClick={() => setCurrentSlide((p) => (p + 1) % total)}
+                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full bg-background/70 p-1 shadow hover:bg-background/90 transition-colors z-10"
+              >
+                <ChevronRight className="h-3.5 w-3.5 text-foreground" />
+              </button>
+            </>
+          )}
+
+          {/* Dot indicators */}
+          {isCarousel && total > 1 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentSlide(i)}
+                  className={cn(
+                    "h-1.5 rounded-full transition-all",
+                    i === currentSlide ? "w-3 bg-background" : "w-1.5 bg-background/50"
+                  )}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Slide counter */}
+          {isCarousel && total > 1 && (
+            <div className="absolute top-7 right-2 rounded-full bg-foreground/60 px-2 py-0.5 text-[10px] font-medium text-background z-10">
+              {currentSlide + 1}/{total}
             </div>
           )}
         </div>
@@ -44,7 +98,7 @@ function PhoneMockup({ artUrl, title, onEditArt }: { artUrl?: string; title: str
       {onEditArt && (
         <Button variant="outline" size="sm" className="gap-1.5" onClick={onEditArt}>
           <ImagePlus className="h-3.5 w-3.5" />
-          {artUrl ? "Trocar arte" : "Adicionar arte"}
+          {total > 0 ? "Trocar arte" : "Adicionar arte"}
         </Button>
       )}
     </div>
