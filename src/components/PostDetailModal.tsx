@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,15 +8,17 @@ import { PostBadge } from "./PostBadge";
 import { FUNNEL_LABELS, type Post } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PostDetailModalProps {
   post: Post | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdateDate?: (postId: string, newDate: string) => void;
+  onUpdateArt?: (postId: string, artUrl: string | null) => Promise<void>;
 }
 
 function PhoneMockup({ artUrl, title }: { artUrl?: string; title: string }) {
