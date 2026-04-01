@@ -481,6 +481,12 @@ function PostEntryForm({
 
           {/* Hashtags */}
           <div className="space-y-2">
+            <Label>Referência</Label>
+            <Input placeholder="Ex: link, imagem de referência, briefing..." value={entry.reference} onChange={(e) => onUpdate({ reference: e.target.value })} />
+          </div>
+
+          {/* Hashtags */}
+          <div className="space-y-2">
             <Label>Hashtags</Label>
             <div className="flex gap-2">
               <div className="relative flex-1">

@@ -15,6 +15,7 @@ export interface Post {
   artUrl?: string;
   artUrls?: string[];
   channels?: string[];
+  reference?: string;
 }
 
 export const CHANNEL_OPTIONS = [
