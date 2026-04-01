@@ -98,6 +98,7 @@ export default function CreatePost() {
         hashtagInput: "",
         hashtags: data.hashtags || [],
         artPreview: null,
+        artFile: null,
         collapsed: false,
         draftId: data.id,
       }]);
