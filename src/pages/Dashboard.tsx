@@ -57,28 +57,20 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Visão geral do planejamento de conteúdo.</p>
         </div>
+        <div className="ml-auto flex items-center gap-2">
+          <input
+            type="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+          {selectedMonth && (
+            <Button variant="ghost" size="sm" onClick={() => setSelectedMonth("")} className="text-xs">
+              Todos
+            </Button>
+          )}
+        </div>
        </div>
-
-      {/* Date filter */}
-      <div className="mb-6 flex flex-wrap items-end gap-3">
-        <div className="flex items-center gap-2">
-          <CalendarDays className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-muted-foreground">Período:</span>
-        </div>
-        <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">De</Label>
-          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="h-8 w-40 text-sm" />
-        </div>
-        <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Até</Label>
-          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="h-8 w-40 text-sm" />
-        </div>
-        {(startDate || endDate) && (
-          <Button variant="ghost" size="sm" onClick={() => { setStartDate(""); setEndDate(""); }} className="text-xs">
-            Limpar
-          </Button>
-        )}
-      </div>
 
       {/* Format cards */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
