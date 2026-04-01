@@ -21,6 +21,8 @@ export default function Clients() {
   const [newClientName, setNewClientName] = useState("");
   const [newInstagram, setNewInstagram] = useState("");
   const [newFacebookUrl, setNewFacebookUrl] = useState("");
+  const [newLinkedinUrl, setNewLinkedinUrl] = useState("");
+  const [newGmbUrl, setNewGmbUrl] = useState("");
   const [newObjective, setNewObjective] = useState("");
   const [uploading, setUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
