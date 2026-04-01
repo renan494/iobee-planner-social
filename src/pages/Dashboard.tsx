@@ -1,7 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BarChart3, Image, Film, Clapperboard, MessageCircle, TrendingUp, Clock, Upload, PenTool, Trash2 } from "lucide-react";
+import { BarChart3, Image, Film, Clapperboard, MessageCircle, TrendingUp, Clock, Upload, PenTool, Trash2, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -24,21 +26,32 @@ export default function Dashboard() {
   const isAdmin = useAdminCheck();
   const navigate = useNavigate();
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const filteredPosts = useMemo(() => {
+    return posts.filter((p) => {
+      if (startDate && p.date < startDate) return false;
+      if (endDate && p.date > endDate) return false;
+      return true;
+    });
+  }, [posts, startDate, endDate]);
+
   const formatCounts = useMemo(() => {
     const counts: Record<PostFormat, number> = { static: 0, carousel: 0, reels: 0, stories: 0 };
-    posts.forEach((p) => counts[p.format]++);
+    filteredPosts.forEach((p) => counts[p.format]++);
     return counts;
-  }, [posts]);
+  }, [filteredPosts]);
 
   const analystStats = useMemo(() => {
     return analysts.map((name) => {
-      const analystPosts = posts.filter((p) => p.analyst === name);
+      const analystPosts = filteredPosts.filter((p) => p.analyst === name);
       const byFormat: Record<PostFormat, number> = { static: 0, carousel: 0, reels: 0, stories: 0 };
       analystPosts.forEach((p) => byFormat[p.format]++);
       const accounts = new Set(analystPosts.map((p) => p.client)).size;
       return { name, accounts, total: analystPosts.length, ...byFormat };
     });
-  }, [posts, analysts]);
+  }, [filteredPosts, analysts]);
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
@@ -50,6 +63,27 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Visão geral do planejamento de conteúdo.</p>
         </div>
+       </div>
+
+      {/* Date filter */}
+      <div className="mb-6 flex flex-wrap items-end gap-3">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-muted-foreground">Período:</span>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">De</Label>
+          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="h-8 w-40 text-sm" />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">Até</Label>
+          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="h-8 w-40 text-sm" />
+        </div>
+        {(startDate || endDate) && (
+          <Button variant="ghost" size="sm" onClick={() => { setStartDate(""); setEndDate(""); }} className="text-xs">
+            Limpar
+          </Button>
+        )}
       </div>
 
       {/* Format cards */}
