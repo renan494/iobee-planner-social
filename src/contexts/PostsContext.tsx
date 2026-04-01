@@ -146,6 +146,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (fields.client !== undefined) dbFields.client = fields.client;
     if (fields.analyst !== undefined) dbFields.analyst = fields.analyst;
     if (fields.channels !== undefined) dbFields.channels = fields.channels;
+    if (fields.reference !== undefined) dbFields.reference = fields.reference || null;
     const { error } = await supabase.from("posts").update(dbFields).eq("id", postId);
     if (!error) await fetchPosts();
   }, [fetchPosts]);
