@@ -553,6 +553,38 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         </div>
       </div>
 
+      {/* Date filters */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <CalendarIcon className="h-4 w-4" />
+              {dateFrom ? format(dateFrom, "dd/MM/yy") : "De"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={ptBR} className={cn("p-3 pointer-events-auto")} />
+          </PopoverContent>
+        </Popover>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <CalendarIcon className="h-4 w-4" />
+              {dateTo ? format(dateTo, "dd/MM/yy") : "Até"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={ptBR} className={cn("p-3 pointer-events-auto")} />
+          </PopoverContent>
+        </Popover>
+        {hasFilters && (
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}>
+            Limpar filtros
+          </Button>
+        )}
+      </div>
+
       {/* Preview document */}
       <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
         <div className="mx-auto max-w-[800px] p-8 sm:p-12 space-y-8">
