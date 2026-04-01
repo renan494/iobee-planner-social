@@ -191,7 +191,7 @@ export default function Index() {
         {renderView()}
       </main>
 
-      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} />
+      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} />
       <ImportModal
         open={importOpen}
         onOpenChange={setImportOpen}
