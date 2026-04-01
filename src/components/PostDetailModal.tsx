@@ -102,7 +102,19 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
         <div className="flex gap-6">
           {/* Phone mockup on left */}
           <div className="hidden sm:flex flex-shrink-0">
-            <PhoneMockup artUrl={post.artUrl} title={post.title} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleArtUpload}
+              disabled={uploading}
+            />
+            <PhoneMockup
+              artUrl={post.artUrl}
+              title={post.title}
+              onEditArt={onUpdateArt ? () => fileInputRef.current?.click() : undefined}
+            />
           </div>
 
           {/* Details on right */}

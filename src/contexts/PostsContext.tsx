@@ -132,7 +132,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
   }, [fetchAnalysts]);
 
   return (
-    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, deletePost, addAnalyst, updateAnalyst, removeAnalyst }}>
+    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, updatePostArt, deletePost, addAnalyst, updateAnalyst, removeAnalyst }}>
       {children}
     </PostsContext.Provider>
   );
