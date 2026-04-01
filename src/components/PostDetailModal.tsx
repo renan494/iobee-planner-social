@@ -326,7 +326,7 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
             ) : (
               post.legend && (
                 <div className="rounded-lg bg-secondary p-3">
-                  <p className="text-sm leading-relaxed text-secondary-foreground">{post.legend}</p>
+                  <p className="text-sm leading-relaxed text-secondary-foreground whitespace-pre-line">{post.legend}</p>
                 </div>
               )
             )}
