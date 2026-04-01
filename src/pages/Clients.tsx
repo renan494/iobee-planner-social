@@ -97,16 +97,10 @@ export default function Clients() {
             <p className="text-sm text-muted-foreground">Gerencie seus clientes e veja a produção de cada um.</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/criar")} className="gap-2">
-            <PenTool className="h-4 w-4" />
-            Produzir Conteúdo
-          </Button>
-          <Button onClick={() => setDialogOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Cadastrar Cliente
-          </Button>
-        </div>
+        <Button onClick={() => setDialogOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" />
+          Cadastrar Cliente
+        </Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
