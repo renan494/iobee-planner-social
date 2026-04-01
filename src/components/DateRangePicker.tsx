@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { format, subDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { format, subDays, startOfMonth, endOfMonth, subMonths, startOfQuarter, endOfQuarter } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
