@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { UserPlus, Trash2, Users, Pencil, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import { usePosts } from "@/contexts/PostsContext";
 import { toast } from "@/hooks/use-toast";
 
 export default function Analysts() {
+  const navigate = useNavigate();
   const { analysts, posts, addAnalyst, updateAnalyst, removeAnalyst } = usePosts();
   const [name, setName] = useState("");
   const [editingName, setEditingName] = useState<string | null>(null);
@@ -90,7 +92,8 @@ export default function Analysts() {
           return (
             <div
               key={a}
-              className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm"
+              className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
+              onClick={() => !isEditing && navigate(`/analistas/${encodeURIComponent(a)}`)}
             >
               {isEditing ? (
                 <Input
@@ -120,13 +123,14 @@ export default function Analysts() {
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" size="icon" onClick={() => { setEditingName(a); setEditValue(a); }}>
+                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setEditingName(a); setEditValue(a); }}>
                       <Pencil className="h-4 w-4 text-muted-foreground" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         removeAnalyst(a);
                         toast({ title: `${a} removido(a).` });
                       }}
