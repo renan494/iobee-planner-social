@@ -166,7 +166,7 @@ export default function CalendarPage() {
 
       {renderView()}
 
-      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} />
+      <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} />
       <ImportModal
         open={importOpen}
         onOpenChange={setImportOpen}
