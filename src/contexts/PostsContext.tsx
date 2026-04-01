@@ -173,11 +173,13 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (!error) await fetchAnalysts();
   }, [fetchAnalysts]);
 
-  const addClient = useCallback(async (data: { name: string; instagramHandle?: string; facebookUrl?: string; objective?: string; avatarUrl?: string }) => {
+  const addClient = useCallback(async (data: { name: string; instagramHandle?: string; facebookUrl?: string; linkedinUrl?: string; gmbUrl?: string; objective?: string; avatarUrl?: string }) => {
     const { error } = await supabase.from("clients").insert({
       name: data.name,
       instagram_handle: data.instagramHandle || null,
       facebook_url: data.facebookUrl || null,
+      linkedin_url: data.linkedinUrl || null,
+      gmb_url: data.gmbUrl || null,
       objective: data.objective || null,
       avatar_url: data.avatarUrl || null,
     } as any);
