@@ -207,49 +207,7 @@ export default function CalendarPage() {
       </div>
 
       <div className="mb-3 flex items-center gap-3">
-
-        {/* Date filter */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <CalendarIcon className="h-4 w-4" />
-              {datePreset === "all" ? "Filtrar por data"
-                : datePreset === "day" ? "Hoje"
-                : datePreset === "month" ? "Este mês"
-                : datePreset === "quarter" ? "Este trimestre"
-                : datePreset === "year" ? "Este ano"
-                : `${dateFrom ? format(dateFrom, "dd/MM/yy") : "..."} – ${dateTo ? format(dateTo, "dd/MM/yy") : "..."}`}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-2 space-y-1 z-50" align="start">
-            {([
-              ["all", "Todos"],
-              ["day", "Dia"],
-              ["month", "Mês"],
-              ["quarter", "Trimestre"],
-              ["year", "Ano"],
-              ["custom", "Personalizado"],
-            ] as [DatePreset, string][]).map(([key, label]) => (
-              <Button
-                key={key}
-                variant={datePreset === key ? "default" : "ghost"}
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => applyPreset(key)}
-              >
-                {label}
-              </Button>
-            ))}
-            {showCustomCalendars && (
-              <div className="border-t border-border pt-3 mt-2 space-y-3">
-                <p className="text-xs font-medium text-muted-foreground">De</p>
-                <Calendar mode="single" selected={dateFrom} onSelect={(d) => { setDateFrom(d); }} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
-                <p className="text-xs font-medium text-muted-foreground">Até</p>
-                <Calendar mode="single" selected={dateTo} onSelect={(d) => { setDateTo(d); }} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
-              </div>
-            )}
-          </PopoverContent>
-        </Popover>
+        <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
 
         {/* Layout toggle */}
         <div className="ml-auto flex items-center rounded-lg border border-border p-0.5">
