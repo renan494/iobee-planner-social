@@ -110,6 +110,7 @@ export default function ClientDetail() {
           analysts={analysts}
           byFormat={byFormat}
           avatarUrl={avatarUrl}
+          onPostClick={(post) => setSelectedPost(post)}
         />
       ) : (
         <>
