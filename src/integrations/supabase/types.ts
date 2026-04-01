@@ -152,6 +152,7 @@ export type Database = {
           headline: string
           id: string
           legend: string | null
+          reference: string | null
           title: string
           updated_at: string
         }
@@ -169,6 +170,7 @@ export type Database = {
           headline: string
           id?: string
           legend?: string | null
+          reference?: string | null
           title: string
           updated_at?: string
         }
@@ -186,6 +188,7 @@ export type Database = {
           headline?: string
           id?: string
           legend?: string | null
+          reference?: string | null
           title?: string
           updated_at?: string
         }
