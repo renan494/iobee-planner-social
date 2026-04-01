@@ -170,10 +170,56 @@ export default function CalendarPage() {
 
       <div className="mb-3 flex items-center gap-3">
         <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
-        <FormatLegend />
+
+        {/* Date filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <CalendarIcon className="h-4 w-4" />
+              {dateFrom || dateTo
+                ? `${dateFrom ? format(dateFrom, "dd/MM/yy") : "..."} – ${dateTo ? format(dateTo, "dd/MM/yy") : "..."}`
+                : "Filtrar por data"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-4 space-y-3" align="start">
+            <p className="text-xs font-medium text-muted-foreground">De</p>
+            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
+            <p className="text-xs font-medium text-muted-foreground">Até</p>
+            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={ptBR} className={cn("p-0 pointer-events-auto")} />
+            {(dateFrom || dateTo) && (
+              <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}>
+                Limpar filtros
+              </Button>
+            )}
+          </PopoverContent>
+        </Popover>
+
+        {/* Layout toggle */}
+        <div className="ml-auto flex items-center rounded-lg border border-border p-0.5">
+          <Button
+            variant={layoutMode === "calendar" ? "default" : "ghost"}
+            size="sm"
+            className="h-7 px-2"
+            onClick={() => setLayoutMode("calendar")}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={layoutMode === "list" ? "default" : "ghost"}
+            size="sm"
+            className="h-7 px-2"
+            onClick={() => setLayoutMode("list")}
+          >
+            <List className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-      {renderView()}
+      {layoutMode === "list" ? (
+        <CalendarListView posts={filteredPosts} onPostClick={handlePostClick} />
+      ) : (
+        renderView()
+      )}
 
       <PostDetailModal post={selectedPost} open={modalOpen} onOpenChange={setModalOpen} onUpdateDate={handleUpdateDate} onUpdateArt={updatePostArt} onUpdatePost={updatePost} onDeletePost={async (id) => { await deletePost(id); setModalOpen(false); }} />
       <ImportModal
