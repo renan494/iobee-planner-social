@@ -7,6 +7,7 @@ import {
   Shield,
   LogOut,
   FileEdit,
+  UserCircle,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -42,6 +43,7 @@ export function AppSidebar() {
     { title: "Clientes", url: "/clientes", icon: Users },
     { title: "Analistas", url: "/analistas", icon: UserCog },
     ...(isAdmin ? [{ title: "Gerenciar Acessos", url: "/admin", icon: Shield }] : []),
+    { title: "Meus Dados", url: "/meus-dados", icon: UserCircle },
   ];
 
   return (
