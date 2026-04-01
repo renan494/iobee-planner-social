@@ -31,7 +31,16 @@ function formatDate(dateStr: string) {
 
 export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick, onEditPost, onDeletePost }: ClientReportPreviewProps) {
   const navigate = useNavigate();
-  const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
+
+  const allSorted = [...posts].sort((a, b) => a.date.localeCompare(b.date));
+  const sortedPosts = allSorted.filter((p) => {
+    if (dateFrom && p.date < format(dateFrom, "yyyy-MM-dd")) return false;
+    if (dateTo && p.date > format(dateTo, "yyyy-MM-dd")) return false;
+    return true;
+  });
+  const hasFilters = dateFrom || dateTo;
 
   const handleDownloadPDF = async () => {
     const doc = new jsPDF();
