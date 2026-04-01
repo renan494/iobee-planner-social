@@ -1,11 +1,13 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   addMonths, subMonths,
   addDays, subDays,
   addWeeks, subWeeks,
   addQuarters, subQuarters,
   addYears, subYears,
+  format,
 } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { usePosts } from "@/contexts/PostsContext";
 import { getClients, getAnalysts, type Post } from "@/data/posts";
 import { CalendarHeader } from "@/components/CalendarHeader";
@@ -14,24 +16,26 @@ import { DayView } from "@/components/DayView";
 import { WeekView } from "@/components/WeekView";
 import { QuarterView } from "@/components/QuarterView";
 import { YearView } from "@/components/YearView";
+import { CalendarListView } from "@/components/CalendarListView";
 import { ClientFilter } from "@/components/ClientFilter";
 import { AnalystFilter } from "@/components/AnalystFilter";
 import { ViewModeSwitcher } from "@/components/ViewModeSwitcher";
-import { FormatLegend } from "@/components/FormatLegend";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { ImportModal } from "@/components/ImportModal";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Upload, Download, FileText, FileSpreadsheet } from "lucide-react";
+import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid } from "lucide-react";
 import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
 import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
-import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export default function CalendarPage() {
   const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost, deletePost } = usePosts();
