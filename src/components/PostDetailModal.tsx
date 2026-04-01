@@ -146,7 +146,8 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
       const { data: urlData } = supabase.storage.from("post-arts").getPublicUrl(path);
       await onUpdateArt(post.id, urlData.publicUrl);
       toast({ title: "Arte atualizada", description: "A arte do post foi alterada com sucesso." });
-    } catch {
+    } catch (err) {
+      console.error("Art upload error:", err);
       toast({ title: "Erro", description: "Não foi possível enviar a arte.", variant: "destructive" });
     } finally {
       setUploading(false);
