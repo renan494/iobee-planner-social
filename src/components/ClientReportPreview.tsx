@@ -162,7 +162,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
                 </thead>
                 <tbody>
                   {sortedPosts.map((post, i) => (
-                    <tr key={post.id} className={i % 2 === 0 ? "bg-white" : "bg-muted/20"}>
+                    <tr key={post.id} className={`${i % 2 === 0 ? "bg-white" : "bg-muted/20"} ${onPostClick ? "cursor-pointer hover:bg-muted/40" : ""}`} onClick={() => onPostClick?.(post)}>
                       <td className="px-3 py-2 whitespace-nowrap">{formatDate(post.date)}</td>
                       <td className="px-3 py-2 font-medium">{post.title}</td>
                       <td className="px-3 py-2"><PostBadge format={post.format} /></td>
