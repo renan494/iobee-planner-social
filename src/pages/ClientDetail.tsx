@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { usePosts } from "@/contexts/PostsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage, type Post } from "@/data/posts";
+import { PostBadge } from "@/components/PostBadge";
 import { toast } from "sonner";
 import { ClientReportPreview } from "@/components/ClientReportPreview";
 import { PostDetailModal } from "@/components/PostDetailModal";
@@ -208,7 +209,7 @@ export default function ClientDetail() {
                         <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
                         <TableCell className="font-medium">{post.title}</TableCell>
                         <TableCell className="text-muted-foreground">{post.headline}</TableCell>
-                        <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
+                        <TableCell><PostBadge format={post.format} /></TableCell>
                         <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">

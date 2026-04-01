@@ -6,12 +6,7 @@ import {
   addQuarters, subQuarters,
   addYears, subYears,
   format,
-  startOfDay, endOfDay,
-  startOfMonth, endOfMonth,
-  startOfQuarter, endOfQuarter,
-  startOfYear, endOfYear,
 } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { usePosts } from "@/contexts/PostsContext";
 import { getClients, getAnalysts, type Post, FORMAT_LABELS, CHANNEL_OPTIONS, type PostFormat } from "@/data/posts";
 import { CalendarHeader } from "@/components/CalendarHeader";
@@ -30,29 +25,24 @@ import { PostDetailModal } from "@/components/PostDetailModal";
 import { ImportModal } from "@/components/ImportModal";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Upload, Download, FileText, FileSpreadsheet, Calendar as CalendarIcon, List, LayoutGrid, PenTool } from "lucide-react";
+import { Upload, Download, FileText, FileSpreadsheet, List, LayoutGrid, PenTool } from "lucide-react";
 import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
 import { useNavigate } from "react-router-dom";
 import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
-import { cn } from "@/lib/utils";
+
 
 export default function CalendarPage() {
   const routerNavigate = useNavigate();
   const { posts, clients, analysts, addPosts, updatePostDate, updatePostArt, updatePost, deletePost } = usePosts();
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
   const [viewMode, setViewMode] = useState<ViewMode>("month");
-  type DatePreset = "all" | "day" | "month" | "quarter" | "year" | "custom";
-  const [datePreset, setDatePreset] = useState<DatePreset>("all");
-  const [showCustomCalendars, setShowCustomCalendars] = useState(false);
   const [selectedClient, setSelectedClient] = useState("all");
   const [selectedAnalyst, setSelectedAnalyst] = useState("all");
   const [selectedFormat, setSelectedFormat] = useState("all");
@@ -63,37 +53,6 @@ export default function CalendarPage() {
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
   const [layoutMode, setLayoutMode] = useState<"calendar" | "list">("calendar");
-
-  const applyPreset = useCallback((preset: DatePreset) => {
-    setDatePreset(preset);
-    setShowCustomCalendars(false);
-    const now = new Date();
-    switch (preset) {
-      case "all":
-        setDateFrom(undefined);
-        setDateTo(undefined);
-        break;
-      case "day":
-        setDateFrom(startOfDay(now));
-        setDateTo(endOfDay(now));
-        break;
-      case "month":
-        setDateFrom(startOfMonth(now));
-        setDateTo(endOfMonth(now));
-        break;
-      case "quarter":
-        setDateFrom(startOfQuarter(now));
-        setDateTo(endOfQuarter(now));
-        break;
-      case "year":
-        setDateFrom(startOfYear(now));
-        setDateTo(endOfYear(now));
-        break;
-      case "custom":
-        setShowCustomCalendars(true);
-        break;
-    }
-  }, []);
 
   const availableClients = useMemo(() => {
     if (selectedAnalyst === "all") return clients;
@@ -225,7 +184,6 @@ export default function CalendarPage() {
         </Select>
       </div>
 
-      {/* Row 3: View mode + Legend + Layout toggle */}
       {/* Row 3: View mode + Layout toggle */}
       <div className="flex items-center gap-3">
         <ViewModeSwitcher value={viewMode} onChange={setViewMode} />

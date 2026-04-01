@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, FUNNEL_LABELS, type Post } from "@/data/posts";
+import { PostBadge } from "@/components/PostBadge";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -175,7 +176,7 @@ export default function AnalystDetail() {
                     <TableCell className="font-medium">{post.client}</TableCell>
                     <TableCell className="font-medium">{post.title}</TableCell>
                     <TableCell className="text-muted-foreground">{post.headline}</TableCell>
-                    <TableCell><Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge></TableCell>
+                    <TableCell><PostBadge format={post.format as any} /></TableCell>
                     <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">

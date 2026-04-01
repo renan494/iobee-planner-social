@@ -112,8 +112,9 @@ export function QuarterView({ currentDate, posts, onPostClick }: QuarterViewProp
                       <span className="w-5 text-[10px] font-medium text-muted-foreground">
                         {format(new Date(p.date + "T12:00:00"), "dd")}
                       </span>
-                      <PostBadge format={p.format} />
-                      <span className="truncate text-xs font-medium">{p.title}</span>
+                      <span className="truncate text-xs font-medium">
+                        {p.client} – {p.title}
+                      </span>
                     </button>
                   ))}
               </div>
