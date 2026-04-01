@@ -4,6 +4,7 @@ import { ptBR } from "date-fns/locale";
 import { Download } from "lucide-react";
 import logoSvg from "@/assets/logo-iobee.svg";
 import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 import { PostBadge } from "./PostBadge";
 import { FUNNEL_LABELS, FORMAT_LABELS, type Post, type PostFormat } from "@/data/posts";
 import jsPDF from "jspdf";
@@ -359,7 +360,14 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Detalhes por Post</h3>
             <div className="space-y-6">
               {sortedPosts.map((post) => (
-                <div key={post.id} className={`rounded-lg border border-border p-5 space-y-3 ${onPostClick ? "cursor-pointer hover:border-primary/50 transition-colors" : ""}`} onClick={() => onPostClick?.(post)}>
+                <div key={post.id} className={`group relative rounded-lg border border-border p-5 space-y-3 ${onPostClick ? "cursor-pointer hover:border-primary/50 hover:shadow-md transition-all" : ""}`} onClick={() => onPostClick?.(post)}>
+                  {onPostClick && (
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                        <Pencil className="h-3 w-3" /> Editar
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h4 className="font-semibold text-foreground">{post.title}</h4>
