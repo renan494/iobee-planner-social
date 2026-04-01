@@ -91,60 +91,67 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     };
 
     // ==========================================
-    // PAGE 1: COVER
+    // PAGE 1: COVER (clean white with branded accents)
     // ==========================================
-    // Full yellow header block
+    // Top yellow accent line
     doc.setFillColor(...yellow);
-    doc.rect(0, 0, pageWidth, 80, "F");
+    doc.rect(0, 0, pageWidth, 3, "F");
 
-    // Logo centered on yellow
-    drawLogo(pageWidth / 2 - 25, 15, 50);
+    // Logo centered
+    drawLogo(pageWidth / 2 - 25, 20, 50);
 
-    // Client name on the yellow band
-    doc.setFontSize(28);
+    // Yellow thin divider under logo
+    const logoBottom = 20 + 50 * logoAspect + 8;
+    doc.setFillColor(...yellow);
+    doc.rect(pageWidth / 2 - 30, logoBottom, 60, 1, "F");
+
+    // Client name
+    doc.setFontSize(26);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...dark);
-    doc.text(clientName.toUpperCase(), pageWidth / 2, 62, { align: "center" });
+    doc.text(clientName.toUpperCase(), pageWidth / 2, logoBottom + 16, { align: "center" });
 
-    // Subtitle below yellow
+    // Subtitle
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...gray);
-    doc.text("RELATÓRIO DE CONTEÚDO", pageWidth / 2, 92, { align: "center" });
+    doc.text("RELATÓRIO DE CONTEÚDO", pageWidth / 2, logoBottom + 26, { align: "center" });
 
-    // Info box
-    const boxY = 105;
-    doc.setFillColor(...warmBg);
-    doc.roundedRect(margin, boxY, contentWidth, 30, 3, 3, "F");
+    // Info box with left yellow border
+    const boxY = logoBottom + 38;
+    doc.setFillColor(250, 248, 243);
+    doc.roundedRect(margin, boxY, contentWidth, 34, 3, 3, "F");
+    doc.setFillColor(...yellow);
+    doc.rect(margin, boxY, 2.5, 34, "F");
 
     doc.setFontSize(10);
     doc.setTextColor(...dark);
-    const infoCol1X = margin + 8;
+    const infoCol1X = margin + 10;
     const infoCol2X = pageWidth / 2 + 8;
 
     doc.setFont("helvetica", "bold");
-    doc.text("Total de posts:", infoCol1X, boxY + 10);
+    doc.text("Total de posts:", infoCol1X, boxY + 11);
     doc.setFont("helvetica", "normal");
-    doc.text(`${posts.length}`, infoCol1X + 35, boxY + 10);
+    doc.text(`${posts.length}`, infoCol1X + 35, boxY + 11);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Analista(s):", infoCol2X, boxY + 10);
+    doc.text("Analista(s):", infoCol2X, boxY + 11);
     doc.setFont("helvetica", "normal");
-    doc.text(analysts.join(", "), infoCol2X + 28, boxY + 10);
+    doc.text(analysts.join(", "), infoCol2X + 28, boxY + 11);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Formatos:", infoCol1X, boxY + 20);
+    doc.text("Formatos:", infoCol1X, boxY + 22);
     doc.setFont("helvetica", "normal");
     const fmtText = (Object.entries(byFormat) as [PostFormat, number][])
       .filter(([, c]) => c > 0)
       .map(([f, c]) => `${FORMAT_LABELS[f]}: ${c}`)
       .join("  ·  ");
-    doc.text(fmtText, infoCol1X + 23, boxY + 20);
+    doc.text(fmtText, infoCol1X + 23, boxY + 22);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Gerado em:", infoCol2X, boxY + 20);
+    doc.text("Gerado em:", infoCol2X, boxY + 22);
     doc.setFont("helvetica", "normal");
-    doc.text(format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }), infoCol2X + 26, boxY + 20);
+    doc.text(format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }), infoCol2X + 26, boxY + 22);
 
     // ==========================================
     // PAGE 2: SUMMARY TABLE
