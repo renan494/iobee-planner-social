@@ -239,6 +239,7 @@ export default function CalendarPage() {
 
       <div className="mb-3 flex items-center gap-3">
         <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
+        <FormatLegend />
 
         {/* Layout toggle */}
         <div className="ml-auto flex items-center rounded-lg border border-border p-0.5">
