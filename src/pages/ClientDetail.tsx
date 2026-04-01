@@ -352,6 +352,14 @@ export default function ClientDetail() {
               <Input id="edit-facebook" placeholder="https://facebook.com/iobee" value={editFacebookUrl} onChange={(e) => setEditFacebookUrl(e.target.value)} />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="edit-linkedin">URL do LinkedIn</Label>
+              <Input id="edit-linkedin" placeholder="https://linkedin.com/company/iobee" value={editLinkedinUrl} onChange={(e) => setEditLinkedinUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-gmb">URL do Google Meu Negócio</Label>
+              <Input id="edit-gmb" placeholder="https://g.page/iobee" value={editGmbUrl} onChange={(e) => setEditGmbUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="edit-objective">Objetivo</Label>
               <Textarea id="edit-objective" placeholder="Descreva o objetivo..." value={editObjective} onChange={(e) => setEditObjective(e.target.value)} rows={3} />
             </div>
