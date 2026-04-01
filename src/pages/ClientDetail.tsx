@@ -152,7 +152,7 @@ export default function ClientDetail() {
                     </TableRow>
                   ) : (
                     clientPosts.map((post) => (
-                      <TableRow key={post.id} className="group cursor-pointer hover:bg-accent/40 transition-colors" onClick={() => setSelectedPost(post)}>
+                      <TableRow key={post.id} className="group cursor-pointer hover:bg-[hsl(var(--primary)/0.08)] transition-colors" onClick={() => setSelectedPost(post)}>
                         <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
                         <TableCell className="font-medium">{post.title}</TableCell>
                         <TableCell className="text-muted-foreground">{post.headline}</TableCell>
@@ -174,7 +174,7 @@ export default function ClientDetail() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-primary"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary"
                             onClick={(e) => { e.stopPropagation(); setSelectedPost(post); }}
                             title="Editar post"
                           >
