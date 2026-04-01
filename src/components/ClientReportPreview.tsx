@@ -27,6 +27,7 @@ function formatDate(dateStr: string) {
 }
 
 export function ClientReportPreview({ clientName, posts, analysts, byFormat, avatarUrl, onPostClick, onEditPost, onDeletePost }: ClientReportPreviewProps) {
+  const navigate = useNavigate();
   const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
 
   const handleDownloadPDF = async () => {
