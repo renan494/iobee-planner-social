@@ -16,6 +16,7 @@ import Analysts from "./pages/Analysts";
 import AnalystDetail from "./pages/AnalystDetail";
 import Drafts from "./pages/Drafts";
 import AdminUsers from "./pages/AdminUsers";
+import MyProfile from "./pages/MyProfile";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
