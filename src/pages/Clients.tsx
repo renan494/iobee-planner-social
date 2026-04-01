@@ -1,8 +1,9 @@
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, User, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,6 +35,21 @@ export default function Clients() {
       return { name, total: clientPosts.length, analysts, byFormat };
     });
   }, [posts, clients]);
+
+  // Fetch avatar URLs for each client from storage
+  const [avatarUrls, setAvatarUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    clients.forEach((name) => {
+      const storagePath = `${encodeURIComponent(name)}/avatar`;
+      const { data } = supabase.storage.from("client-avatars").getPublicUrl(storagePath);
+      fetch(data.publicUrl, { method: "HEAD" }).then((res) => {
+        if (res.ok) {
+          setAvatarUrls((prev) => ({ ...prev, [name]: data.publicUrl + "?t=" + Date.now() }));
+        }
+      }).catch(() => {});
+    });
+  }, [clients]);
 
   const [saving, setSaving] = useState(false);
 
@@ -107,9 +123,14 @@ export default function Clients() {
         {clientStats.map((c) => (
           <Card key={c.name} className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => navigate(`/clientes/${encodeURIComponent(c.name)}`)}>
             <CardHeader className="flex flex-row items-center gap-3 pb-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
-                <User className="h-5 w-5 text-muted-foreground" />
-              </div>
+              <Avatar className="h-10 w-10">
+                {avatarUrls[c.name] ? (
+                  <AvatarImage src={avatarUrls[c.name]} alt={c.name} />
+                ) : null}
+                <AvatarFallback className="bg-secondary">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <CardTitle className="text-base">{c.name}</CardTitle>
                 <p className="text-xs text-muted-foreground">{c.total} posts</p>
