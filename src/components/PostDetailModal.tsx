@@ -21,9 +21,9 @@ interface PostDetailModalProps {
   onUpdateArt?: (postId: string, artUrl: string | null) => Promise<void>;
 }
 
-function PhoneMockup({ artUrl, title }: { artUrl?: string; title: string }) {
+function PhoneMockup({ artUrl, title, onEditArt }: { artUrl?: string; title: string; onEditArt?: () => void }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-2">
       <div className="relative w-[200px] rounded-[2rem] border-[6px] border-foreground/80 bg-background shadow-xl overflow-hidden">
         {/* Notch */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-foreground/80 rounded-b-xl z-10" />
@@ -41,6 +41,12 @@ function PhoneMockup({ artUrl, title }: { artUrl?: string; title: string }) {
         {/* Home indicator */}
         <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full bg-foreground/40" />
       </div>
+      {onEditArt && (
+        <Button variant="outline" size="sm" className="gap-1.5" onClick={onEditArt}>
+          <ImagePlus className="h-3.5 w-3.5" />
+          {artUrl ? "Trocar arte" : "Adicionar arte"}
+        </Button>
+      )}
     </div>
   );
 }
