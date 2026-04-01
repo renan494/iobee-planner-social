@@ -11,7 +11,7 @@ import { PostBadge } from "./PostBadge";
 import { FORMAT_LABELS, FUNNEL_LABELS, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight, Check, X, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
