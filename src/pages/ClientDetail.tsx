@@ -72,6 +72,34 @@ export default function ClientDetail() {
     }
   };
 
+  const openEditDialog = async () => {
+    // Load client data from DB
+    const { data } = await supabase.from("clients").select("*").eq("name", clientName).maybeSingle();
+    setEditName(clientName);
+    setEditInstagram((data as any)?.instagram_handle || "");
+    setEditFacebookUrl((data as any)?.facebook_url || "");
+    setEditObjective((data as any)?.objective || "");
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    setEditSaving(true);
+    try {
+      const { error } = await supabase.from("clients").update({
+        instagram_handle: editInstagram.trim() || null,
+        facebook_url: editFacebookUrl.trim() || null,
+        objective: editObjective.trim() || null,
+      } as any).eq("name", clientName);
+      if (error) throw error;
+      toast.success("Dados do cliente atualizados!");
+      setEditOpen(false);
+    } catch {
+      toast.error("Erro ao salvar dados do cliente.");
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
       <div className="mb-4 flex items-center justify-between">
