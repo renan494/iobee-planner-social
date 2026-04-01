@@ -368,15 +368,13 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             <div className="space-y-6">
               {sortedPosts.map((post) => (
                 <div key={post.id} className={`group relative rounded-lg border border-border p-5 space-y-3 ${onPostClick ? "cursor-pointer hover:border-primary/50 hover:shadow-md transition-all" : ""}`} onClick={() => onPostClick?.(post)}>
+                  {onPostClick && (
+                    <Pencil className="absolute -right-6 top-5 h-3.5 w-3.5 text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-colors" />
+                  )}
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-2">
-                      <div>
-                        <h4 className="font-semibold text-foreground">{post.title}</h4>
-                        <p className="text-sm text-muted-foreground">{post.headline}</p>
-                      </div>
-                      {onPostClick && (
-                        <Pencil className="h-3.5 w-3.5 mt-1 flex-shrink-0 text-muted-foreground/30 group-hover:text-primary/60 transition-colors" />
-                      )}
+                    <div>
+                      <h4 className="font-semibold text-foreground">{post.title}</h4>
+                      <p className="text-sm text-muted-foreground">{post.headline}</p>
                     </div>
                     {post.artUrl && (
                       <img src={post.artUrl} alt={post.title} className="h-20 w-20 rounded-lg object-cover flex-shrink-0" />
