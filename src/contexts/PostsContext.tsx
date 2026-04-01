@@ -16,6 +16,7 @@ interface PostsContextType {
   addAnalyst: (name: string) => Promise<void>;
   updateAnalyst: (oldName: string, newName: string) => Promise<void>;
   removeAnalyst: (name: string) => Promise<void>;
+  addClient: (name: string) => Promise<void>;
 }
 
 const PostsContext = createContext<PostsContextType | null>(null);
@@ -23,6 +24,7 @@ const PostsContext = createContext<PostsContextType | null>(null);
 export function PostsProvider({ children }: { children: ReactNode }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [analystNames, setAnalystNames] = useState<string[]>([]);
+  const [registeredClients, setRegisteredClients] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPosts = useCallback(async () => {
@@ -62,11 +64,24 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    Promise.all([fetchPosts(), fetchAnalysts()]).then(() => setLoading(false));
-  }, [fetchPosts, fetchAnalysts]);
+  const fetchClients = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("clients")
+      .select("name")
+      .order("name");
 
-  const clients = getClients(posts);
+    if (!error && data) {
+      setRegisteredClients(data.map((c) => c.name));
+    }
+  }, []);
+
+  useEffect(() => {
+    Promise.all([fetchPosts(), fetchAnalysts(), fetchClients()]).then(() => setLoading(false));
+  }, [fetchPosts, fetchAnalysts, fetchClients]);
+
+  // Merge clients from posts + registered clients table
+  const clientsFromPosts = getClients(posts);
+  const clients = [...new Set([...registeredClients, ...clientsFromPosts])].sort();
   const analysts = analystNames;
 
   const addPost = useCallback(async (post: Omit<Post, "id">) => {
@@ -154,8 +169,14 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (!error) await fetchAnalysts();
   }, [fetchAnalysts]);
 
+  const addClient = useCallback(async (name: string) => {
+    const { error } = await supabase.from("clients").insert({ name } as any);
+    if (error) throw error;
+    await fetchClients();
+  }, [fetchClients]);
+
   return (
-    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, updatePostArt, updatePost, deletePost, addAnalyst, updateAnalyst, removeAnalyst }}>
+    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, updatePostArt, updatePost, deletePost, addAnalyst, updateAnalyst, removeAnalyst, addClient }}>
       {children}
     </PostsContext.Provider>
   );
