@@ -24,16 +24,12 @@ export default function Dashboard() {
   const isAdmin = useAdminCheck();
   const navigate = useNavigate();
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
 
   const filteredPosts = useMemo(() => {
-    return posts.filter((p) => {
-      if (startDate && p.date < startDate) return false;
-      if (endDate && p.date > endDate) return false;
-      return true;
-    });
-  }, [posts, startDate, endDate]);
+    if (!selectedMonth) return posts;
+    return posts.filter((p) => p.date.startsWith(selectedMonth));
+  }, [posts, selectedMonth]);
 
   const formatCounts = useMemo(() => {
     const counts: Record<PostFormat, number> = { static: 0, carousel: 0, reels: 0, stories: 0 };
