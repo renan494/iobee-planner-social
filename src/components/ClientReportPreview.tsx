@@ -193,6 +193,29 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
     // ==========================================
     // POST DETAIL PAGES (1 per page)
     // ==========================================
+    // Pre-load post art images
+    const artImages: Map<string, string> = new Map();
+    await Promise.all(
+      sortedPosts
+        .filter((p) => p.artUrl)
+        .map(async (p) => {
+          try {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            await new Promise<void>((resolve, reject) => {
+              img.onload = () => resolve();
+              img.onerror = reject;
+              img.src = p.artUrl!;
+            });
+            const c = document.createElement("canvas");
+            c.width = img.naturalWidth;
+            c.height = img.naturalHeight;
+            c.getContext("2d")!.drawImage(img, 0, 0);
+            artImages.set(p.id, c.toDataURL("image/jpeg", 0.85));
+          } catch { /* skip */ }
+        })
+    );
+
     sortedPosts.forEach((post, idx) => {
       doc.addPage();
       addHeader();
@@ -218,8 +241,15 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...gray);
-      const headlineLines = doc.splitTextToSize(post.headline, contentWidth);
+      const headlineLines = doc.splitTextToSize(post.headline, contentWidth - (artImages.has(post.id) ? 45 : 0));
       doc.text(headlineLines, margin, y);
+
+      // Art image (top-right area)
+      if (artImages.has(post.id)) {
+        const artSize = 35;
+        doc.addImage(artImages.get(post.id)!, "JPEG", pageWidth - margin - artSize, 22, artSize, artSize);
+      }
+
       y += headlineLines.length * 5.5 + 6;
 
       // Yellow divider
@@ -227,29 +257,32 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       doc.rect(margin, y, contentWidth, 1, "F");
       y += 8;
 
-      // Details in a styled grid
+      // Details in a styled grid (no emojis)
       doc.setFillColor(...warmBg);
       const detailPairs: [string, string][] = [
-        ["📅  Data", formatDate(post.date)],
-        ["📋  Formato", FORMAT_LABELS[post.format]],
-        ["🎯  Funil", FUNNEL_LABELS[post.funnelStage]],
-        ["👤  Analista", post.analyst],
+        ["Data", formatDate(post.date)],
+        ["Formato", FORMAT_LABELS[post.format]],
+        ["Funil", FUNNEL_LABELS[post.funnelStage]],
+        ["Analista", post.analyst],
       ];
       if (post.channels && post.channels.length > 0) {
-        detailPairs.push(["📱  Canais", post.channels.join(", ")]);
+        detailPairs.push(["Canais", post.channels.join(", ")]);
       }
 
       const detailBoxH = detailPairs.length * 8 + 6;
       doc.roundedRect(margin, y - 3, contentWidth, detailBoxH, 2, 2, "F");
+      // Yellow left accent on detail box
+      doc.setFillColor(...yellow);
+      doc.rect(margin, y - 3, 2, detailBoxH, "F");
 
       doc.setFontSize(9);
       detailPairs.forEach(([label, value]) => {
         doc.setFont("helvetica", "bold");
         doc.setTextColor(...dark);
-        doc.text(label, margin + 5, y + 3);
+        doc.text(label, margin + 8, y + 3);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(...gray);
-        doc.text(value, margin + 42, y + 3);
+        doc.text(value, margin + 35, y + 3);
         y += 8;
       });
       y += 6;
@@ -274,7 +307,6 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         doc.text("LEGENDA / CONTEÚDO", margin, y);
         y += 5;
 
-        // Yellow left-border accent box
         const legendLines = doc.splitTextToSize(post.legend, contentWidth - 14);
         const boxH = legendLines.length * 4.5 + 8;
 
