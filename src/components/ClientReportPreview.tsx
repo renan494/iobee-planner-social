@@ -572,6 +572,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             Baixar PDF
           </Button>
         </div>
+      </div>
 
       {/* Preview document */}
       <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
