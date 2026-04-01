@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Trash2, PenTool } from "lucide-react";
 import logoSvg from "@/assets/logo-iobee.svg";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
