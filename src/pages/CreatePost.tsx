@@ -154,8 +154,8 @@ export default function CreatePost() {
     for (const entry of entries) {
       const ec = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
       const ea = entry.analyst === "__new__" ? entry.newAnalyst.trim() : entry.analyst;
-      if (!ec || !ea || !entry.date || !entry.title.trim()) {
-        toast({ title: "Preencha os campos obrigatórios", description: "Cliente, analista, data e título são obrigatórios em todos os posts.", variant: "destructive" });
+      if (!ec || !ea || !entry.date || !entry.title.trim() || !entry.postFormat || !entry.funnelStage) {
+        toast({ title: "Preencha os campos obrigatórios", description: "Cliente, analista, formato, etapa do funil, data e título são obrigatórios.", variant: "destructive" });
         return;
       }
       if (entry.analyst === "__new__" && ea) newAnalystsToAdd.add(ea);
