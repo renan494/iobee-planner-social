@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Camera } from "lucide-react";
+import { ArrowLeft, User, Camera, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { usePosts } from "@/contexts/PostsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage } from "@/data/posts";
 import { toast } from "sonner";
+import { ClientReportPreview } from "@/components/ClientReportPreview";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
