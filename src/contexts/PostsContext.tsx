@@ -76,7 +76,8 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       date: post.date,
       hashtags: post.hashtags,
       legend: post.legend || null,
-    });
+      art_url: post.artUrl || null,
+    } as any);
     if (!error) await fetchPosts();
   }, [fetchPosts]);
 
