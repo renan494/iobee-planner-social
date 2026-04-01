@@ -42,26 +42,21 @@ export function PostCard({ post, onClick }: PostCardProps) {
     <button
       onClick={() => onClick(post)}
       className={cn(
-        "group flex w-full flex-col gap-1 rounded-md border-l-[3px] px-1.5 py-1.5 text-left transition-colors hover:bg-secondary",
+        "group flex w-full items-center gap-1.5 rounded-md border-l-[3px] px-1.5 py-1 text-left transition-colors hover:bg-secondary",
         FORMAT_BG[post.format as PostFormat] || "border-l-transparent"
       )}
     >
-      <div className="flex w-full items-center gap-1.5">
-        <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
-          {post.title}
-        </span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <PostBadge format={post.format as PostFormat} className="text-[9px] px-1.5 py-0.5" />
-        <span
-          className={cn(
-            "inline-block self-start rounded border px-1.5 py-0.5 text-[10px] font-semibold leading-tight",
-            colorClass
-          )}
-        >
-          {post.client}
-        </span>
-      </div>
+      <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
+        {post.title}
+      </span>
+      <span
+        className={cn(
+          "shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-semibold leading-tight",
+          colorClass
+        )}
+      >
+        {post.client}
+      </span>
     </button>
   );
 }
