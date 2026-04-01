@@ -17,6 +17,7 @@ export default function ClientDetail() {
   const navigate = useNavigate();
   const { posts } = usePosts();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showReport, setShowReport] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
   const clientPosts = useMemo(() => posts.filter((p) => p.client === clientName), [posts, clientName]);
