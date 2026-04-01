@@ -194,11 +194,29 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
             ) : (
               <DialogTitle className="text-lg font-bold">{post.title}</DialogTitle>
             )}
-            {onUpdatePost && !editing && (
-              <Button variant="ghost" size="sm" className="gap-1.5 ml-2 flex-shrink-0" onClick={() => setEditing(true)}>
-                <Pencil className="h-3.5 w-3.5" /> Editar
-              </Button>
-            )}
+            <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+              {onUpdatePost && !editing && (
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditing(true)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
+              {onDeletePost && !editing && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={async () => {
+                    if (window.confirm("Tem certeza que deseja excluir este post?")) {
+                      await onDeletePost(post.id);
+                      onOpenChange(false);
+                      toast({ title: "Post excluído", description: "O post foi removido com sucesso." });
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </DialogHeader>
 
