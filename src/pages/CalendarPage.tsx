@@ -51,6 +51,8 @@ export default function CalendarPage() {
   const [showCustomCalendars, setShowCustomCalendars] = useState(false);
   const [selectedClient, setSelectedClient] = useState("all");
   const [selectedAnalyst, setSelectedAnalyst] = useState("all");
+  const [selectedFormat, setSelectedFormat] = useState("all");
+  const [selectedChannel, setSelectedChannel] = useState("all");
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
