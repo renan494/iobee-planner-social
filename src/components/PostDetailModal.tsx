@@ -165,8 +165,15 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
               disabled={uploading}
             />
             <PhoneMockup
-              artUrl={post.artUrl}
+              images={
+                post.format === "carousel" && post.artUrls && post.artUrls.length > 0
+                  ? post.artUrls
+                  : post.artUrl
+                    ? [post.artUrl]
+                    : []
+              }
               title={post.title}
+              isCarousel={post.format === "carousel"}
               onEditArt={onUpdateArt ? () => fileInputRef.current?.click() : undefined}
             />
           </div>
