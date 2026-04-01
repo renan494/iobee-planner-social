@@ -13,6 +13,7 @@ import CalendarPage from "./pages/CalendarPage";
 import Clients from "./pages/Clients";
 import ClientDetail from "./pages/ClientDetail";
 import Analysts from "./pages/Analysts";
+import AnalystDetail from "./pages/AnalystDetail";
 import Drafts from "./pages/Drafts";
 import AdminUsers from "./pages/AdminUsers";
 import Login from "./pages/Login";
