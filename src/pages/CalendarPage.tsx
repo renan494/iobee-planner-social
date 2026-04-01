@@ -184,7 +184,6 @@ export default function CalendarPage() {
         </Select>
       </div>
 
-      {/* Row 3: View mode + Legend + Layout toggle */}
       {/* Row 3: View mode + Layout toggle */}
       <div className="flex items-center gap-3">
         <ViewModeSwitcher value={viewMode} onChange={setViewMode} />
