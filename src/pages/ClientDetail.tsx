@@ -174,7 +174,7 @@ export default function ClientDetail() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-primary"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary"
                             onClick={(e) => { e.stopPropagation(); setSelectedPost(post); }}
                             title="Editar post"
                           >
