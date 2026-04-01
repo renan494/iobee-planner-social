@@ -51,14 +51,17 @@ export function PostCard({ post, onClick }: PostCardProps) {
           {post.title}
         </span>
       </div>
-      <span
-        className={cn(
-          "inline-block self-start rounded border px-1.5 py-0.5 text-[10px] font-semibold leading-tight",
-          colorClass
-        )}
-      >
-        {post.client}
-      </span>
+      <div className="flex items-center gap-1.5">
+        <PostBadge format={post.format as PostFormat} className="text-[9px] px-1.5 py-0.5" />
+        <span
+          className={cn(
+            "inline-block self-start rounded border px-1.5 py-0.5 text-[10px] font-semibold leading-tight",
+            colorClass
+          )}
+        >
+          {post.client}
+        </span>
+      </div>
     </button>
   );
 }
