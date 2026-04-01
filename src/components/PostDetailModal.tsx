@@ -353,7 +353,7 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
           </div>
 
           {/* Phone mockup on right */}
-          <div className="hidden sm:flex flex-shrink-0">
+          <div className="hidden sm:flex flex-shrink-0 items-center">
             <input
               ref={fileInputRef}
               type="file"
