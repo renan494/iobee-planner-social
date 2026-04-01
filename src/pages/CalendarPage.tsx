@@ -36,7 +36,7 @@ import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
 import { useNavigate } from "react-router-dom";
 import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
-import { cn } from "@/lib/utils";
+
 
 export default function CalendarPage() {
   const routerNavigate = useNavigate();
