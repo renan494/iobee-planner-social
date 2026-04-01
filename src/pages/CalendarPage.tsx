@@ -274,7 +274,7 @@ export default function CalendarPage() {
       )}
 
       {/* Legend below calendar */}
-      <div className="flex items-center justify-center pt-2">
+      <div className="flex items-center pt-2">
         <FormatLegend />
       </div>
 
