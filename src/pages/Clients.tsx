@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, type PostFormat } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Clients() {
   const { posts, clients, addClient } = usePosts();
