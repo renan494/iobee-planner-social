@@ -37,7 +37,6 @@ export function PostCard({ post, onClick }: PostCardProps) {
       className="group flex w-full flex-col gap-1 rounded-md px-1.5 py-1.5 text-left transition-colors hover:bg-secondary"
     >
       <div className="flex w-full items-center gap-1.5">
-        <PostBadge format={post.format} className="shrink-0" />
         <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
           {post.title}
         </span>
