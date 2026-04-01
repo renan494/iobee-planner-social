@@ -1,7 +1,14 @@
 import { useMemo } from "react";
-import type { Post } from "@/data/posts";
+import type { Post, PostFormat } from "@/data/posts";
 import { PostBadge } from "./PostBadge";
 import { cn } from "@/lib/utils";
+
+const FORMAT_BG: Record<PostFormat, string> = {
+  static: "border-l-format-static",
+  carousel: "border-l-format-carousel",
+  reels: "border-l-format-reels",
+  stories: "border-l-format-stories",
+};
 
 // Deterministic color based on client name
 const CLIENT_COLORS = [
@@ -34,7 +41,10 @@ export function PostCard({ post, onClick }: PostCardProps) {
   return (
     <button
       onClick={() => onClick(post)}
-      className="group flex w-full flex-col gap-1 rounded-md px-1.5 py-1.5 text-left transition-colors hover:bg-secondary"
+      className={cn(
+        "group flex w-full flex-col gap-1 rounded-md border-l-[3px] px-1.5 py-1.5 text-left transition-colors hover:bg-secondary",
+        FORMAT_BG[post.format as PostFormat] || "border-l-transparent"
+      )}
     >
       <div className="flex w-full items-center gap-1.5">
         <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
