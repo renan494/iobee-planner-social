@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Download, Trash2, PenTool } from "lucide-react";
+import { Download, Trash2, PenTool, Eye } from "lucide-react";
 import logoSvg from "@/assets/logo-iobee.svg";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
@@ -606,14 +606,26 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
                     </div>
                     <div className="flex flex-col items-end gap-2 flex-shrink-0">
                       {/* Edit & Delete buttons */}
-                      {(onEditPost || onDeletePost) && (
+                      {(onPostClick || onEditPost || onDeletePost) && (
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {onPostClick && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
+                              onClick={(e) => { e.stopPropagation(); onPostClick(post); }}
+                              title="Visualizar post"
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                           {onEditPost && (
                             <Button
                               variant="ghost"
                               size="icon"
                               className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
                               onClick={(e) => { e.stopPropagation(); onEditPost(post); }}
+                              title="Editar post"
                             >
                               <Pencil className="h-3.5 w-3.5" />
                             </Button>
