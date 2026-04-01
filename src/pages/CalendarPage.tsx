@@ -113,11 +113,13 @@ export default function CalendarPage() {
     return posts.filter((p) => {
       if (selectedClient !== "all" && p.client !== selectedClient) return false;
       if (selectedAnalyst !== "all" && p.analyst !== selectedAnalyst) return false;
+      if (selectedFormat !== "all" && p.format !== selectedFormat) return false;
+      if (selectedChannel !== "all" && !(p.channels || []).includes(selectedChannel)) return false;
       if (dateFrom && p.date < format(dateFrom, "yyyy-MM-dd")) return false;
       if (dateTo && p.date > format(dateTo, "yyyy-MM-dd")) return false;
       return true;
     });
-  }, [posts, selectedClient, selectedAnalyst, dateFrom, dateTo]);
+  }, [posts, selectedClient, selectedAnalyst, selectedFormat, selectedChannel, dateFrom, dateTo]);
 
   const handlePostClick = useCallback((post: Post) => {
     setSelectedPost(post);
