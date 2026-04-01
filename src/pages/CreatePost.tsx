@@ -71,6 +71,7 @@ function createEmptyEntry(): PostEntry {
     artPreviews: [],
     artFiles: [],
     channels: [],
+    reference: "",
     collapsed: false,
   };
 }
