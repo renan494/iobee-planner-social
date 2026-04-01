@@ -28,6 +28,14 @@ const PRESETS: { label: string; range: PresetFn }[] = [
   { label: "Este mês", range: () => [startOfMonth(today()), endOfMonth(today())] },
   { label: "30 dias atrás", range: () => [subDays(today(), 29), today()] },
   { label: "Último mês", range: () => { const d = subMonths(today(), 1); return [startOfMonth(d), endOfMonth(d)]; } },
+  { label: "Este trimestre", range: () => [startOfQuarter(today()), endOfQuarter(today())] },
+  { label: "Este semestre", range: () => {
+    const m = today().getMonth();
+    const y = today().getFullYear();
+    return m < 6
+      ? [new Date(y, 0, 1), new Date(y, 5, 30)]
+      : [new Date(y, 6, 1), new Date(y, 11, 31)];
+  }},
   { label: "Todo o período", range: () => [null, null] },
 ];
 
