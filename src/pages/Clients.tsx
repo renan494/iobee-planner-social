@@ -42,9 +42,17 @@ export default function Clients() {
     }
     setSaving(true);
     try {
-      await addClient(trimmed);
+      await addClient({
+        name: trimmed,
+        monthlyPosts: parseInt(newMonthlyPosts) || 0,
+        objective: newObjective.trim() || undefined,
+        goal: newGoal.trim() || undefined,
+      });
       toast({ title: "Cliente cadastrado", description: `"${trimmed}" foi adicionado com sucesso.` });
       setNewClientName("");
+      setNewMonthlyPosts("");
+      setNewObjective("");
+      setNewGoal("");
       setDialogOpen(false);
     } catch (err) {
       toast({ title: "Erro", description: "Não foi possível cadastrar o cliente.", variant: "destructive" });
