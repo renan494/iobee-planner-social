@@ -110,7 +110,7 @@ function PhoneMockup({
   );
 }
 
-export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpdateArt, onUpdatePost }: PostDetailModalProps) {
+export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpdateArt, onUpdatePost, onDeletePost }: PostDetailModalProps) {
   const [editingDate, setEditingDate] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(false);
