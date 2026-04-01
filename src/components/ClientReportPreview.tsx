@@ -17,6 +17,8 @@ interface ClientReportPreviewProps {
   byFormat: Record<PostFormat, number>;
   avatarUrl: string | null;
   onPostClick?: (post: Post) => void;
+  onEditPost?: (post: Post) => void;
+  onDeletePost?: (postId: string) => Promise<void>;
 }
 
 function formatDate(dateStr: string) {
