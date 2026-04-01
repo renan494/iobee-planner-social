@@ -23,6 +23,7 @@ export default function ClientDetail() {
   const { posts, updatePostDate, updatePostArt, updatePost, deletePost, analysts: allAnalysts } = usePosts();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [previewPost, setPreviewPost] = useState<Post | null>(null);
   const [showReport, setShowReport] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
