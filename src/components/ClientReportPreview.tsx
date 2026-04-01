@@ -305,6 +305,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       // Phone mockup dimensions
       const phoneWidth = 36;
       const phoneX = pageWidth - margin - phoneWidth;
+      const leftColWidth = hasArt ? contentWidth - phoneWidth - 12 : contentWidth;
 
       let y = 24;
 
@@ -316,8 +317,8 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       doc.setTextColor(...dark);
       doc.text(`${idx + 1}/${sortedPosts.length}`, margin + 9, y + 1, { align: "center" });
 
-      // Title (leave room for phone mockup)
-      const titleMaxWidth = hasArt ? contentWidth - phoneWidth - 12 : contentWidth - 22;
+      // Title
+      const titleMaxWidth = hasArt ? leftColWidth - 22 : contentWidth - 22;
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...dark);
@@ -326,31 +327,28 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       y += titleLines.length * 8 + 4;
 
       // Headline
-      const headlineMaxWidth = hasArt ? contentWidth - phoneWidth - 12 : contentWidth;
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(...gray);
-      const headlineLines = doc.splitTextToSize(post.headline, headlineMaxWidth);
+      const headlineLines = doc.splitTextToSize(post.headline, leftColWidth);
       doc.text(headlineLines, margin, y);
-      const headlineBottom = y + headlineLines.length * 5.5;
+      y += headlineLines.length * 5.5 + 6;
 
-      // Draw phone mockup with first image
-      let artBottom = headlineBottom;
+      // Draw phone mockup with first image (on the right)
+      let phoneBottom = y;
       if (hasArt) {
         const firstImg = images[0];
         const phoneY = 22;
         const phoneH = drawPhoneMockup(doc, firstImg.src, firstImg.width, firstImg.height, phoneX, phoneY, phoneWidth);
-        artBottom = Math.max(artBottom, phoneY + phoneH + 4);
+        phoneBottom = phoneY + phoneH + 4;
       }
 
-      y = Math.max(headlineBottom, artBottom) + 6;
-
-      // Yellow divider
+      // Yellow divider (left column only)
       doc.setFillColor(...yellow);
-      doc.rect(margin, y, contentWidth, 1, "F");
+      doc.rect(margin, y, leftColWidth, 1, "F");
       y += 8;
 
-      // Details grid
+      // Details grid (left column)
       doc.setFillColor(...warmBg);
       const detailPairs: [string, string][] = [
         ["Data", formatDate(post.date)],
@@ -363,7 +361,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       }
 
       const detailBoxH = detailPairs.length * 8 + 6;
-      doc.roundedRect(margin, y - 3, contentWidth, detailBoxH, 2, 2, "F");
+      doc.roundedRect(margin, y - 3, leftColWidth, detailBoxH, 2, 2, "F");
       doc.setFillColor(...yellow);
       doc.rect(margin, y - 3, 2, detailBoxH, "F");
 
@@ -379,7 +377,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       });
       y += 6;
 
-      // Legend / copy (with hashtags inside)
+      // Legend / copy (left column, beside phone)
       const hasLegend = !!post.legend;
       const hasHashtags = post.hashtags.length > 0;
 
@@ -391,16 +389,16 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         doc.text("LEGENDA / CONTEÚDO", margin, y);
         y += 5;
 
-        // Build combined content: legend + hashtags
         const legendText = post.legend || "";
         const hashText = hasHashtags ? "\n\n" + post.hashtags.map((h) => "#" + h).join(" ") : "";
         const combinedText = (legendText + hashText).trim();
 
-        const combinedLines = doc.splitTextToSize(combinedText, contentWidth - 14);
+        const legendWidth = leftColWidth - 14;
+        const combinedLines = doc.splitTextToSize(combinedText, legendWidth);
         const boxH = combinedLines.length * 4.5 + 8;
 
         doc.setFillColor(...warmBg);
-        doc.roundedRect(margin, y - 3, contentWidth, boxH, 2, 2, "F");
+        doc.roundedRect(margin, y - 3, leftColWidth, boxH, 2, 2, "F");
         doc.setFillColor(...yellow);
         doc.rect(margin, y - 3, 2.5, boxH, "F");
 
@@ -410,6 +408,9 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         doc.text(combinedLines, margin + 7, y + 2);
         y += boxH + 4;
       }
+
+      // Ensure y is at least past the phone mockup
+      y = Math.max(y, phoneBottom) + 2;
 
       // Carousel: show remaining slides in a row below
       if (isCarousel && images.length > 1) {
