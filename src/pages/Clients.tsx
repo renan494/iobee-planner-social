@@ -17,7 +17,9 @@ export default function Clients() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClientName, setNewClientName] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [newMonthlyPosts, setNewMonthlyPosts] = useState("");
+  const [newObjective, setNewObjective] = useState("");
+  const [newGoal, setNewGoal] = useState("");
 
   const clientStats = useMemo(() => {
     return clients.map((name) => {
