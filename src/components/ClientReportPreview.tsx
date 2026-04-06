@@ -493,9 +493,20 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         doc.setFont("helvetica", "bold");
         doc.setTextColor(...dark);
         doc.text(label, margin + 8, detailY);
+
+        const isLink = label === "Referência" && /^https?:\/\//.test(value);
+        const maxValueWidth = textColWidth - 30;
+        const truncated = doc.splitTextToSize(value, maxValueWidth)[0];
+        const displayValue = truncated.length < value.length ? truncated.slice(0, -3) + "..." : truncated;
+
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(...gray);
-        doc.text(value, margin + 35, detailY);
+        if (isLink) {
+          doc.setTextColor(0, 90, 200);
+          doc.textWithLink(displayValue, margin + 35, detailY, { url: value });
+        } else {
+          doc.setTextColor(...gray);
+          doc.text(value, margin + 35, detailY);
+        }
         detailY += 8;
       });
 
