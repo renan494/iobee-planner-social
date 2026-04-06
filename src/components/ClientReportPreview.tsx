@@ -428,6 +428,9 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       if (post.channels && post.channels.length > 0) {
         detailPairs.push(["Canais", post.channels.join(", ")]);
       }
+      if (post.reference) {
+        detailPairs.push(["Referência", post.reference]);
+      }
 
       // Calculate phone height for the box
       let phoneH = 0;
