@@ -130,14 +130,14 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         doc.setFontSize(13);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(...dark);
-        doc.text(sectionTitle, pageWidth - margin, 11);
+        doc.text(sectionTitle, pageWidth - margin, 11, { align: "right" });
       }
 
       if (sectionSubtitle) {
         doc.setFontSize(8);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(...gray);
-        doc.text(sectionSubtitle, pageWidth - margin, 16);
+        doc.text(sectionSubtitle, pageWidth - margin, 16, { align: "right" });
       }
     };
 
@@ -387,27 +387,22 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
       const phoneWidth = 40;
       const phoneInternalPad = 8;
 
-      let y = 24;
-
-      doc.setFontSize(7);
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(...gray);
-      doc.text("PLANEJAMENTO VISUAL", margin, y - 1);
+      let y = 26;
 
       // Post number badge
       doc.setFillColor(...yellow);
-      doc.roundedRect(margin, y - 4, 18, 8, 2, 2, "F");
+      doc.roundedRect(margin, y - 5, 18, 8, 2, 2, "F");
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...dark);
-      doc.text(`${idx + 1}/${sortedPosts.length}`, margin + 9, y + 1, { align: "center" });
+      doc.text(`${idx + 1}/${sortedPosts.length}`, margin + 9, y, { align: "center" });
 
-      // Title
+      // Title (next to badge)
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...dark);
-      const titleLines = doc.splitTextToSize(post.title, contentWidth - 22);
-      doc.text(titleLines, margin + 22, y + 1);
+      const titleLines = doc.splitTextToSize(post.title, contentWidth - 24);
+      doc.text(titleLines, margin + 22, y);
       y += titleLines.length * 8 + 4;
 
       // Headline
