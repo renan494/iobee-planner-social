@@ -1,0 +1,1 @@
+UPDATE auth.users SET encrypted_password = crypt('iobee123', gen_salt('bf')) WHERE email IN ('renan@iobee.com.br', 'julia@iobee.com.br', 'leticia@iobee.com.br', 'jeanine@iobee.com.br');
