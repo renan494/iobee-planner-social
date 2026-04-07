@@ -135,7 +135,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
   }, [fetchPosts]);
 
   const updatePost = useCallback(async (postId: string, fields: Partial<Omit<Post, "id">>) => {
-    const dbFields: { [K in keyof Database["public"]["Tables"]["posts"]["Update"]]?: Database["public"]["Tables"]["posts"]["Update"][K] } = {};
+    const dbFields: Record<string, unknown> = {};
     if (fields.title !== undefined) dbFields.title = fields.title;
     if (fields.headline !== undefined) dbFields.headline = fields.headline;
     if (fields.legend !== undefined) dbFields.legend = fields.legend || null;
@@ -147,7 +147,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (fields.analyst !== undefined) dbFields.analyst = fields.analyst;
     if (fields.channels !== undefined) dbFields.channels = fields.channels;
     if (fields.reference !== undefined) dbFields.reference = fields.reference || null;
-    const { error } = await supabase.from("posts").update(dbFields).eq("id", postId);
+    const { error } = await supabase.from("posts").update(dbFields as any).eq("id", postId);
     if (!error) await fetchPosts();
   }, [fetchPosts]);
 
