@@ -135,7 +135,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
   }, [fetchPosts]);
 
   const updatePost = useCallback(async (postId: string, fields: Partial<Omit<Post, "id">>) => {
-    const dbFields: Record<string, any> = {};
+    const dbFields: { [K in keyof Database["public"]["Tables"]["posts"]["Update"]]?: Database["public"]["Tables"]["posts"]["Update"][K] } = {};
     if (fields.title !== undefined) dbFields.title = fields.title;
     if (fields.headline !== undefined) dbFields.headline = fields.headline;
     if (fields.legend !== undefined) dbFields.legend = fields.legend || null;
