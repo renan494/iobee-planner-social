@@ -14,7 +14,7 @@ export function AnalystFilter({ analysts, selected, onChange }: AnalystFilterPro
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">Todos os analistas</SelectItem>
-        {analysts.map((a) => (
+        {analysts.filter(a => a && a.trim() !== "").map((a) => (
           <SelectItem key={a} value={a}>
             {a}
           </SelectItem>

@@ -14,7 +14,7 @@ export function ClientFilter({ clients, selected, onChange }: ClientFilterProps)
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">Todos os clientes</SelectItem>
-        {clients.map((c) => (
+        {clients.filter(c => c && c.trim() !== "").map((c) => (
           <SelectItem key={c} value={c}>
             {c}
           </SelectItem>
