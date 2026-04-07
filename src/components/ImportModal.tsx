@@ -158,7 +158,7 @@ export function ImportModal({ open, onOpenChange, onImport, existingClients }: I
                 <SelectValue placeholder="Selecione o cliente" />
               </SelectTrigger>
               <SelectContent>
-                {existingClients.map((c) => (
+                {existingClients.filter(c => c && c.trim() !== "").map((c) => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
                 <SelectItem value="__new__">+ Novo cliente</SelectItem>
