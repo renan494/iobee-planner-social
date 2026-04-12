@@ -4,15 +4,10 @@ import {
   CalendarDays,
   Users,
   UserCog,
-  Shield,
-  LogOut,
   FileEdit,
-  UserCircle,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-iobee.svg";
 
 import {
@@ -26,25 +21,19 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+const items = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
+  { title: "Rascunhos", url: "/rascunhos", icon: FileEdit },
+  { title: "Calendário", url: "/calendario", icon: CalendarDays },
+  { title: "Clientes", url: "/clientes", icon: Users },
+  { title: "Analistas", url: "/analistas", icon: UserCog },
+];
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
-  const isAdmin = useAdminCheck();
-
-  const items = [
-    { title: "Meus Dados", url: "/meus-dados", icon: UserCircle },
-    { title: "Dashboard", url: "/", icon: LayoutDashboard },
-    { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
-    { title: "Rascunhos", url: "/rascunhos", icon: FileEdit },
-    { title: "Calendário", url: "/calendario", icon: CalendarDays },
-    { title: "Clientes", url: "/clientes", icon: Users },
-    { title: "Analistas", url: "/analistas", icon: UserCog },
-    ...(isAdmin ? [{ title: "Gerenciar Acessos", url: "/admin", icon: Shield }] : []),
-  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -79,16 +68,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        <div className="mt-auto px-3 pb-4">
-          <button
-            onClick={() => signOut()}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            {!collapsed && <span>Sair</span>}
-          </button>
-        </div>
       </SidebarContent>
     </Sidebar>
   );
