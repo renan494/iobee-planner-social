@@ -245,7 +245,7 @@ export default function CreatePost() {
   };
 
   const handleSaveDraft = async () => {
-    if (!user) return;
+    
 
     for (const entry of entries) {
       const ec = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
