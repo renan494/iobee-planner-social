@@ -6,7 +6,6 @@ import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { usePosts } from "@/contexts/PostsContext";
 import { useActivity } from "@/contexts/ActivityContext";
 import { toast } from "@/hooks/use-toast";
@@ -29,7 +28,6 @@ interface Draft {
 }
 
 export default function Drafts() {
-  const { user } = useAuth();
   const { addPost } = usePosts();
   const { logActivity } = useActivity();
   const navigate = useNavigate();
@@ -37,7 +35,6 @@ export default function Drafts() {
   const [loading, setLoading] = useState(true);
 
   const fetchDrafts = useCallback(async () => {
-    if (!user) return;
     const { data, error } = await supabase
       .from("drafts")
       .select("*")
@@ -45,7 +42,7 @@ export default function Drafts() {
 
     if (!error && data) setDrafts(data as Draft[]);
     setLoading(false);
-  }, [user]);
+  }, []);
 
   useEffect(() => { fetchDrafts(); }, [fetchDrafts]);
 

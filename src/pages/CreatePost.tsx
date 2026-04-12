@@ -26,7 +26,7 @@ import { FORMAT_LABELS, FUNNEL_LABELS, CHANNEL_OPTIONS } from "@/data/posts";
 import type { PostFormat, FunnelStage } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { useActivity } from "@/contexts/ActivityContext";
-import { useAuth } from "@/contexts/AuthContext";
+
 import { supabase } from "@/integrations/supabase/client";
 
 interface PostEntry {
@@ -79,7 +79,7 @@ function createEmptyEntry(): PostEntry {
 export default function CreatePost() {
   const { clients, analysts, addPost, addPosts, addAnalyst } = usePosts();
   const { logActivity } = useActivity();
-  const { user } = useAuth();
+  
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -245,14 +245,14 @@ export default function CreatePost() {
   };
 
   const handleSaveDraft = async () => {
-    if (!user) return;
+    
 
     for (const entry of entries) {
       const ec = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
       const ea = entry.analyst === "__new__" ? entry.newAnalyst.trim() : entry.analyst;
 
       const draftData = {
-        user_id: user.id,
+        user_id: "anonymous",
         client: ec || null,
         analyst: ea || null,
         title: entry.title.trim() || null,
