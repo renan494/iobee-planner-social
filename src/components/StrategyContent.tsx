@@ -5,6 +5,11 @@ import {
   Palette, TrendingUp, CalendarClock, FileText
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+function cleanContent(text: string): string {
+  return text.replace(/<br\s*\/?>/gi, "\n\n").replace(/\|\s*\|/g, "|\n|");
+}
 
 const sectionIcons: Record<string, React.ReactNode> = {
   "diagnóstico": <Search className="h-5 w-5 text-primary" />,
