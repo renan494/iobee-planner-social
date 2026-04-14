@@ -40,6 +40,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const navigate = useNavigate();
   const isAdmin = useAdminCheck();
+  const { signOut } = useAuth();
 
   return (
     <Sidebar collapsible="icon">
