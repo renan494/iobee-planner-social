@@ -4,11 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+import StrategyContent from "@/components/StrategyContent";
 
 type ClientData = {
   id: string;
@@ -289,28 +289,22 @@ export default function Strategy() {
 
       {/* Streaming / Generated Content */}
       {(generating || streamContent) && (
-        <Card className="mb-6 border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              {generating ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  Gerando estratégia...
-                </>
-              ) : (
-                <>
-                  <FileText className="h-4 w-4 text-primary" />
-                  Estratégia gerada
-                </>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-headings:font-bold prose-h2:text-base prose-h2:mt-6 prose-h2:mb-2 prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-ul:my-2 prose-li:my-0.5">
-              <ReactMarkdown>{streamContent}</ReactMarkdown>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            {generating ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <span className="text-sm font-semibold text-foreground">Gerando estratégia...</span>
+              </>
+            ) : (
+              <>
+                <FileText className="h-5 w-5 text-primary" />
+                <span className="text-sm font-semibold text-foreground">Estratégia gerada</span>
+              </>
+            )}
+          </div>
+          <StrategyContent content={streamContent} isStreaming={generating} />
+        </div>
       )}
 
       {/* Saved Strategies */}
@@ -357,9 +351,7 @@ export default function Strategy() {
                   </div>
                   {expandedId === s.id && (
                     <CardContent className="border-t pt-4">
-                      <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-headings:font-bold prose-h2:text-base prose-h2:mt-6 prose-h2:mb-2 prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-ul:my-2 prose-li:my-0.5">
-                        <ReactMarkdown>{s.content}</ReactMarkdown>
-                      </div>
+                      <StrategyContent content={s.content} />
                     </CardContent>
                   )}
                 </Card>
