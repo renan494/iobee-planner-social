@@ -1,11 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Search, Swords, Target, BookOpen, BarChart3, Lightbulb,
   Palette, TrendingUp, CalendarClock, FileText, CheckCircle2,
   Quote, AlertTriangle, Zap, Shield, Eye, Star,
-  Megaphone, Users, ArrowRight, ChevronRight,
+  Megaphone, Users, ArrowRight, ChevronRight, ChevronDown,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
