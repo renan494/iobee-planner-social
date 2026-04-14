@@ -456,12 +456,12 @@ const markdownComponents = {
     <tr className="hover:bg-muted/50 transition-colors duration-150 even:bg-muted/20" {...props}>{children}</tr>
   ),
   ul: ({ children, ...props }: any) => (
-    <ul className="my-5 space-y-2.5 list-none pl-0" {...props}>{children}</ul>
+    <ul className="my-4 space-y-1.5 list-none pl-0" {...props}>{children}</ul>
   ),
   li: ({ children, ...props }: any) => (
-    <li className="flex items-start gap-3 text-foreground/75 leading-[1.7] py-1 border-b border-border/20 last:border-0" {...props}>
-      <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-1" />
-      <span className="flex-1 text-[15px]">{children}</span>
+    <li className="flex items-start gap-2 text-foreground/75 leading-[1.65] py-0.5 text-sm" {...props}>
+      <span className="text-emerald-500 shrink-0 mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+      <span className="flex-1">{children}</span>
     </li>
   ),
   blockquote: ({ children, ...props }: any) => (
