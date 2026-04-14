@@ -15,6 +15,7 @@ import ClientDetail from "./pages/ClientDetail";
 import Analysts from "./pages/Analysts";
 import AnalystDetail from "./pages/AnalystDetail";
 import Drafts from "./pages/Drafts";
+import AdminUsers from "./pages/AdminUsers";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
@@ -49,6 +50,7 @@ function ProtectedRoutes() {
             <Route path="/clientes/:name" element={<ClientDetail />} />
             <Route path="/analistas" element={<Analysts />} />
             <Route path="/analistas/:name" element={<AnalystDetail />} />
+            <Route path="/admin/usuarios" element={<AdminUsers />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

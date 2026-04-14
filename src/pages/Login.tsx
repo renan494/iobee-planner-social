@@ -151,6 +151,9 @@ export default function Login() {
           </form>
 
           <p className="text-center text-xs text-muted-foreground">
+            Não tem uma conta? Solicite ao administrador.
+          </p>
+          <p className="text-center text-xs text-muted-foreground">
             iOBEE Social Lab · Todos os direitos reservados
           </p>
         </div>
