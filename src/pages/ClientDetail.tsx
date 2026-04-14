@@ -33,6 +33,15 @@ export default function ClientDetail() {
   const [editLinkedinUrl, setEditLinkedinUrl] = useState("");
   const [editGmbUrl, setEditGmbUrl] = useState("");
   const [editObjective, setEditObjective] = useState("");
+  const [editNiche, setEditNiche] = useState("");
+  const [editTargetAudience, setEditTargetAudience] = useState("");
+  const [editToneOfVoice, setEditToneOfVoice] = useState("");
+  const [editCompetitors, setEditCompetitors] = useState("");
+  const [editDifferentials, setEditDifferentials] = useState("");
+  const [editProductsServices, setEditProductsServices] = useState("");
+  const [editPostingFrequency, setEditPostingFrequency] = useState("");
+  const [editBrandValues, setEditBrandValues] = useState("");
+  const [editCurrentSocialPresence, setEditCurrentSocialPresence] = useState("");
   const [editSaving, setEditSaving] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
@@ -77,7 +86,6 @@ export default function ClientDetail() {
   };
 
   const openEditDialog = async () => {
-    // Load client data from DB
     const { data } = await supabase.from("clients").select("*").eq("name", clientName).maybeSingle();
     setEditName(clientName);
     setEditInstagram((data as any)?.instagram_handle || "");
@@ -85,6 +93,15 @@ export default function ClientDetail() {
     setEditLinkedinUrl((data as any)?.linkedin_url || "");
     setEditGmbUrl((data as any)?.gmb_url || "");
     setEditObjective((data as any)?.objective || "");
+    setEditNiche((data as any)?.niche || "");
+    setEditTargetAudience((data as any)?.target_audience || "");
+    setEditToneOfVoice((data as any)?.tone_of_voice || "");
+    setEditCompetitors(((data as any)?.competitors || []).join(", "));
+    setEditDifferentials((data as any)?.differentials || "");
+    setEditProductsServices((data as any)?.products_services || "");
+    setEditPostingFrequency((data as any)?.posting_frequency || "");
+    setEditBrandValues((data as any)?.brand_values || "");
+    setEditCurrentSocialPresence((data as any)?.current_social_presence || "");
     setEditOpen(true);
   };
 
@@ -97,6 +114,15 @@ export default function ClientDetail() {
         linkedin_url: editLinkedinUrl.trim() || null,
         gmb_url: editGmbUrl.trim() || null,
         objective: editObjective.trim() || null,
+        niche: editNiche.trim() || null,
+        target_audience: editTargetAudience.trim() || null,
+        tone_of_voice: editToneOfVoice.trim() || null,
+        competitors: editCompetitors.trim() ? editCompetitors.split(",").map((c: string) => c.trim()).filter(Boolean) : null,
+        differentials: editDifferentials.trim() || null,
+        products_services: editProductsServices.trim() || null,
+        posting_frequency: editPostingFrequency.trim() || null,
+        brand_values: editBrandValues.trim() || null,
+        current_social_presence: editCurrentSocialPresence.trim() || null,
       } as any).eq("name", clientName);
       if (error) throw error;
       toast.success("Dados do cliente atualizados!");
