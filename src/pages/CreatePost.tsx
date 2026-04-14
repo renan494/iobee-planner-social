@@ -76,6 +76,8 @@ function createEmptyEntry(): PostEntry {
     channels: [],
     reference: "",
     collapsed: false,
+    aiTheme: "",
+    aiLoading: false,
   };
 }
 
@@ -116,6 +118,8 @@ export default function CreatePost() {
         reference: "",
         collapsed: false,
         draftId: data.id,
+        aiTheme: "",
+        aiLoading: false,
       }]);
     });
   }, [searchParams]);
