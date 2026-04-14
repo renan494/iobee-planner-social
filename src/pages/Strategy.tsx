@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+import StrategyContent from "@/components/StrategyContent";
 
 type ClientData = {
   id: string;
