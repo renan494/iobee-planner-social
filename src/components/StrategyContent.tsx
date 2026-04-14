@@ -404,10 +404,10 @@ let thColorIndex = 0;
 
 const markdownComponents = {
   table: ({ children, ...props }: any) => {
-    thColorIndex = 0; // Reset per table
+    thColorIndex = 0;
     return (
-      <div className="my-6 overflow-x-auto rounded-xl border border-border shadow-sm">
-        <table className="w-full text-sm border-collapse table-fixed" {...props}>
+      <div className="my-6 overflow-x-auto rounded-xl border border-border shadow-sm [&_strong]:font-semibold [&_strong]:text-foreground [&_td_strong]:text-xs [&_td_strong]:font-semibold">
+        <table className="w-full text-xs border-collapse" {...props}>
           {children}
         </table>
       </div>
@@ -426,18 +426,18 @@ const markdownComponents = {
     const cls = colors[thColorIndex % colors.length];
     thColorIndex++;
     return (
-      <th className={`px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider ${cls} border-r border-white/20 last:border-r-0`} {...props}>
+      <th className={`px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider ${cls} border-r border-white/20 last:border-r-0`} {...props}>
         {children}
       </th>
     );
   },
   td: ({ children, ...props }: any) => (
-    <td className="px-4 py-3 text-sm text-foreground/80 border-t border-border/30 border-r border-border/20 last:border-r-0 leading-relaxed align-top" {...props}>
+    <td className="px-3 py-2.5 text-xs text-foreground/80 border-t border-border/30 border-r border-border/20 last:border-r-0 leading-relaxed align-top" {...props}>
       {children}
     </td>
   ),
   tr: ({ children, ...props }: any) => (
-    <tr className="hover:bg-muted/50 transition-colors duration-150 even:bg-muted/20" {...props}>{children}</tr>
+    <tr className="hover:bg-muted/40 transition-colors duration-100 even:bg-muted/15" {...props}>{children}</tr>
   ),
   ul: ({ children, ...props }: any) => (
     <ul className="my-4 space-y-1.5 list-none pl-0" {...props}>{children}</ul>
