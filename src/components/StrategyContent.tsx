@@ -92,18 +92,18 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
   if (sections.length === 0) {
     return (
       <div className={proseClasses}>
-        <ReactMarkdown>{content}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanContent(content)}</ReactMarkdown>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Intro / Summary */}
       {intro && (
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
           <div className={proseClasses}>
-            <ReactMarkdown>{intro}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanContent(intro)}</ReactMarkdown>
           </div>
         </div>
       )}
@@ -132,9 +132,9 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
           </div>
 
           {/* Section Body */}
-          <CardContent className="p-5">
+          <CardContent className="px-6 py-5">
             <div className={proseClasses}>
-              <ReactMarkdown>{section.content.trim()}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanContent(section.content.trim())}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>
