@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
 import StrategyContent from "@/components/StrategyContent";
+import StrategyDebateChat from "@/components/StrategyDebateChat";
 
 type ClientData = {
   id: string;
@@ -304,6 +305,9 @@ export default function Strategy() {
             )}
           </div>
           <StrategyContent content={streamContent} isStreaming={generating} />
+          {!generating && streamContent && selectedClient && (
+            <StrategyDebateChat strategyContent={streamContent} clientName={selectedClient.name} />
+          )}
         </div>
       )}
 
@@ -352,6 +356,7 @@ export default function Strategy() {
                   {expandedId === s.id && (
                     <CardContent className="border-t pt-4">
                       <StrategyContent content={s.content} />
+                      <StrategyDebateChat strategyContent={s.content} clientName={selectedClient?.name || ""} />
                     </CardContent>
                   )}
                 </Card>

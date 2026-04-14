@@ -136,35 +136,134 @@ function detectSwot(content: string): { isSwot: boolean; quadrants: { label: str
   return { isSwot: quadrants.length >= 2, quadrants };
 }
 
-const swotConfig: Record<string, { bg: string; border: string; iconColor: string; icon: React.ReactNode }> = {
-  "Forças":         { bg: "bg-emerald-50",  border: "border-emerald-300", iconColor: "text-emerald-600", icon: <CheckCircle2 className="h-5 w-5" /> },
-  "Fraquezas":      { bg: "bg-red-50",      border: "border-red-300",     iconColor: "text-red-600",     icon: <AlertTriangle className="h-5 w-5" /> },
-  "Oportunidades":  { bg: "bg-blue-50",     border: "border-blue-300",    iconColor: "text-blue-600",    icon: <Lightbulb className="h-5 w-5" /> },
-  "Ameaças":        { bg: "bg-amber-50",    border: "border-amber-300",   iconColor: "text-amber-600",   icon: <AlertTriangle className="h-5 w-5" /> },
+const swotConfig: Record<string, { bg: string; headerBg: string; headerText: string; icon: React.ReactNode }> = {
+  "Forças":         { bg: "bg-emerald-50/50",  headerBg: "bg-emerald-600", headerText: "text-white", icon: <CheckCircle2 className="h-4 w-4" /> },
+  "Fraquezas":      { bg: "bg-red-50/50",      headerBg: "bg-red-600",     headerText: "text-white", icon: <AlertTriangle className="h-4 w-4" /> },
+  "Oportunidades":  { bg: "bg-blue-50/50",     headerBg: "bg-blue-600",    headerText: "text-white", icon: <Lightbulb className="h-4 w-4" /> },
+  "Ameaças":        { bg: "bg-amber-50/50",    headerBg: "bg-amber-600",   headerText: "text-white", icon: <AlertTriangle className="h-4 w-4" /> },
 };
 
 function SwotGrid({ quadrants, isMobile }: { quadrants: { label: string; items: string[] }[]; isMobile: boolean }) {
-  return (
-    <div className={`grid gap-4 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
-      {quadrants.map((q) => {
-        const cfg = swotConfig[q.label] || swotConfig["Forças"];
-        return (
-          <div key={q.label} className={`rounded-xl border-2 ${cfg.border} ${cfg.bg} p-5`}>
-            <div className={`flex items-center gap-2 mb-3 ${cfg.iconColor}`}>
-              {cfg.icon}
-              <h4 className="font-bold text-base">{q.label}</h4>
+  // Ensure we always have 4 quadrants in correct order
+  const orderedLabels = ["Forças", "Fraquezas", "Oportunidades", "Ameaças"];
+  const ordered = orderedLabels.map(label => {
+    const found = quadrants.find(q => q.label === label);
+    return found || { label, items: [] };
+  });
+
+  if (isMobile) {
+    return (
+      <div className="space-y-0 border border-border rounded-xl overflow-hidden">
+        {ordered.map((q) => {
+          const cfg = swotConfig[q.label] || swotConfig["Forças"];
+          return (
+            <div key={q.label} className={`${cfg.bg} border-b border-border last:border-b-0`}>
+              <div className={`flex items-center gap-2 px-4 py-2.5 ${cfg.headerBg} ${cfg.headerText}`}>
+                {cfg.icon}
+                <span className="font-bold text-sm">{q.label}</span>
+              </div>
+              <ul className="px-4 py-3 space-y-1.5">
+                {q.items.map((item, i) => (
+                  <li key={i} className="text-xs text-foreground/80 leading-relaxed flex items-start gap-1.5">
+                    <span className="text-muted-foreground/50 mt-px">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="space-y-2">
-              {q.items.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-foreground/80 leading-relaxed">
-                  <ChevronRight className={`h-4 w-4 shrink-0 mt-0.5 ${cfg.iconColor}`} />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Desktop: proper 2x2 matrix table
+  return (
+    <div className="border border-border rounded-xl overflow-hidden">
+      {/* Header row */}
+      <div className="grid grid-cols-[140px_1fr_1fr] border-b border-border">
+        <div className="bg-muted/60 border-r border-border" />
+        <div className="bg-emerald-600 text-white px-4 py-2.5 text-center font-bold text-xs uppercase tracking-wider border-r border-emerald-700">
+          Fatores Positivos
+        </div>
+        <div className="bg-red-600 text-white px-4 py-2.5 text-center font-bold text-xs uppercase tracking-wider">
+          Fatores Negativos
+        </div>
+      </div>
+
+      {/* Internal row */}
+      <div className="grid grid-cols-[140px_1fr_1fr] border-b border-border">
+        <div className="bg-blue-600 text-white px-3 py-3 flex items-center justify-center">
+          <span className="font-bold text-xs uppercase tracking-wider text-center leading-tight">Ambiente<br/>Interno</span>
+        </div>
+        {/* Forças */}
+        <div className={`${swotConfig["Forças"].bg} border-r border-border px-4 py-3`}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+            <span className="font-bold text-xs text-emerald-700 uppercase">Forças</span>
           </div>
-        );
-      })}
+          <ul className="space-y-1">
+            {ordered[0].items.map((item, i) => (
+              <li key={i} className="text-xs text-foreground/80 leading-relaxed flex items-start gap-1.5">
+                <span className="text-emerald-400 mt-px">•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* Fraquezas */}
+        <div className={`${swotConfig["Fraquezas"].bg} px-4 py-3`}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <AlertTriangle className="h-3.5 w-3.5 text-red-600" />
+            <span className="font-bold text-xs text-red-700 uppercase">Fraquezas</span>
+          </div>
+          <ul className="space-y-1">
+            {ordered[1].items.map((item, i) => (
+              <li key={i} className="text-xs text-foreground/80 leading-relaxed flex items-start gap-1.5">
+                <span className="text-red-400 mt-px">•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* External row */}
+      <div className="grid grid-cols-[140px_1fr_1fr]">
+        <div className="bg-purple-600 text-white px-3 py-3 flex items-center justify-center">
+          <span className="font-bold text-xs uppercase tracking-wider text-center leading-tight">Ambiente<br/>Externo</span>
+        </div>
+        {/* Oportunidades */}
+        <div className={`${swotConfig["Oportunidades"].bg} border-r border-border px-4 py-3`}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <Lightbulb className="h-3.5 w-3.5 text-blue-600" />
+            <span className="font-bold text-xs text-blue-700 uppercase">Oportunidades</span>
+          </div>
+          <ul className="space-y-1">
+            {ordered[2].items.map((item, i) => (
+              <li key={i} className="text-xs text-foreground/80 leading-relaxed flex items-start gap-1.5">
+                <span className="text-blue-400 mt-px">•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* Ameaças */}
+        <div className={`${swotConfig["Ameaças"].bg} px-4 py-3`}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+            <span className="font-bold text-xs text-amber-700 uppercase">Ameaças</span>
+          </div>
+          <ul className="space-y-1">
+            {ordered[3].items.map((item, i) => (
+              <li key={i} className="text-xs text-foreground/80 leading-relaxed flex items-start gap-1.5">
+                <span className="text-amber-400 mt-px">•</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
