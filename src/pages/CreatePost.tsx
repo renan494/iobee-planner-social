@@ -28,6 +28,7 @@ import { toast } from "@/hooks/use-toast";
 import { useActivity } from "@/contexts/ActivityContext";
 
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PostEntry {
   id: string;
