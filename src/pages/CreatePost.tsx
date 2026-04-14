@@ -473,6 +473,36 @@ function PostEntryForm({
             </div>
           </div>
 
+          {/* AI Generation */}
+          <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-primary">
+              <Sparkles className="h-4 w-4" />
+              Gerar com IA
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Tema ou assunto do post (opcional)"
+                value={(entry as any).aiTheme || ""}
+                onChange={(e) => onUpdate({ aiTheme: e.target.value } as any)}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={(entry as any).aiLoading}
+                onClick={() => onGenerateAI?.()}
+                className="shrink-0 gap-1.5 border-primary/30 text-primary hover:bg-primary/10"
+              >
+                {(entry as any).aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {(entry as any).aiLoading ? "Gerando..." : "Gerar"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Preencha cliente, formato e etapa do funil acima para melhores resultados.
+            </p>
+          </div>
+
           {/* Title */}
           <div className="space-y-2">
             <Label>Título *</Label>
