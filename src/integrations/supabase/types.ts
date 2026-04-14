@@ -62,36 +62,63 @@ export type Database = {
       clients: {
         Row: {
           avatar_url: string | null
+          brand_values: string | null
+          competitors: string[] | null
           created_at: string
+          current_social_presence: string | null
+          differentials: string | null
           facebook_url: string | null
           gmb_url: string | null
           id: string
           instagram_handle: string | null
           linkedin_url: string | null
           name: string
+          niche: string | null
           objective: string | null
+          posting_frequency: string | null
+          products_services: string | null
+          target_audience: string | null
+          tone_of_voice: string | null
         }
         Insert: {
           avatar_url?: string | null
+          brand_values?: string | null
+          competitors?: string[] | null
           created_at?: string
+          current_social_presence?: string | null
+          differentials?: string | null
           facebook_url?: string | null
           gmb_url?: string | null
           id?: string
           instagram_handle?: string | null
           linkedin_url?: string | null
           name: string
+          niche?: string | null
           objective?: string | null
+          posting_frequency?: string | null
+          products_services?: string | null
+          target_audience?: string | null
+          tone_of_voice?: string | null
         }
         Update: {
           avatar_url?: string | null
+          brand_values?: string | null
+          competitors?: string[] | null
           created_at?: string
+          current_social_presence?: string | null
+          differentials?: string | null
           facebook_url?: string | null
           gmb_url?: string | null
           id?: string
           instagram_handle?: string | null
           linkedin_url?: string | null
           name?: string
+          niche?: string | null
           objective?: string | null
+          posting_frequency?: string | null
+          products_services?: string | null
+          target_audience?: string | null
+          tone_of_voice?: string | null
         }
         Relationships: []
       }
@@ -199,6 +226,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      strategies: {
+        Row: {
+          client_id: string
+          content: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategies_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

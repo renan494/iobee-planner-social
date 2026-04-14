@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Camera, FileText, Pencil, Eye, PenTool, X } from "lucide-react";
+import { ArrowLeft, User, Camera, FileText, Pencil, Eye, PenTool, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,6 +33,15 @@ export default function ClientDetail() {
   const [editLinkedinUrl, setEditLinkedinUrl] = useState("");
   const [editGmbUrl, setEditGmbUrl] = useState("");
   const [editObjective, setEditObjective] = useState("");
+  const [editNiche, setEditNiche] = useState("");
+  const [editTargetAudience, setEditTargetAudience] = useState("");
+  const [editToneOfVoice, setEditToneOfVoice] = useState("");
+  const [editCompetitors, setEditCompetitors] = useState("");
+  const [editDifferentials, setEditDifferentials] = useState("");
+  const [editProductsServices, setEditProductsServices] = useState("");
+  const [editPostingFrequency, setEditPostingFrequency] = useState("");
+  const [editBrandValues, setEditBrandValues] = useState("");
+  const [editCurrentSocialPresence, setEditCurrentSocialPresence] = useState("");
   const [editSaving, setEditSaving] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
@@ -77,7 +86,6 @@ export default function ClientDetail() {
   };
 
   const openEditDialog = async () => {
-    // Load client data from DB
     const { data } = await supabase.from("clients").select("*").eq("name", clientName).maybeSingle();
     setEditName(clientName);
     setEditInstagram((data as any)?.instagram_handle || "");
@@ -85,6 +93,15 @@ export default function ClientDetail() {
     setEditLinkedinUrl((data as any)?.linkedin_url || "");
     setEditGmbUrl((data as any)?.gmb_url || "");
     setEditObjective((data as any)?.objective || "");
+    setEditNiche((data as any)?.niche || "");
+    setEditTargetAudience((data as any)?.target_audience || "");
+    setEditToneOfVoice((data as any)?.tone_of_voice || "");
+    setEditCompetitors(((data as any)?.competitors || []).join(", "));
+    setEditDifferentials((data as any)?.differentials || "");
+    setEditProductsServices((data as any)?.products_services || "");
+    setEditPostingFrequency((data as any)?.posting_frequency || "");
+    setEditBrandValues((data as any)?.brand_values || "");
+    setEditCurrentSocialPresence((data as any)?.current_social_presence || "");
     setEditOpen(true);
   };
 
@@ -97,6 +114,15 @@ export default function ClientDetail() {
         linkedin_url: editLinkedinUrl.trim() || null,
         gmb_url: editGmbUrl.trim() || null,
         objective: editObjective.trim() || null,
+        niche: editNiche.trim() || null,
+        target_audience: editTargetAudience.trim() || null,
+        tone_of_voice: editToneOfVoice.trim() || null,
+        competitors: editCompetitors.trim() ? editCompetitors.split(",").map((c: string) => c.trim()).filter(Boolean) : null,
+        differentials: editDifferentials.trim() || null,
+        products_services: editProductsServices.trim() || null,
+        posting_frequency: editPostingFrequency.trim() || null,
+        brand_values: editBrandValues.trim() || null,
+        current_social_presence: editCurrentSocialPresence.trim() || null,
       } as any).eq("name", clientName);
       if (error) throw error;
       toast.success("Dados do cliente atualizados!");
@@ -334,7 +360,7 @@ export default function ClientDetail() {
       />
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Cliente</DialogTitle>
           </DialogHeader>
@@ -343,26 +369,83 @@ export default function ClientDetail() {
               <Label>Nome</Label>
               <Input value={editName} disabled className="opacity-60" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-instagram">@ do Instagram</Label>
-              <Input id="edit-instagram" placeholder="@iobee.digital" value={editInstagram} onChange={(e) => setEditInstagram(e.target.value)} />
+
+            {/* Briefing Section */}
+            <div className="border-t pt-4">
+              <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5">
+                <Sparkles className="h-4 w-4 text-primary" />
+                Briefing para IA Estrategista
+              </p>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-niche">Nicho / Segmento</Label>
+                  <Input id="edit-niche" placeholder="Ex: Gastronomia, Moda feminina, SaaS B2B..." value={editNiche} onChange={(e) => setEditNiche(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-target">Público-alvo</Label>
+                  <Textarea id="edit-target" placeholder="Descreva o público ideal: idade, gênero, interesses, dores..." value={editTargetAudience} onChange={(e) => setEditTargetAudience(e.target.value)} rows={2} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-tone">Tom de voz</Label>
+                  <Input id="edit-tone" placeholder="Ex: Profissional e acolhedor, Jovem e descontraído..." value={editToneOfVoice} onChange={(e) => setEditToneOfVoice(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-products">Produtos / Serviços principais</Label>
+                  <Textarea id="edit-products" placeholder="Descreva os principais produtos ou serviços..." value={editProductsServices} onChange={(e) => setEditProductsServices(e.target.value)} rows={2} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-differentials">Diferenciais</Label>
+                  <Textarea id="edit-differentials" placeholder="O que diferencia este cliente dos concorrentes?" value={editDifferentials} onChange={(e) => setEditDifferentials(e.target.value)} rows={2} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-competitors">Concorrentes (separados por vírgula)</Label>
+                  <Input id="edit-competitors" placeholder="Ex: @marca1, @marca2, empresa X" value={editCompetitors} onChange={(e) => setEditCompetitors(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-frequency">Frequência de postagem desejada</Label>
+                  <Input id="edit-frequency" placeholder="Ex: 5x por semana, diário, 3x por semana..." value={editPostingFrequency} onChange={(e) => setEditPostingFrequency(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-brand-values">Valores da marca</Label>
+                  <Input id="edit-brand-values" placeholder="Ex: Inovação, sustentabilidade, qualidade..." value={editBrandValues} onChange={(e) => setEditBrandValues(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-social-presence">Presença atual nas redes</Label>
+                  <Textarea id="edit-social-presence" placeholder="Descreva a situação atual: plataformas ativas, nº de seguidores, frequência..." value={editCurrentSocialPresence} onChange={(e) => setEditCurrentSocialPresence(e.target.value)} rows={2} />
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-facebook">URL do Facebook</Label>
-              <Input id="edit-facebook" placeholder="https://facebook.com/iobee" value={editFacebookUrl} onChange={(e) => setEditFacebookUrl(e.target.value)} />
+
+            {/* Social links */}
+            <div className="border-t pt-4">
+              <p className="text-sm font-semibold text-foreground mb-3">Redes sociais</p>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-instagram">@ do Instagram</Label>
+                  <Input id="edit-instagram" placeholder="@iobee.digital" value={editInstagram} onChange={(e) => setEditInstagram(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-facebook">URL do Facebook</Label>
+                  <Input id="edit-facebook" placeholder="https://facebook.com/iobee" value={editFacebookUrl} onChange={(e) => setEditFacebookUrl(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-linkedin">URL do LinkedIn</Label>
+                  <Input id="edit-linkedin" placeholder="https://linkedin.com/company/iobee" value={editLinkedinUrl} onChange={(e) => setEditLinkedinUrl(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-gmb">URL do Google Meu Negócio</Label>
+                  <Input id="edit-gmb" placeholder="https://g.page/iobee" value={editGmbUrl} onChange={(e) => setEditGmbUrl(e.target.value)} />
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-linkedin">URL do LinkedIn</Label>
-              <Input id="edit-linkedin" placeholder="https://linkedin.com/company/iobee" value={editLinkedinUrl} onChange={(e) => setEditLinkedinUrl(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-gmb">URL do Google Meu Negócio</Label>
-              <Input id="edit-gmb" placeholder="https://g.page/iobee" value={editGmbUrl} onChange={(e) => setEditGmbUrl(e.target.value)} />
-            </div>
-            <div className="space-y-2">
+
+            {/* Objective */}
+            <div className="space-y-1.5">
               <Label htmlFor="edit-objective">Objetivo</Label>
               <Textarea id="edit-objective" placeholder="Descreva o objetivo..." value={editObjective} onChange={(e) => setEditObjective(e.target.value)} rows={3} />
             </div>
+
+            {/* Analysts */}
             <div className="space-y-2">
               <Label>Analistas</Label>
               <div className="flex flex-wrap gap-1.5">
@@ -373,7 +456,6 @@ export default function ClientDetail() {
                       type="button"
                       onClick={() => {
                         if (window.confirm(`Remover "${a}" dos posts deste cliente? Isso não exclui os posts, apenas desvincula o analista.`)) {
-                          // Update all posts from this analyst to remove them
                           const analystPosts = clientPosts.filter((p) => p.analyst === a);
                           analystPosts.forEach((p) => updatePost(p.id, { analyst: "" }));
                         }
@@ -395,8 +477,6 @@ export default function ClientDetail() {
                   onChange={(e) => {
                     const analyst = e.target.value;
                     if (!analyst) return;
-                    // No direct "add analyst to client" — analysts are linked via posts
-                    // Show info toast
                     navigate(`/criar?client=${encodeURIComponent(clientName)}`);
                     setEditOpen(false);
                   }}
