@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
 import StrategyContent from "@/components/StrategyContent";
+import StrategyDebateChat from "@/components/StrategyDebateChat";
 
 type ClientData = {
   id: string;
