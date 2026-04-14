@@ -95,18 +95,12 @@ O documento deve conter AS SEGUINTES SEÇÕES (use títulos ## para cada uma):
 - 10 sugestões concretas de posts com: título, formato, etapa do funil e breve descrição
 - Mix entre topo, meio e fundo de funil
 
-## 7. Diretrizes Visuais
-- Sugestões de identidade visual para redes sociais
-- Paleta de cores recomendada
-- Estilo de fotografia/ilustração
-- Templates sugeridos
-
-## 8. KPIs e Métricas de Acompanhamento
+## 7. KPIs e Métricas de Acompanhamento
 - Métricas principais a serem monitoradas
 - Metas sugeridas para os primeiros 3 meses
 - Ferramentas de análise recomendadas
 
-## 9. Cronograma de Implementação
+## 8. Cronograma de Implementação
 - Roadmap de ações para os primeiros 30, 60 e 90 dias
 
 Lembre-se: TODAS as recomendações devem vir acompanhadas de dados estatísticos e referências de mercado com fontes citadas.`;
