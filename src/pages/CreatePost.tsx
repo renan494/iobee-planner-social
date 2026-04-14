@@ -314,6 +314,37 @@ export default function CreatePost() {
             onRemove={() => removeEntry(idx)}
             onAddHashtag={() => addHashtag(idx)}
             onRemoveHashtag={(tag) => removeHashtag(idx, tag)}
+            onGenerateAI={async () => {
+              updateEntry(idx, { aiLoading: true });
+              try {
+                const ec = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
+                const res = await supabase.functions.invoke("generate-post", {
+                  body: {
+                    client: ec,
+                    format: entry.postFormat,
+                    funnelStage: entry.funnelStage,
+                    channels: entry.channels,
+                    theme: entry.aiTheme || undefined,
+                  },
+                });
+                if (res.error) throw res.error;
+                const data = res.data;
+                if (data.error) {
+                  toast({ title: "Erro da IA", description: data.error, variant: "destructive" });
+                } else {
+                  updateEntry(idx, {
+                    title: data.title || entry.title,
+                    content: data.legend || entry.content,
+                    hashtags: data.hashtags || entry.hashtags,
+                  });
+                  toast({ title: "Post gerado!", description: "Campos preenchidos pela IA. Revise antes de publicar." });
+                }
+              } catch (err: any) {
+                toast({ title: "Erro", description: err.message || "Falha ao gerar post com IA.", variant: "destructive" });
+              } finally {
+                updateEntry(idx, { aiLoading: false });
+              }
+            }}
           />
         ))}
       </div>
