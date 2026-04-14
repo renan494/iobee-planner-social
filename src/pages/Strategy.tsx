@@ -308,6 +308,7 @@ export default function Strategy() {
           {!generating && streamContent && selectedClient && (
             <StrategyDebateChat strategyContent={streamContent} clientName={selectedClient.name} />
           )}
+        </div>
       )}
 
       {/* Saved Strategies */}
