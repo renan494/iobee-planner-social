@@ -586,6 +586,7 @@ function CollapsibleSection({
   const swot = detectSwot(section.content);
   const kpis = detectKpis(section.content);
   const funnel = detectFunnel(section.content);
+  const timeline = detectTimeline(section.title, section.content);
 
   const preview = useMemo(() => {
     if (!isCollapsible) return "";
