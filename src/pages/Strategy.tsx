@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 type ClientData = {
@@ -48,15 +48,12 @@ export default function Strategy() {
 
   const selectedClient = clients.find((c) => c.id === selectedClientId);
 
-  // Check if briefing is filled
   const briefingFields = selectedClient
     ? [selectedClient.niche, selectedClient.target_audience, selectedClient.tone_of_voice, selectedClient.differentials, selectedClient.products_services].filter(Boolean)
     : [];
   const hasBriefing = briefingFields.length >= 3;
 
-  useEffect(() => {
-    loadClients();
-  }, []);
+  useEffect(() => { loadClients(); }, []);
 
   useEffect(() => {
     const clientParam = searchParams.get("client");
@@ -142,7 +139,6 @@ export default function Strategy() {
         }
       }
 
-      // Save strategy
       if (fullContent.trim()) {
         const title = `Estratégia - ${selectedClient.name} - ${new Date().toLocaleDateString("pt-BR")}`;
         const { error } = await supabase.from("strategies").insert({
@@ -181,111 +177,147 @@ export default function Strategy() {
 
   return (
     <div className="mx-auto max-w-[1000px] px-4 py-8 sm:px-6">
+      {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
-          Criador de Estratégia
+          Estratégia de Mídia
         </h1>
         <p className="text-muted-foreground mt-1">
-          Gere estratégias completas de redes sociais com IA especialista, incluindo análise de mercado, linha editorial e sugestões de conteúdo.
+          IA especialista em social media gera estratégias completas com referências de mercado.
         </p>
       </div>
 
-      {/* Client selector */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Selecione o cliente</label>
-              <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Escolha um cliente..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      {/* Client + Briefing Card */}
+      <Card className="mb-6 border-border">
+        <CardContent className="pt-6 space-y-4">
+          {/* Client Selector */}
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cliente</label>
+            <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Escolha um cliente..." />
+              </SelectTrigger>
+              <SelectContent>
+                {clients.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Briefing Preview */}
+          {selectedClient && !hasBriefing && (
+            <div className="flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+              <AlertCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Briefing incompleto</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Preencha pelo menos <strong>nicho</strong>, <strong>público-alvo</strong> e <strong>tom de voz</strong> no cadastro do cliente.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => navigate(`/clientes/${encodeURIComponent(selectedClient.name)}`)}
+                >
+                  Completar briefing
+                </Button>
+              </div>
             </div>
+          )}
 
-            {selectedClient && !hasBriefing && (
-              <div className="flex items-start gap-3 rounded-lg border border-border bg-muted p-4">
-                <AlertCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-foreground">Briefing incompleto</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    Para gerar uma estratégia de qualidade, preencha pelo menos os campos de <strong>nicho</strong>, <strong>público-alvo</strong> e <strong>tom de voz</strong> no cadastro do cliente.
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-2"
-                    onClick={() => navigate(`/clientes/${encodeURIComponent(selectedClient.name)}`)}
-                  >
-                    Completar briefing
-                  </Button>
-                </div>
+          {selectedClient && hasBriefing && (
+            <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Briefing</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1.5 text-sm">
+                {selectedClient.niche && (
+                  <p><span className="mr-1.5">💼</span>{selectedClient.niche}</p>
+                )}
+                {selectedClient.products_services && (
+                  <p><span className="mr-1.5">🏷️</span>Ticket: {selectedClient.products_services}</p>
+                )}
+                {selectedClient.target_audience && (
+                  <p><span className="mr-1.5">👥</span>{selectedClient.target_audience}</p>
+                )}
+                {selectedClient.posting_frequency && (
+                  <p><span className="mr-1.5">📅</span>{selectedClient.posting_frequency}</p>
+                )}
+                {selectedClient.differentials && (
+                  <p><span className="mr-1.5">✨</span>{selectedClient.differentials}</p>
+                )}
+                {selectedClient.objective && (
+                  <p><span className="mr-1.5">🎯</span>{selectedClient.objective}</p>
+                )}
+                {selectedClient.tone_of_voice && (
+                  <p><span className="mr-1.5">🗣️</span>{selectedClient.tone_of_voice}</p>
+                )}
+                {selectedClient.brand_values && (
+                  <p><span className="mr-1.5">💎</span>{selectedClient.brand_values}</p>
+                )}
+                {selectedClient.current_social_presence && (
+                  <p><span className="mr-1.5">📱</span>{selectedClient.current_social_presence}</p>
+                )}
+                {selectedClient.competitors?.length ? (
+                  <p><span className="mr-1.5">⚔️</span>{selectedClient.competitors.join(", ")}</p>
+                ) : null}
               </div>
-            )}
+            </div>
+          )}
 
-            {selectedClient && hasBriefing && (
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">Briefing do cliente</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedClient.niche && <Badge variant="secondary">Nicho: {selectedClient.niche}</Badge>}
-                  {selectedClient.target_audience && <Badge variant="secondary">Público: {selectedClient.target_audience}</Badge>}
-                  {selectedClient.tone_of_voice && <Badge variant="secondary">Tom: {selectedClient.tone_of_voice}</Badge>}
-                  {selectedClient.posting_frequency && <Badge variant="secondary">Freq: {selectedClient.posting_frequency}</Badge>}
-                  {selectedClient.competitors?.length ? <Badge variant="outline">{selectedClient.competitors.length} concorrente(s)</Badge> : null}
-                </div>
-              </div>
+          {/* Generate Button */}
+          <Button
+            onClick={handleGenerate}
+            disabled={!selectedClient || generating}
+            className="gap-2"
+            size="lg"
+          >
+            {generating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Gerando estratégia...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Gerar Estratégia
+              </>
             )}
+          </Button>
+        </CardContent>
+      </Card>
 
-            <Button
-              onClick={handleGenerate}
-              disabled={!selectedClient || generating}
-              className="w-full gap-2"
-              size="lg"
-            >
+      {/* Streaming / Generated Content */}
+      {(generating || streamContent) && (
+        <Card className="mb-6 border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
               {generating ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   Gerando estratégia...
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4" />
-                  Gerar Estratégia com IA
+                  <FileText className="h-4 w-4 text-primary" />
+                  Estratégia gerada
                 </>
               )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Streaming content */}
-      {(generating || streamContent) && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              {generating && <Loader2 className="h-4 w-4 animate-spin" />}
-              {generating ? "Gerando estratégia..." : "Estratégia gerada"}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground">
+            <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-headings:font-bold prose-h2:text-base prose-h2:mt-6 prose-h2:mb-2 prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-ul:my-2 prose-li:my-0.5">
               <ReactMarkdown>{streamContent}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Saved strategies */}
+      {/* Saved Strategies */}
       {selectedClientId && (
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+            <FileText className="h-5 w-5 text-primary" />
             Estratégias salvas
           </h2>
           {loadingStrategies ? (
@@ -297,7 +329,7 @@ export default function Strategy() {
           ) : (
             <div className="space-y-3">
               {strategies.map((s) => (
-                <Card key={s.id} className="overflow-hidden">
+                <Card key={s.id} className="overflow-hidden border-border">
                   <div
                     className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={() => setExpandedId(expandedId === s.id ? null : s.id)}
@@ -306,7 +338,9 @@ export default function Strategy() {
                       <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">{s.title}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(s.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
@@ -323,7 +357,7 @@ export default function Strategy() {
                   </div>
                   {expandedId === s.id && (
                     <CardContent className="border-t pt-4">
-                      <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground">
+                      <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-headings:font-bold prose-h2:text-base prose-h2:mt-6 prose-h2:mb-2 prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-ul:my-2 prose-li:my-0.5">
                         <ReactMarkdown>{s.content}</ReactMarkdown>
                       </div>
                     </CardContent>
