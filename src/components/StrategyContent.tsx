@@ -335,6 +335,82 @@ function FunnelVisual({ stages }: { stages: { label: string; detail: string }[] 
 }
 
 /* ═══════════════════════════════════════════════════════
+   TIMELINE DETECTOR & RENDERER
+   ═══════════════════════════════════════════════════════ */
+
+const timelineIcons = [
+  { icon: <FileText className="h-4 w-4" />, bg: "bg-blue-100", color: "text-blue-600", ring: "ring-blue-200" },
+  { icon: <Target className="h-4 w-4" />, bg: "bg-emerald-100", color: "text-emerald-600", ring: "ring-emerald-200" },
+  { icon: <TrendingUp className="h-4 w-4" />, bg: "bg-purple-100", color: "text-purple-600", ring: "ring-purple-200" },
+  { icon: <Star className="h-4 w-4" />, bg: "bg-amber-100", color: "text-amber-600", ring: "ring-amber-200" },
+  { icon: <Megaphone className="h-4 w-4" />, bg: "bg-pink-100", color: "text-pink-600", ring: "ring-pink-200" },
+  { icon: <BarChart3 className="h-4 w-4" />, bg: "bg-indigo-100", color: "text-indigo-600", ring: "ring-indigo-200" },
+];
+
+function detectTimeline(title: string, content: string): { isTimeline: boolean; steps: { label: string; items: string[] }[] } {
+  const lower = title.toLowerCase();
+  const isTimelineSection = ["cronograma", "implementação", "roadmap", "timeline", "fases"].some(k => lower.includes(k));
+  if (!isTimelineSection) return { isTimeline: false, steps: [] };
+
+  const steps: { label: string; items: string[] }[] = [];
+  let current: { label: string; items: string[] } | null = null;
+
+  for (const line of content.split("\n")) {
+    // Detect step headers: ### or **bold** lines
+    const h3Match = line.match(/^###\s+(.+)/);
+    const boldMatch = line.match(/^\s*\*\*(.{5,})\*\*\s*$/);
+    if (h3Match || boldMatch) {
+      if (current) steps.push(current);
+      current = { label: (h3Match?.[1] || boldMatch?.[1] || "").replace(/\*+/g, "").trim(), items: [] };
+    } else if (current) {
+      const item = line.replace(/^[\s\-*•]+/, "").trim();
+      if (item && !item.startsWith("|") && !item.startsWith("---")) {
+        current.items.push(item);
+      }
+    }
+  }
+  if (current) steps.push(current);
+
+  return { isTimeline: steps.length >= 2, steps };
+}
+
+function TimelineFlow({ steps }: { steps: { label: string; items: string[] }[] }) {
+  return (
+    <div className="relative pl-8 space-y-0">
+      {/* Vertical line */}
+      <div className="absolute left-[15px] top-3 bottom-3 w-px bg-border" />
+
+      {steps.map((step, i) => {
+        const style = timelineIcons[i % timelineIcons.length];
+        return (
+          <div key={i} className="relative pb-6 last:pb-0 animate-fade-in" style={{ animationDelay: `${i * 80}ms` }}>
+            {/* Icon node */}
+            <div className={`absolute -left-8 top-0 h-8 w-8 rounded-full ${style.bg} ${style.color} ring-4 ${style.ring} flex items-center justify-center z-10`}>
+              {style.icon}
+            </div>
+
+            {/* Content */}
+            <div className="ml-4 pt-0.5">
+              <h4 className="text-sm font-bold text-foreground mb-1.5">{step.label}</h4>
+              {step.items.length > 0 && (
+                <ul className="space-y-1">
+                  {step.items.map((item, j) => (
+                    <li key={j} className="flex items-start gap-2 text-xs text-foreground/70 leading-relaxed">
+                      <ArrowRight className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
    CALLOUT EXTRACTION
    ═══════════════════════════════════════════════════════ */
 
