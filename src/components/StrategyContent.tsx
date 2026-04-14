@@ -399,56 +399,40 @@ const compactProseClasses =
   "prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:my-3 prose-blockquote:not-italic " +
   "prose-a:text-accent prose-a:underline-offset-2";
 
-const tableColors = [
-  { headerBg: "bg-blue-600", headerText: "text-white", cellBg: "bg-blue-50/30" },
-  { headerBg: "bg-emerald-600", headerText: "text-white", cellBg: "bg-emerald-50/30" },
-  { headerBg: "bg-amber-600", headerText: "text-white", cellBg: "bg-amber-50/30" },
-  { headerBg: "bg-purple-600", headerText: "text-white", cellBg: "bg-purple-50/30" },
-  { headerBg: "bg-red-600", headerText: "text-white", cellBg: "bg-red-50/30" },
-];
+// Counter to color each th header differently
+let thColorIndex = 0;
 
 const markdownComponents = {
-  table: ({ children, ...props }: any) => (
-    <div className="my-6 overflow-x-auto rounded-xl border border-border shadow-sm">
-      <table className="w-full text-sm border-collapse" {...props}>
-        {children}
-      </table>
-    </div>
-  ),
-  thead: ({ children, ...props }: any) => {
-    // Extract th cells from the <tr> inside <thead>
-    const trChildren = React.Children.toArray(children);
-    const firstTr: any = trChildren[0];
-    const thCells = firstTr?.props?.children
-      ? React.Children.toArray(firstTr.props.children)
-      : trChildren;
-
+  table: ({ children, ...props }: any) => {
+    thColorIndex = 0; // Reset per table
     return (
-      <thead {...props}>
-        <tr>
-          {thCells.map((th: any, idx: number) => {
-            const color = tableColors[idx % tableColors.length];
-            const content = th?.props?.children ?? th;
-            return (
-              <th
-                key={idx}
-                className={`px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider ${color.headerBg} ${color.headerText} border-r border-white/20 last:border-r-0`}
-              >
-                {content}
-              </th>
-            );
-          })}
-        </tr>
-      </thead>
+      <div className="my-6 overflow-x-auto rounded-xl border border-border shadow-sm">
+        <table className="w-full text-sm border-collapse table-fixed" {...props}>
+          {children}
+        </table>
+      </div>
     );
   },
-  th: ({ children }: any) => (
-    <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider bg-foreground text-background">
-      {children}
-    </th>
+  thead: ({ children, ...props }: any) => (
+    <thead {...props}>{children}</thead>
   ),
+  th: ({ children, ...props }: any) => {
+    const colors = [
+      "bg-blue-600 text-white",
+      "bg-emerald-600 text-white",
+      "bg-amber-600 text-white",
+      "bg-purple-600 text-white",
+    ];
+    const cls = colors[thColorIndex % colors.length];
+    thColorIndex++;
+    return (
+      <th className={`px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider ${cls} border-r border-white/20 last:border-r-0`} {...props}>
+        {children}
+      </th>
+    );
+  },
   td: ({ children, ...props }: any) => (
-    <td className="px-4 py-3 text-sm text-foreground/80 border-t border-border/30 border-r border-border/20 last:border-r-0 leading-relaxed" {...props}>
+    <td className="px-4 py-3 text-sm text-foreground/80 border-t border-border/30 border-r border-border/20 last:border-r-0 leading-relaxed align-top" {...props}>
       {children}
     </td>
   ),
