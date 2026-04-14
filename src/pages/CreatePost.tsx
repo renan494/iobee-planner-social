@@ -51,6 +51,8 @@ interface PostEntry {
   reference: string;
   collapsed: boolean;
   draftId?: string;
+  aiTheme: string;
+  aiLoading: boolean;
 }
 
 function createEmptyEntry(): PostEntry {
