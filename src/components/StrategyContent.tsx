@@ -431,72 +431,21 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
         </div>
       )}
 
-      {/* ── Sections as flat dividers ── */}
+      {/* ── Sections ── */}
       {sections.map((section, i) => {
         const style = getStyle(section.title);
-        const { callouts, rest } = extractCallouts(section.content);
-        const swot = detectSwot(section.content);
-        const kpis = detectKpis(section.content);
-        const funnel = detectFunnel(section.content);
+        const isCollapsible = i >= 3; // Sections 4+ are collapsible
 
         return (
-          <div
+          <CollapsibleSection
             key={i}
-            className="animate-fade-in"
-            style={{ animationDelay: `${i * 60}ms` }}
-          >
-            {/* Divider line */}
-            {i > 0 && <div className="border-t border-border/60 my-1" />}
-
-            {/* Section Header — flat, inline */}
-            <div className="flex items-center gap-2.5 pt-5 pb-3">
-              <div className={`flex items-center justify-center h-7 w-7 rounded-lg ${style.accentBg} ${style.accent}`}>
-                {React.cloneElement(style.icon as React.ReactElement, { className: "h-3.5 w-3.5" })}
-              </div>
-              <h3 className="text-sm font-bold text-foreground leading-tight">
-                <span className="text-muted-foreground/50 mr-1">{section.number || i + 1}.</span>
-                {section.title}
-              </h3>
-            </div>
-
-            {/* Callouts — inline pills */}
-            {callouts.length > 0 && (
-              <div className="space-y-1.5 mb-3">
-                {callouts.map((c, idx) => (
-                  <div key={idx} className="flex items-start gap-2 rounded-lg border-l-3 border-l-primary/40 bg-primary/5 px-3 py-2">
-                    <Lightbulb className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
-                    <p className="text-xs font-medium text-foreground/80 leading-relaxed">{c}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Special renderers */}
-            {swot.isSwot && (
-              <div className="mb-4">
-                <SwotGrid quadrants={swot.quadrants} isMobile={isMobile} />
-              </div>
-            )}
-
-            {kpis.isKpi && (
-              <div className="mb-4">
-                <KpiCards kpis={kpis.kpis} isMobile={isMobile} />
-              </div>
-            )}
-
-            {funnel.isFunnel && (
-              <div className="mb-4">
-                <FunnelVisual stages={funnel.stages} />
-              </div>
-            )}
-
-            {/* Body */}
-            <div className={`${compactProseClasses} pb-4`}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                {cleanContent(rest.trim())}
-              </ReactMarkdown>
-            </div>
-          </div>
+            section={section}
+            index={i}
+            style={style}
+            isCollapsible={isCollapsible}
+            isMobile={isMobile}
+            animationDelay={i * 60}
+          />
         );
       })}
 
