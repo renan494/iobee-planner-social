@@ -446,7 +446,7 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* ── Executive Summary ── */}
       {intro && (
         <div className="rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-primary/[0.03] to-transparent p-6 sm:p-8 animate-fade-in">
