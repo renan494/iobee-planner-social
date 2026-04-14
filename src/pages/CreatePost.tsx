@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Hash, ImagePlus, PenTool, X, Plus, Trash2, Save, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
+import { CalendarIcon, Hash, ImagePlus, PenTool, X, Plus, Trash2, Save, ChevronDown, ChevronUp, ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +28,7 @@ import { toast } from "@/hooks/use-toast";
 import { useActivity } from "@/contexts/ActivityContext";
 
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PostEntry {
   id: string;
@@ -50,6 +51,8 @@ interface PostEntry {
   reference: string;
   collapsed: boolean;
   draftId?: string;
+  aiTheme: string;
+  aiLoading: boolean;
 }
 
 function createEmptyEntry(): PostEntry {
@@ -73,6 +76,8 @@ function createEmptyEntry(): PostEntry {
     channels: [],
     reference: "",
     collapsed: false,
+    aiTheme: "",
+    aiLoading: false,
   };
 }
 
@@ -113,6 +118,8 @@ export default function CreatePost() {
         reference: "",
         collapsed: false,
         draftId: data.id,
+        aiTheme: "",
+        aiLoading: false,
       }]);
     });
   }, [searchParams]);
@@ -307,6 +314,37 @@ export default function CreatePost() {
             onRemove={() => removeEntry(idx)}
             onAddHashtag={() => addHashtag(idx)}
             onRemoveHashtag={(tag) => removeHashtag(idx, tag)}
+            onGenerateAI={async () => {
+              updateEntry(idx, { aiLoading: true });
+              try {
+                const ec = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
+                const res = await supabase.functions.invoke("generate-post", {
+                  body: {
+                    client: ec,
+                    format: entry.postFormat,
+                    funnelStage: entry.funnelStage,
+                    channels: entry.channels,
+                    theme: entry.aiTheme || undefined,
+                  },
+                });
+                if (res.error) throw res.error;
+                const data = res.data;
+                if (data.error) {
+                  toast({ title: "Erro da IA", description: data.error, variant: "destructive" });
+                } else {
+                  updateEntry(idx, {
+                    title: data.title || entry.title,
+                    content: data.legend || entry.content,
+                    hashtags: data.hashtags || entry.hashtags,
+                  });
+                  toast({ title: "Post gerado!", description: "Campos preenchidos pela IA. Revise antes de publicar." });
+                }
+              } catch (err: any) {
+                toast({ title: "Erro", description: err.message || "Falha ao gerar post com IA.", variant: "destructive" });
+              } finally {
+                updateEntry(idx, { aiLoading: false });
+              }
+            }}
           />
         ))}
       </div>
@@ -333,7 +371,7 @@ export default function CreatePost() {
 }
 
 function PostEntryForm({
-  entry, idx, total, clients, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag,
+  entry, idx, total, clients, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag, onGenerateAI,
 }: {
   entry: PostEntry;
   idx: number;
@@ -344,6 +382,7 @@ function PostEntryForm({
   onRemove: () => void;
   onAddHashtag: () => void;
   onRemoveHashtag: (tag: string) => void;
+  onGenerateAI: () => void;
 }) {
   const effectiveClient = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
 
@@ -470,6 +509,36 @@ function PostEntryForm({
                 );
               })}
             </div>
+          </div>
+
+          {/* AI Generation */}
+          <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-primary">
+              <Sparkles className="h-4 w-4" />
+              Gerar com IA
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Tema ou assunto do post (opcional)"
+                value={entry.aiTheme}
+                onChange={(e) => onUpdate({ aiTheme: e.target.value })}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={entry.aiLoading}
+                onClick={() => onGenerateAI()}
+                className="shrink-0 gap-1.5 border-primary/30 text-primary hover:bg-primary/10"
+              >
+                {entry.aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {entry.aiLoading ? "Gerando..." : "Gerar"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Preencha cliente, formato e etapa do funil acima para melhores resultados.
+            </p>
           </div>
 
           {/* Title */}
