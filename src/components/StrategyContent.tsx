@@ -415,31 +415,35 @@ const markdownComponents = {
       </table>
     </div>
   ),
-  thead: ({ children, ...props }: any) => (
-    <thead {...props}>
-      <tr>
-        {React.Children.map(
-          // Get the <tr> children, then map over <th> cells
-          React.Children.toArray(
-            React.Children.toArray(children)?.[0]?.props?.children || children
-          ),
-          (th: any, idx: number) => {
+  thead: ({ children, ...props }: any) => {
+    // Extract th cells from the <tr> inside <thead>
+    const trChildren = React.Children.toArray(children);
+    const firstTr: any = trChildren[0];
+    const thCells = firstTr?.props?.children
+      ? React.Children.toArray(firstTr.props.children)
+      : trChildren;
+
+    return (
+      <thead {...props}>
+        <tr>
+          {thCells.map((th: any, idx: number) => {
             const color = tableColors[idx % tableColors.length];
+            const content = th?.props?.children ?? th;
             return (
               <th
                 key={idx}
                 className={`px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider ${color.headerBg} ${color.headerText} border-r border-white/20 last:border-r-0`}
               >
-                {th?.props?.children || th}
+                {content}
               </th>
             );
-          }
-        )}
-      </tr>
-    </thead>
-  ),
-  th: ({ children, ...props }: any) => (
-    <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider bg-foreground text-background" {...props}>
+          })}
+        </tr>
+      </thead>
+    );
+  },
+  th: ({ children }: any) => (
+    <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider bg-foreground text-background">
       {children}
     </th>
   ),
