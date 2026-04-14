@@ -52,6 +52,7 @@ function ProtectedRoutes() {
             <Route path="/analistas" element={<Analysts />} />
             <Route path="/analistas/:name" element={<AnalystDetail />} />
             <Route path="/admin/usuarios" element={<AdminUsers />} />
+            <Route path="/perfil" element={<MyProfile />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
