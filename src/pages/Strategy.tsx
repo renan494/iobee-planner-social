@@ -210,11 +210,11 @@ export default function Strategy() {
             </div>
 
             {selectedClient && !hasBriefing && (
-              <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
-                <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 rounded-lg border border-border bg-muted p-4">
+                <AlertCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Briefing incompleto</p>
-                  <p className="text-sm text-amber-700 dark:text-amber-300 mt-0.5">
+                  <p className="text-sm font-medium text-foreground">Briefing incompleto</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">
                     Para gerar uma estratégia de qualidade, preencha pelo menos os campos de <strong>nicho</strong>, <strong>público-alvo</strong> e <strong>tom de voz</strong> no cadastro do cliente.
                   </p>
                   <Button
