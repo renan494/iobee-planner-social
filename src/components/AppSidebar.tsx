@@ -28,12 +28,12 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
+  { title: "Clientes", url: "/clientes", icon: Users },
+  { title: "Estratégia", url: "/estrategia", icon: Sparkles },
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
-  { title: "Estratégia", url: "/estrategia", icon: Sparkles },
   { title: "Rascunhos", url: "/rascunhos", icon: FileEdit },
   { title: "Calendário", url: "/calendario", icon: CalendarDays },
-  { title: "Clientes", url: "/clientes", icon: Users },
   { title: "Analistas", url: "/analistas", icon: UserCog },
 ];
 
