@@ -318,6 +318,19 @@ const proseClasses =
   "prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:rounded-r-xl prose-blockquote:my-6 prose-blockquote:not-italic " +
   "prose-a:text-accent prose-a:underline-offset-2";
 
+const compactProseClasses =
+  "prose prose-sm max-w-[720px] dark:prose-invert " +
+  "prose-headings:text-foreground prose-headings:font-semibold " +
+  "prose-h3:text-base prose-h3:mt-4 prose-h3:mb-2 prose-h3:pb-1.5 prose-h3:border-b prose-h3:border-border/30 " +
+  "prose-h4:text-sm prose-h4:mt-3 prose-h4:mb-1.5 " +
+  "prose-p:text-foreground/75 prose-p:leading-[1.6] prose-p:my-2 prose-p:text-sm " +
+  "prose-strong:text-foreground prose-strong:font-semibold " +
+  "prose-li:text-foreground/75 prose-li:my-1 prose-li:leading-[1.6] prose-li:text-sm " +
+  "prose-ul:my-3 prose-ul:space-y-0.5 prose-ol:my-3 prose-ol:space-y-0.5 " +
+  "prose-hr:my-4 prose-hr:border-border " +
+  "prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:my-3 prose-blockquote:not-italic " +
+  "prose-a:text-accent prose-a:underline-offset-2";
+
 const markdownComponents = {
   table: ({ children, ...props }: any) => (
     <div className="my-6 overflow-x-auto rounded-xl border border-border">
