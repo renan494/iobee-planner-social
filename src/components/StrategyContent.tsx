@@ -199,22 +199,9 @@ function KpiCards({ kpis, isMobile }: { kpis: { label: string; value: string }[]
    FUNNEL DETECTOR & RENDERER
    ═══════════════════════════════════════════════════════ */
 
-function detectFunnel(content: string): { isFunnel: boolean; stages: { label: string; detail: string }[] } {
-  const lower = content.toLowerCase();
-  const funnelKeywords = ["topo de funil", "meio de funil", "fundo de funil", "tofu", "mofu", "bofu", "atração", "consideração", "conversão", "descoberta", "reconhecimento"];
-  const matchCount = funnelKeywords.filter(k => lower.includes(k)).length;
-  if (matchCount < 2) return { isFunnel: false, stages: [] };
-
-  const stages: { label: string; detail: string }[] = [];
-  const lines = content.split("\n");
-  for (const line of lines) {
-    const match = line.match(/^[\s\-*•]+\**([^*:]+)\**\s*[:–-]\s*(.+)/);
-    if (match) {
-      stages.push({ label: match[1].replace(/\*+/g, "").trim(), detail: match[2].replace(/\*+/g, "").trim() });
-    }
-  }
-
-  return { isFunnel: stages.length >= 2, stages };
+function detectFunnel(_content: string): { isFunnel: boolean; stages: { label: string; detail: string }[] } {
+  // Disabled — too aggressive on real AI content
+  return { isFunnel: false, stages: [] };
 }
 
 const funnelColors = [
