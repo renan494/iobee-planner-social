@@ -517,12 +517,13 @@ function PostEntryForm({
               <Sparkles className="h-4 w-4" />
               Gerar com IA
             </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Tema ou assunto do post (opcional)"
+            <div className="flex gap-2 items-end">
+              <Textarea
+                placeholder="Descreva o que você espera para este post. Ex: 'Quero um post educativo sobre os benefícios do produto X, com tom leve e descontraído, voltado para mulheres de 25-40 anos que buscam bem-estar...'"
                 value={entry.aiTheme}
                 onChange={(e) => onUpdate({ aiTheme: e.target.value })}
-                className="flex-1"
+                className="flex-1 min-h-[80px] resize-y"
+                rows={3}
               />
               <Button
                 type="button"
@@ -530,14 +531,14 @@ function PostEntryForm({
                 size="sm"
                 disabled={entry.aiLoading}
                 onClick={() => onGenerateAI()}
-                className="shrink-0 gap-1.5 border-primary/30 text-primary hover:bg-primary/10"
+                className="shrink-0 gap-1.5 border-primary/30 text-primary hover:bg-primary/10 h-10"
               >
                 {entry.aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 {entry.aiLoading ? "Gerando..." : "Gerar"}
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Preencha cliente, formato e etapa do funil acima para melhores resultados.
+              Quanto mais detalhes você fornecer, melhor será o resultado. Preencha também cliente, formato e etapa do funil acima.
             </p>
           </div>
 
