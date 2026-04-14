@@ -318,6 +318,19 @@ const proseClasses =
   "prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-3 prose-blockquote:px-5 prose-blockquote:rounded-r-xl prose-blockquote:my-6 prose-blockquote:not-italic " +
   "prose-a:text-accent prose-a:underline-offset-2";
 
+const compactProseClasses =
+  "prose prose-sm max-w-[720px] dark:prose-invert " +
+  "prose-headings:text-foreground prose-headings:font-semibold " +
+  "prose-h3:text-base prose-h3:mt-4 prose-h3:mb-2 prose-h3:pb-1.5 prose-h3:border-b prose-h3:border-border/30 " +
+  "prose-h4:text-sm prose-h4:mt-3 prose-h4:mb-1.5 " +
+  "prose-p:text-foreground/75 prose-p:leading-[1.6] prose-p:my-2 prose-p:text-sm " +
+  "prose-strong:text-foreground prose-strong:font-semibold " +
+  "prose-li:text-foreground/75 prose-li:my-1 prose-li:leading-[1.6] prose-li:text-sm " +
+  "prose-ul:my-3 prose-ul:space-y-0.5 prose-ol:my-3 prose-ol:space-y-0.5 " +
+  "prose-hr:my-4 prose-hr:border-border " +
+  "prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:my-3 prose-blockquote:not-italic " +
+  "prose-a:text-accent prose-a:underline-offset-2";
+
 const markdownComponents = {
   table: ({ children, ...props }: any) => (
     <div className="my-6 overflow-x-auto rounded-xl border border-border">
@@ -433,7 +446,7 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* ── Executive Summary ── */}
       {intro && (
         <div className="rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-primary/[0.03] to-transparent p-6 sm:p-8 animate-fade-in">
@@ -462,31 +475,39 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
         const kpis = detectKpis(section.content);
         const funnel = detectFunnel(section.content);
 
+        // First 3 sections get full-size layout; 4+ get compact
+        const isCompact = i >= 3;
+
         return (
           <Card
             key={i}
-            className={`overflow-hidden border border-border/60 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border-l-4 ${style.borderAccent} animate-fade-in`}
+            className={`overflow-hidden border border-border/60 shadow-sm hover:shadow-md transition-all duration-300 border-l-4 ${style.borderAccent} animate-fade-in ${isCompact ? "rounded-xl" : "rounded-2xl"}`}
             style={{ animationDelay: `${i * 80}ms` }}
           >
             {/* Section Header */}
-            <div className={`flex items-center gap-4 px-6 py-5 ${style.accentBg}`}>
-              <div className={`flex items-center justify-center h-11 w-11 rounded-xl bg-background border border-border shadow-sm shrink-0 ${style.accent}`}>
-                {style.icon}
+            <div className={`flex items-center gap-3 ${style.accentBg} ${isCompact ? "px-4 py-3" : "px-6 py-5 gap-4"}`}>
+              <div className={`flex items-center justify-center shrink-0 bg-background border border-border shadow-sm ${style.accent} ${isCompact ? "h-8 w-8 rounded-lg" : "h-11 w-11 rounded-xl"}`}>
+                {React.cloneElement(style.icon as React.ReactElement, {
+                  className: isCompact ? "h-4 w-4" : "h-5 w-5",
+                })}
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/70 block mb-0.5">
-                  Seção {section.number || i + 1}
-                </span>
-                <h3 className="text-lg font-bold text-foreground leading-tight">
+                {!isCompact && (
+                  <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/70 block mb-0.5">
+                    Seção {section.number || i + 1}
+                  </span>
+                )}
+                <h3 className={`font-bold text-foreground leading-tight ${isCompact ? "text-sm" : "text-lg"}`}>
+                  {isCompact && <span className="text-muted-foreground/60 mr-1.5">{section.number || i + 1}.</span>}
                   {section.title}
                 </h3>
               </div>
             </div>
 
-            <CardContent className={`${isMobile ? "px-4 py-5" : "px-8 py-7"}`}>
+            <CardContent className={isCompact ? (isMobile ? "px-4 py-3" : "px-5 py-4") : (isMobile ? "px-4 py-5" : "px-8 py-7")}>
               {/* Callouts */}
               {callouts.length > 0 && (
-                <div className="space-y-3 mb-6">
+                <div className={`space-y-2 ${isCompact ? "mb-3" : "mb-6"}`}>
                   {callouts.map((c, idx) => (
                     <CalloutBox key={idx} text={c} index={idx} />
                   ))}
@@ -495,31 +516,27 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
 
               {/* Special renderers */}
               {swot.isSwot && (
-                <div className="mb-6">
+                <div className={isCompact ? "mb-3" : "mb-6"}>
                   <SwotGrid quadrants={swot.quadrants} isMobile={isMobile} />
                 </div>
               )}
 
               {kpis.isKpi && (
-                <div className="mb-6">
+                <div className={isCompact ? "mb-3" : "mb-6"}>
                   <KpiCards kpis={kpis.kpis} isMobile={isMobile} />
                 </div>
               )}
 
               {funnel.isFunnel && (
-                <div className="mb-6">
+                <div className={isCompact ? "mb-3" : "mb-6"}>
                   <FunnelVisual stages={funnel.stages} />
                 </div>
               )}
 
               {/* Body content */}
-              <div className={proseClasses}>
+              <div className={isCompact ? compactProseClasses : proseClasses}>
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                  {cleanContent(
-                    swot.isSwot || kpis.isKpi || funnel.isFunnel
-                      ? rest.trim()
-                      : rest.trim()
-                  )}
+                  {cleanContent(rest.trim())}
                 </ReactMarkdown>
               </div>
             </CardContent>
