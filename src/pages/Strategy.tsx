@@ -305,7 +305,9 @@ export default function Strategy() {
             )}
           </div>
           <StrategyContent content={streamContent} isStreaming={generating} />
-        </div>
+          {!generating && streamContent && selectedClient && (
+            <StrategyDebateChat strategyContent={streamContent} clientName={selectedClient.name} />
+          )}
       )}
 
       {/* Saved Strategies */}
@@ -353,6 +355,7 @@ export default function Strategy() {
                   {expandedId === s.id && (
                     <CardContent className="border-t pt-4">
                       <StrategyContent content={s.content} />
+                      <StrategyDebateChat strategyContent={s.content} clientName={selectedClient?.name || ""} />
                     </CardContent>
                   )}
                 </Card>
