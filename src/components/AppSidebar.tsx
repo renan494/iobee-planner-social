@@ -7,6 +7,7 @@ import {
   FileEdit,
   Shield,
   LogOut,
+  Sparkles,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +30,7 @@ import {
 const items = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
+  { title: "Estratégia", url: "/estrategia", icon: Sparkles },
   { title: "Rascunhos", url: "/rascunhos", icon: FileEdit },
   { title: "Calendário", url: "/calendario", icon: CalendarDays },
   { title: "Clientes", url: "/clientes", icon: Users },

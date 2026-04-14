@@ -15,6 +15,7 @@ import ClientDetail from "./pages/ClientDetail";
 import Analysts from "./pages/Analysts";
 import AnalystDetail from "./pages/AnalystDetail";
 import Drafts from "./pages/Drafts";
+import Strategy from "./pages/Strategy";
 import AdminUsers from "./pages/AdminUsers";
 import MyProfile from "./pages/MyProfile";
 import Login from "./pages/Login";
@@ -46,6 +47,7 @@ function ProtectedRoutes() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/criar" element={<CreatePost />} />
             <Route path="/rascunhos" element={<Drafts />} />
+            <Route path="/estrategia" element={<Strategy />} />
             <Route path="/calendario" element={<CalendarPage />} />
             <Route path="/clientes" element={<Clients />} />
             <Route path="/clientes/:name" element={<ClientDetail />} />
