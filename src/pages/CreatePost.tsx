@@ -371,7 +371,7 @@ export default function CreatePost() {
 }
 
 function PostEntryForm({
-  entry, idx, total, clients, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag,
+  entry, idx, total, clients, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag, onGenerateAI,
 }: {
   entry: PostEntry;
   idx: number;
@@ -382,6 +382,7 @@ function PostEntryForm({
   onRemove: () => void;
   onAddHashtag: () => void;
   onRemoveHashtag: (tag: string) => void;
+  onGenerateAI: () => void;
 }) {
   const effectiveClient = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
 
