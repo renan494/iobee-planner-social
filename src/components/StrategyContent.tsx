@@ -374,6 +374,100 @@ function StrategySkeleton() {
     </div>
   );
 }
+/* ═══════════════════════════════════════════════════════
+   COLLAPSIBLE SECTION COMPONENT
+   ═══════════════════════════════════════════════════════ */
+
+type ParsedSection = { number?: string; title: string; content: string };
+
+function CollapsibleSection({
+  section, index, style, isCollapsible, isMobile, animationDelay,
+}: {
+  section: ParsedSection;
+  index: number;
+  style: SectionStyle;
+  isCollapsible: boolean;
+  isMobile: boolean;
+  animationDelay: number;
+}) {
+  const [open, setOpen] = useState(!isCollapsible);
+  const { callouts, rest } = extractCallouts(section.content);
+  const swot = detectSwot(section.content);
+  const kpis = detectKpis(section.content);
+  const funnel = detectFunnel(section.content);
+
+  const preview = useMemo(() => {
+    if (!isCollapsible) return "";
+    const plain = rest.replace(/[#*_\->`|]/g, "").replace(/\n+/g, " ").trim();
+    return plain.length > 100 ? plain.slice(0, 100) + "…" : plain;
+  }, [rest, isCollapsible]);
+
+  return (
+    <div className="animate-fade-in" style={{ animationDelay: `${animationDelay}ms` }}>
+      {index > 0 && <div className="border-t border-border/60 my-1" />}
+
+      <button
+        type="button"
+        onClick={() => isCollapsible && setOpen(!open)}
+        className={`flex items-center gap-2.5 pt-5 pb-3 w-full text-left ${isCollapsible ? "cursor-pointer hover:opacity-80 transition-opacity" : "cursor-default"}`}
+      >
+        <div className={`flex items-center justify-center h-7 w-7 rounded-lg ${style.accentBg} ${style.accent}`}>
+          {React.cloneElement(style.icon as React.ReactElement, { className: "h-3.5 w-3.5" })}
+        </div>
+        <h3 className="text-sm font-bold text-foreground leading-tight flex-1">
+          <span className="text-muted-foreground/50 mr-1">{section.number || index + 1}.</span>
+          {section.title}
+        </h3>
+        {isCollapsible && (
+          <ChevronDown className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        )}
+      </button>
+
+      {isCollapsible && !open && preview && (
+        <p className="text-xs text-muted-foreground/70 pb-3 pl-[38px] line-clamp-1">{preview}</p>
+      )}
+
+      {open && (
+        <div>
+          {callouts.length > 0 && (
+            <div className="space-y-1.5 mb-3">
+              {callouts.map((c, idx) => (
+                <div key={idx} className="flex items-start gap-2 rounded-lg border-l-3 border-l-primary/40 bg-primary/5 px-3 py-2">
+                  <Lightbulb className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                  <p className="text-xs font-medium text-foreground/80 leading-relaxed">{c}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {swot.isSwot && (
+            <div className="mb-4">
+              <SwotGrid quadrants={swot.quadrants} isMobile={isMobile} />
+            </div>
+          )}
+
+          {kpis.isKpi && (
+            <div className="mb-4">
+              <KpiCards kpis={kpis.kpis} isMobile={isMobile} />
+            </div>
+          )}
+
+          {funnel.isFunnel && (
+            <div className="mb-4">
+              <FunnelVisual stages={funnel.stages} />
+            </div>
+          )}
+
+          <div className={`${compactProseClasses} pb-4`}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {cleanContent(rest.trim())}
+            </ReactMarkdown>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ═══════════════════════════════════════════════════════
    MAIN COMPONENT
