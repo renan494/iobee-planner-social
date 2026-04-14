@@ -5,6 +5,11 @@ import {
   Palette, TrendingUp, CalendarClock, FileText
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+function cleanContent(text: string): string {
+  return text.replace(/<br\s*\/?>/gi, "\n\n").replace(/\|\s*\|/g, "|\n|");
+}
 
 const sectionIcons: Record<string, React.ReactNode> = {
   "diagnóstico": <Search className="h-5 w-5 text-primary" />,
@@ -61,13 +66,17 @@ function parseToSections(markdown: string): { intro: string; sections: Section[]
 const proseClasses =
   "prose prose-sm max-w-none dark:prose-invert " +
   "prose-headings:text-foreground prose-headings:font-semibold " +
-  "prose-h3:text-sm prose-h3:mt-4 prose-h3:mb-1.5 " +
-  "prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:my-2 " +
-  "prose-strong:text-foreground " +
-  "prose-li:text-muted-foreground prose-li:my-0.5 " +
-  "prose-ul:my-2 prose-ol:my-2 " +
-  "prose-table:text-sm prose-th:px-3 prose-th:py-2 prose-th:bg-muted/50 prose-th:text-foreground prose-th:font-semibold " +
-  "prose-td:px-3 prose-td:py-2 prose-td:border-t prose-td:border-border";
+  "prose-h3:text-base prose-h3:mt-5 prose-h3:mb-2 " +
+  "prose-h4:text-sm prose-h4:mt-4 prose-h4:mb-1.5 " +
+  "prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:my-3 " +
+  "prose-strong:text-foreground prose-strong:font-semibold " +
+  "prose-li:text-muted-foreground prose-li:my-1 prose-li:leading-relaxed " +
+  "prose-ul:my-3 prose-ul:space-y-1 prose-ol:my-3 prose-ol:space-y-1 " +
+  "prose-table:text-sm prose-table:w-full prose-table:border-collapse prose-table:rounded-lg prose-table:overflow-hidden " +
+  "prose-th:px-4 prose-th:py-2.5 prose-th:bg-muted/60 prose-th:text-foreground prose-th:font-semibold prose-th:text-left prose-th:border prose-th:border-border " +
+  "prose-td:px-4 prose-td:py-2.5 prose-td:border prose-td:border-border prose-td:text-muted-foreground " +
+  "prose-hr:my-5 prose-hr:border-border " +
+  "prose-blockquote:border-l-primary prose-blockquote:bg-muted/20 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg";
 
 interface StrategyContentProps {
   content: string;
@@ -83,18 +92,18 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
   if (sections.length === 0) {
     return (
       <div className={proseClasses}>
-        <ReactMarkdown>{content}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanContent(content)}</ReactMarkdown>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Intro / Summary */}
       {intro && (
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
           <div className={proseClasses}>
-            <ReactMarkdown>{intro}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanContent(intro)}</ReactMarkdown>
           </div>
         </div>
       )}
@@ -123,9 +132,9 @@ export default function StrategyContent({ content, isStreaming }: StrategyConten
           </div>
 
           {/* Section Body */}
-          <CardContent className="p-5">
+          <CardContent className="px-6 py-5">
             <div className={proseClasses}>
-              <ReactMarkdown>{section.content.trim()}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanContent(section.content.trim())}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>
