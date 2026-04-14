@@ -399,29 +399,57 @@ const compactProseClasses =
   "prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:my-3 prose-blockquote:not-italic " +
   "prose-a:text-accent prose-a:underline-offset-2";
 
+const tableColors = [
+  { headerBg: "bg-blue-600", headerText: "text-white", cellBg: "bg-blue-50/30" },
+  { headerBg: "bg-emerald-600", headerText: "text-white", cellBg: "bg-emerald-50/30" },
+  { headerBg: "bg-amber-600", headerText: "text-white", cellBg: "bg-amber-50/30" },
+  { headerBg: "bg-purple-600", headerText: "text-white", cellBg: "bg-purple-50/30" },
+  { headerBg: "bg-red-600", headerText: "text-white", cellBg: "bg-red-50/30" },
+];
+
 const markdownComponents = {
   table: ({ children, ...props }: any) => (
-    <div className="my-6 overflow-x-auto rounded-xl border border-border">
+    <div className="my-6 overflow-x-auto rounded-xl border border-border shadow-sm">
       <table className="w-full text-sm border-collapse" {...props}>
         {children}
       </table>
     </div>
   ),
   thead: ({ children, ...props }: any) => (
-    <thead className="bg-muted" {...props}>{children}</thead>
+    <thead {...props}>
+      <tr>
+        {React.Children.map(
+          // Get the <tr> children, then map over <th> cells
+          React.Children.toArray(
+            React.Children.toArray(children)?.[0]?.props?.children || children
+          ),
+          (th: any, idx: number) => {
+            const color = tableColors[idx % tableColors.length];
+            return (
+              <th
+                key={idx}
+                className={`px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider ${color.headerBg} ${color.headerText} border-r border-white/20 last:border-r-0`}
+              >
+                {th?.props?.children || th}
+              </th>
+            );
+          }
+        )}
+      </tr>
+    </thead>
   ),
   th: ({ children, ...props }: any) => (
-    <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-foreground" {...props}>
+    <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider bg-foreground text-background" {...props}>
       {children}
     </th>
   ),
   td: ({ children, ...props }: any) => (
-    <td className="px-4 py-3.5 text-sm text-foreground/75 border-t border-border/40 leading-relaxed" {...props}>
+    <td className="px-4 py-3 text-sm text-foreground/80 border-t border-border/30 border-r border-border/20 last:border-r-0 leading-relaxed" {...props}>
       {children}
     </td>
   ),
   tr: ({ children, ...props }: any) => (
-    <tr className="hover:bg-muted/40 transition-colors duration-150" {...props}>{children}</tr>
+    <tr className="hover:bg-muted/50 transition-colors duration-150 even:bg-muted/20" {...props}>{children}</tr>
   ),
   ul: ({ children, ...props }: any) => (
     <ul className="my-5 space-y-2.5 list-none pl-0" {...props}>{children}</ul>
