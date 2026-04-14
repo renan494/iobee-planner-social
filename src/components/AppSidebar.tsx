@@ -6,8 +6,10 @@ import {
   UserCog,
   FileEdit,
   Shield,
+  LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-iobee.svg";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
