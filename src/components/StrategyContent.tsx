@@ -61,13 +61,17 @@ function parseToSections(markdown: string): { intro: string; sections: Section[]
 const proseClasses =
   "prose prose-sm max-w-none dark:prose-invert " +
   "prose-headings:text-foreground prose-headings:font-semibold " +
-  "prose-h3:text-sm prose-h3:mt-4 prose-h3:mb-1.5 " +
-  "prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:my-2 " +
-  "prose-strong:text-foreground " +
-  "prose-li:text-muted-foreground prose-li:my-0.5 " +
-  "prose-ul:my-2 prose-ol:my-2 " +
-  "prose-table:text-sm prose-th:px-3 prose-th:py-2 prose-th:bg-muted/50 prose-th:text-foreground prose-th:font-semibold " +
-  "prose-td:px-3 prose-td:py-2 prose-td:border-t prose-td:border-border";
+  "prose-h3:text-base prose-h3:mt-5 prose-h3:mb-2 " +
+  "prose-h4:text-sm prose-h4:mt-4 prose-h4:mb-1.5 " +
+  "prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:my-3 " +
+  "prose-strong:text-foreground prose-strong:font-semibold " +
+  "prose-li:text-muted-foreground prose-li:my-1 prose-li:leading-relaxed " +
+  "prose-ul:my-3 prose-ul:space-y-1 prose-ol:my-3 prose-ol:space-y-1 " +
+  "prose-table:text-sm prose-table:w-full prose-table:border-collapse prose-table:rounded-lg prose-table:overflow-hidden " +
+  "prose-th:px-4 prose-th:py-2.5 prose-th:bg-muted/60 prose-th:text-foreground prose-th:font-semibold prose-th:text-left prose-th:border prose-th:border-border " +
+  "prose-td:px-4 prose-td:py-2.5 prose-td:border prose-td:border-border prose-td:text-muted-foreground " +
+  "prose-hr:my-5 prose-hr:border-border " +
+  "prose-blockquote:border-l-primary prose-blockquote:bg-muted/20 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg";
 
 interface StrategyContentProps {
   content: string;
