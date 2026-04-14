@@ -650,11 +650,19 @@ function CollapsibleSection({
             </div>
           )}
 
-          <div className={`${compactProseClasses} pb-4`}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-              {cleanContent(rest.trim())}
-            </ReactMarkdown>
-          </div>
+          {timeline.isTimeline && (
+            <div className="mb-4">
+              <TimelineFlow steps={timeline.steps} />
+            </div>
+          )}
+
+          {!timeline.isTimeline && (
+            <div className={`${compactProseClasses} pb-4`}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                {cleanContent(rest.trim())}
+              </ReactMarkdown>
+            </div>
+          )}
         </div>
       )}
     </div>
