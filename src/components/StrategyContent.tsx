@@ -173,27 +173,9 @@ function SwotGrid({ quadrants, isMobile }: { quadrants: { label: string; items: 
    KPI DETECTOR & STAT CARDS
    ═══════════════════════════════════════════════════════ */
 
-function detectKpis(content: string): { isKpi: boolean; kpis: { label: string; value: string }[] } {
-  const lower = content.toLowerCase();
-  if (!lower.includes("kpi") && !lower.includes("métrica") && !lower.includes("indicador") && !lower.includes("meta")) {
-    return { isKpi: false, kpis: [] };
-  }
-
-  const kpis: { label: string; value: string }[] = [];
-  const lines = content.split("\n");
-  for (const line of lines) {
-    // Match patterns like "- **Engajamento**: 5%" or "- Taxa de cliques: >3%"
-    const match = line.match(/^[\s\-*•]+\**([^*:]+)\**\s*[:–-]\s*(.+)/);
-    if (match) {
-      const label = match[1].trim();
-      const value = match[2].replace(/\*+/g, "").trim();
-      if (label.length > 2 && label.length < 60) {
-        kpis.push({ label, value });
-      }
-    }
-  }
-
-  return { isKpi: kpis.length >= 2, kpis };
+function detectKpis(_content: string): { isKpi: boolean; kpis: { label: string; value: string }[] } {
+  // Disabled — too aggressive on real AI content, causes oversized card rendering
+  return { isKpi: false, kpis: [] };
 }
 
 function KpiCards({ kpis, isMobile }: { kpis: { label: string; value: string }[]; isMobile: boolean }) {
@@ -217,22 +199,9 @@ function KpiCards({ kpis, isMobile }: { kpis: { label: string; value: string }[]
    FUNNEL DETECTOR & RENDERER
    ═══════════════════════════════════════════════════════ */
 
-function detectFunnel(content: string): { isFunnel: boolean; stages: { label: string; detail: string }[] } {
-  const lower = content.toLowerCase();
-  const funnelKeywords = ["topo de funil", "meio de funil", "fundo de funil", "tofu", "mofu", "bofu", "atração", "consideração", "conversão", "descoberta", "reconhecimento"];
-  const matchCount = funnelKeywords.filter(k => lower.includes(k)).length;
-  if (matchCount < 2) return { isFunnel: false, stages: [] };
-
-  const stages: { label: string; detail: string }[] = [];
-  const lines = content.split("\n");
-  for (const line of lines) {
-    const match = line.match(/^[\s\-*•]+\**([^*:]+)\**\s*[:–-]\s*(.+)/);
-    if (match) {
-      stages.push({ label: match[1].replace(/\*+/g, "").trim(), detail: match[2].replace(/\*+/g, "").trim() });
-    }
-  }
-
-  return { isFunnel: stages.length >= 2, stages };
+function detectFunnel(_content: string): { isFunnel: boolean; stages: { label: string; detail: string }[] } {
+  // Disabled — too aggressive on real AI content
+  return { isFunnel: false, stages: [] };
 }
 
 const funnelColors = [
