@@ -362,8 +362,18 @@ export default function StrategySlideViewer({ content, clientName, date, onClose
         <div ref={wrapperRef} className="flex-1 flex items-center justify-center relative overflow-hidden bg-[#111]">
           {slides.length > 0 && (
             <div
-              style={{ width: 1920, height: 1080, transform: `scale(${scale})`, transformOrigin: "center center" }}
-              className="absolute rounded-xl overflow-hidden shadow-2xl"
+              style={{
+                width: 1920,
+                height: 1080,
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                marginLeft: -960,
+                marginTop: -540,
+                transform: `scale(${scale})`,
+                transformOrigin: "center center",
+              }}
+              className="rounded-xl overflow-hidden shadow-2xl"
             >
               {slides[current]?.render()}
             </div>
