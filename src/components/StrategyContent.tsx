@@ -356,12 +356,30 @@ function detectTimeline(title: string, content: string): { isTimeline: boolean; 
   let current: { label: string; items: string[] } | null = null;
 
   for (const line of content.split("\n")) {
-    // Detect step headers: ### or **bold** lines
+    // Detect step headers: ### headings
     const h3Match = line.match(/^###\s+(.+)/);
+    // **bold entire line**
     const boldMatch = line.match(/^\s*\*\*(.{5,})\*\*\s*$/);
-    if (h3Match || boldMatch) {
+    // Top-level bullet with bold: *   **Label:** or - **Label:**  (no leading whitespace beyond bullet)
+    const topBulletBold = line.match(/^[\-*•]\s+\*\*(.{5,}?)\*\*:?\s*(.*)/);
+    // Indented bullet with bold (sub-item): starts with spaces/tabs then bullet
+    const subBulletBold = !topBulletBold && line.match(/^\s{2,}[\-*•]\s+\*\*(.{3,}?)\*\*:?\s*(.*)/);
+    // Non-bullet bold at start of line: **Label:** rest
+    const inlineBoldMatch = !topBulletBold && !subBulletBold && line.match(/^\s*\*\*(.{5,}?)\*\*:?\s*(.*)/);
+
+    if (h3Match || boldMatch || topBulletBold || inlineBoldMatch) {
       if (current) steps.push(current);
-      current = { label: (h3Match?.[1] || boldMatch?.[1] || "").replace(/\*+/g, "").trim(), items: [] };
+      const raw = h3Match?.[1] || boldMatch?.[1] || topBulletBold?.[1] || inlineBoldMatch?.[1] || "";
+      const label = raw.replace(/\*+/g, "").replace(/:$/, "").trim();
+      current = { label, items: [] };
+      // If has trailing text, add as first item
+      const trailing = (topBulletBold?.[2] || inlineBoldMatch?.[2] || "").trim();
+      if (trailing) current.items.push(trailing);
+    } else if (subBulletBold && current) {
+      // Sub-step within current phase: **Semana 1:** description
+      const subLabel = subBulletBold[1].replace(/\*+/g, "").replace(/:$/, "").trim();
+      const subDetail = subBulletBold[2]?.trim() || "";
+      current.items.push(subDetail ? `${subLabel}: ${subDetail}` : subLabel);
     } else if (current) {
       const item = line.replace(/^[\s\-*•]+/, "").trim();
       if (item && !item.startsWith("|") && !item.startsWith("---")) {
