@@ -96,9 +96,11 @@ O documento deve conter AS SEGUINTES SEÇÕES (use títulos ## para cada uma):
 - Mix entre topo, meio e fundo de funil
 
 ## 7. KPIs e Métricas de Acompanhamento
-- Métricas principais a serem monitoradas
-- Metas sugeridas para os primeiros 3 meses
+- Métricas principais a serem monitoradas organizadas por etapa do funil (Topo, Meio, Fundo)
+- Para CADA métrica, inclua um BENCHMARK DE REFERÊNCIA com fonte estatística (ex: "Taxa de engajamento média no Instagram para varejo: 0.47% — Rival IQ, 2024")
+- Metas sugeridas para os primeiros 3 meses com números específicos
 - Ferramentas de análise recomendadas
+- OBRIGATÓRIO: Use uma TABELA MARKDOWN para apresentar os KPIs com colunas: | Métrica | Benchmark do Setor | Meta Sugerida (3 meses) | Fonte |
 
 ## 8. Cronograma de Implementação
 - Roadmap de ações para os primeiros 30, 60 e 90 dias
