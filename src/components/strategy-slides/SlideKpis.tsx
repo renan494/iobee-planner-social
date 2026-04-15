@@ -3,6 +3,7 @@ import SlideFooter from "./SlideFooter";
 import { TrendingUp } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import symbolPink from "@/assets/symbol-pink.svg";
 
 interface SlideKpisProps {
   content: string;
@@ -16,7 +17,7 @@ const mdComponents = {
   table: ({ children, ...props }: any) => {
     thColorIdx = 0;
     return (
-      <div className="overflow-hidden rounded-2xl border-2 border-[#e8e4dd] shadow-lg">
+      <div className="overflow-hidden rounded-2xl border border-[#e0ddd6] shadow-sm">
         <table className="w-full text-[17px] border-collapse" {...props}>
           {children}
         </table>
@@ -24,7 +25,7 @@ const mdComponents = {
     );
   },
   th: ({ children, ...props }: any) => {
-    const colors = ["bg-blue-600 text-white", "bg-emerald-600 text-white", "bg-amber-600 text-white", "bg-purple-600 text-white"];
+    const colors = ["bg-[#E81F76] text-white", "bg-[#FDB600] text-white", "bg-[#333] text-white", "bg-[#E81F76]/80 text-white"];
     const cls = colors[thColorIdx % colors.length];
     thColorIdx++;
     return (
@@ -39,7 +40,7 @@ const mdComponents = {
     </td>
   ),
   tr: ({ children, ...props }: any) => (
-    <tr className="even:bg-[#f5f3ee]/50" {...props}>{children}</tr>
+    <tr className="even:bg-[#faf8f5]" {...props}>{children}</tr>
   ),
   p: ({ children, ...props }: any) => (
     <p className="text-[18px] text-[#555] leading-[1.7] my-3" {...props}>{children}</p>
@@ -55,7 +56,7 @@ const mdComponents = {
   ),
   li: ({ children, ...props }: any) => (
     <li className="flex items-start gap-3 text-[17px] text-[#555] leading-[1.6]" {...props}>
-      <span className="shrink-0 mt-2.5 h-2 w-2 rounded-full bg-emerald-500" />
+      <span className="shrink-0 mt-2.5 h-2 w-2 rounded-full bg-[#E81F76]" />
       <span className="flex-1">{children}</span>
     </li>
   ),
@@ -66,20 +67,22 @@ function cleanContent(text: string): string {
 }
 
 const SlideKpis = ({ content, slideNumber, totalSlides }: SlideKpisProps) => (
-  <SlideLayout className="bg-[#f5f3ee]">
+  <SlideLayout className="bg-white">
     <div className="h-full flex flex-col px-24 py-20 relative">
+      <img src={symbolPink} alt="" className="absolute -right-[150px] -top-[150px] w-[400px] h-[400px] opacity-[0.04]" />
+
       <div className="flex items-center gap-5 mb-2">
-        <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center">
-          <TrendingUp className="h-7 w-7 text-emerald-600" />
+        <div className="w-16 h-16 rounded-2xl bg-[#FDB600]/10 flex items-center justify-center">
+          <TrendingUp className="h-7 w-7 text-[#FDB600]" />
         </div>
         <div>
-          <span className="text-[14px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-1 block">MÉTRICAS</span>
-          <h1 className="text-[48px] font-light leading-none tracking-tight">
+          <span className="text-[14px] font-black text-[#FDB600] uppercase tracking-[0.2em] mb-1 block">MÉTRICAS</span>
+          <h1 className="text-[48px] font-light leading-none tracking-tight text-[#1a1a1a]">
             KPIs E <span className="font-black">BENCHMARKS</span>
           </h1>
         </div>
       </div>
-      <div className="w-20 h-1 bg-emerald-600 rounded-full mb-8" />
+      <div className="w-20 h-1 bg-[#FDB600] rounded-full mb-8" />
 
       <div className="flex-1 overflow-hidden">
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
