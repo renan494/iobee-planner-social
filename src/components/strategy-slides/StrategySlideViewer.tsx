@@ -359,7 +359,7 @@ export default function StrategySlideViewer({ content, clientName, date, onClose
         )}
 
         {/* Slide canvas */}
-        <div ref={wrapperRef} className="flex-1 flex items-center justify-center relative overflow-hidden bg-[#111]">
+        <div ref={wrapperRef} className="flex-1 relative overflow-hidden bg-[#111]">
           {slides.length > 0 && (
             <div
               style={{
