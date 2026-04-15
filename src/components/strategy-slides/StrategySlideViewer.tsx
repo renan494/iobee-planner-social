@@ -307,22 +307,22 @@ export default function StrategySlideViewer({ content, clientName, date, onClose
   }, [isFullscreen]);
 
   return (
-    <div ref={containerRef} className={`flex flex-col bg-[#1a1a1a] ${isFullscreen ? "fixed inset-0 z-[9999]" : "h-[80vh] min-h-[500px] max-h-[900px] rounded-2xl overflow-hidden border border-border shadow-2xl"}`}>
+    <div ref={containerRef} className={`flex flex-col bg-white ${isFullscreen ? "fixed inset-0 z-[9999] bg-[#f5f3ee]" : "h-[80vh] min-h-[500px] max-h-[900px] rounded-2xl overflow-hidden border border-[#e8e4dd] shadow-2xl"}`}>
       {/* Top bar */}
-      <div className={`flex items-center justify-between px-4 h-12 bg-[#222] border-b border-white/10 shrink-0 transition-opacity duration-300 ${isFullscreen && !showControls ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+      <div className={`flex items-center justify-between px-4 h-12 bg-white border-b border-[#e8e4dd] shrink-0 transition-opacity duration-300 ${isFullscreen && !showControls ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Presentation size={14} className="text-[#FDB600]" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-white/60">Estratégia</span>
+            <Presentation size={14} className="text-[#E81F76]" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#999]">Estratégia</span>
           </div>
-          <span className="text-[11px] text-white/30 ml-2 tabular-nums">{current + 1} / {slides.length}</span>
+          <span className="text-[11px] text-[#bbb] ml-2 tabular-nums">{current + 1} / {slides.length}</span>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={toggleFullscreen} className="text-white/50 hover:text-white p-2 rounded-lg hover:bg-white/10 transition" title={isFullscreen ? "Sair (F)" : "Fullscreen (F)"}>
+          <button onClick={toggleFullscreen} className="text-[#999] hover:text-[#333] p-2 rounded-lg hover:bg-[#f5f3ee] transition" title={isFullscreen ? "Sair (F)" : "Fullscreen (F)"}>
             {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
           </button>
           {onClose && !isFullscreen && (
-            <button onClick={onClose} className="text-white/50 hover:text-white p-2 rounded-lg hover:bg-white/10 transition">
+            <button onClick={onClose} className="text-[#999] hover:text-[#333] p-2 rounded-lg hover:bg-[#f5f3ee] transition">
               <X size={16} />
             </button>
           )}
@@ -333,22 +333,22 @@ export default function StrategySlideViewer({ content, clientName, date, onClose
       <div className="flex flex-1 min-h-0">
         {/* Thumbnail sidebar */}
         {!isFullscreen && (
-          <div className="w-48 bg-[#222] border-r border-white/10 overflow-y-auto shrink-0 py-3 px-2 space-y-1">
+          <div className="w-48 bg-[#faf8f5] border-r border-[#e8e4dd] overflow-y-auto shrink-0 py-3 px-2 space-y-1">
             {slides.map((slide, i) => (
               <button
                 key={slide.id}
                 onClick={() => setCurrent(i)}
                 className={`w-full rounded-lg overflow-hidden border-2 transition-all ${
                   i === current
-                    ? "border-[#FDB600] shadow-md shadow-[#FDB600]/10"
-                    : "border-transparent hover:border-white/20"
+                    ? "border-[#E81F76] shadow-md shadow-[#E81F76]/10"
+                    : "border-transparent hover:border-[#e8e4dd]"
                 }`}
               >
                 <div className={`aspect-video flex items-center justify-center px-2 ${
-                  i === current ? "bg-[#FDB600]/10" : "bg-white/5"
+                  i === current ? "bg-[#E81F76]/10" : "bg-white"
                 }`}>
                   <span className={`text-[10px] font-semibold leading-tight text-center ${
-                    i === current ? "text-[#FDB600]" : "text-white/40"
+                    i === current ? "text-[#E81F76]" : "text-[#999]"
                   }`}>
                     {slide.label}
                   </span>
@@ -359,7 +359,7 @@ export default function StrategySlideViewer({ content, clientName, date, onClose
         )}
 
         {/* Slide canvas */}
-        <div ref={wrapperRef} className="flex-1 relative overflow-hidden bg-[#111]">
+        <div ref={wrapperRef} className="flex-1 relative overflow-hidden bg-[#f0ede7]">
           {slides.length > 0 && (
             <div
               style={{
@@ -384,27 +384,27 @@ export default function StrategySlideViewer({ content, clientName, date, onClose
             <button
               onClick={goPrev}
               disabled={current === 0}
-              className="pointer-events-auto w-10 h-10 rounded-full bg-black/60 border border-white/10 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 disabled:opacity-20 disabled:pointer-events-none transition"
+              className="pointer-events-auto w-10 h-10 rounded-full bg-white/80 border border-[#e8e4dd] backdrop-blur-sm flex items-center justify-center text-[#999] hover:text-[#333] hover:bg-white disabled:opacity-20 disabled:pointer-events-none transition shadow-sm"
             >
               <ArrowLeft size={18} />
             </button>
             <button
               onClick={goNext}
               disabled={current === slides.length - 1}
-              className="pointer-events-auto w-10 h-10 rounded-full bg-black/60 border border-white/10 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 disabled:opacity-20 disabled:pointer-events-none transition"
+              className="pointer-events-auto w-10 h-10 rounded-full bg-white/80 border border-[#e8e4dd] backdrop-blur-sm flex items-center justify-center text-[#999] hover:text-[#333] hover:bg-white disabled:opacity-20 disabled:pointer-events-none transition shadow-sm"
             >
               <ArrowRight size={18} />
             </button>
           </div>
 
           {/* Progress dots */}
-          <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/60 backdrop-blur-sm border border-white/10 rounded-full px-3 py-2 transition-opacity duration-300 ${isFullscreen && !showControls ? "opacity-0" : "opacity-100"}`}>
+          <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 bg-white/80 backdrop-blur-sm border border-[#e8e4dd] rounded-full px-3 py-2 transition-opacity duration-300 shadow-sm ${isFullscreen && !showControls ? "opacity-0" : "opacity-100"}`}>
             {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
                 className={`rounded-full transition-all ${
-                  i === current ? "w-7 h-2 bg-[#FDB600]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
+                  i === current ? "w-7 h-2 bg-[#E81F76]" : "w-2 h-2 bg-[#ddd] hover:bg-[#bbb]"
                 }`}
               />
             ))}
