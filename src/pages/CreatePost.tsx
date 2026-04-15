@@ -84,6 +84,7 @@ function createEmptyEntry(): PostEntry {
 export default function CreatePost() {
   const { clients, analysts, addPost, addPosts, addAnalyst } = usePosts();
   const { logActivity } = useActivity();
+  const { user } = useAuth();
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
