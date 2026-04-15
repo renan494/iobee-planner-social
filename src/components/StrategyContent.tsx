@@ -81,7 +81,8 @@ function parseToSections(markdown: string): { intro: string; sections: Section[]
   let current: Section | null = null;
 
   for (const line of lines) {
-    const match = line.match(/^##\s+(?:(\d+)\.\s*)?(.+)/);
+    // Handle variations: "## 1. Title", "### ## 1. Title", "## **Title**"
+    const match = line.match(/^#{2,3}\s+(?:#{2}\s+)?(?:(\d+)\.\s*)?(.+)/);
     if (match) {
       if (current) sections.push(current);
       current = { title: match[2].trim(), content: "", number: match[1] || String(sections.length + 1) };
