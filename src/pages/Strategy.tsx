@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
 import StrategyContent from "@/components/StrategyContent";
 import StrategyDebateChat from "@/components/StrategyDebateChat";
+import StrategySlideViewer from "@/components/strategy-slides/StrategySlideViewer";
 
 type ClientData = {
   id: string;
@@ -288,26 +289,26 @@ export default function Strategy() {
         </CardContent>
       </Card>
 
-      {/* Streaming / Generated Content */}
-      {(generating || streamContent) && (
+      {/* Streaming Content */}
+      {generating && streamContent && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
-            {generating ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <span className="text-sm font-semibold text-foreground">Gerando estratégia...</span>
-              </>
-            ) : (
-              <>
-                <FileText className="h-5 w-5 text-primary" />
-                <span className="text-sm font-semibold text-foreground">Estratégia gerada</span>
-              </>
-            )}
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <span className="text-sm font-semibold text-foreground">Gerando estratégia...</span>
           </div>
           <StrategyContent content={streamContent} isStreaming={generating} />
-          {!generating && streamContent && selectedClient && (
-            <StrategyDebateChat strategyContent={streamContent} clientName={selectedClient.name} />
-          )}
+        </div>
+      )}
+
+      {/* Generated Content — Slide Viewer */}
+      {!generating && streamContent && selectedClient && (
+        <div className="mb-6">
+          <StrategySlideViewer
+            content={streamContent}
+            clientName={selectedClient.name}
+            onClose={() => setStreamContent("")}
+          />
+          <StrategyDebateChat strategyContent={streamContent} clientName={selectedClient.name} />
         </div>
       )}
 
@@ -355,7 +356,11 @@ export default function Strategy() {
                   </div>
                   {expandedId === s.id && (
                     <CardContent className="border-t pt-4">
-                      <StrategyContent content={s.content} />
+                      <StrategySlideViewer
+                        content={s.content}
+                        clientName={selectedClient?.name || ""}
+                        date={new Date(s.created_at).toLocaleDateString("pt-BR")}
+                      />
                       <StrategyDebateChat strategyContent={s.content} clientName={selectedClient?.name || ""} />
                     </CardContent>
                   )}
