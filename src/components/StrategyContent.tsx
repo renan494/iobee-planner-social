@@ -356,12 +356,27 @@ function detectTimeline(title: string, content: string): { isTimeline: boolean; 
   let current: { label: string; items: string[] } | null = null;
 
   for (const line of content.split("\n")) {
-    // Detect step headers: ### or **bold** lines
+    // Detect step headers: ### headings
     const h3Match = line.match(/^###\s+(.+)/);
+    // **bold entire line**
     const boldMatch = line.match(/^\s*\*\*(.{5,})\*\*\s*$/);
-    if (h3Match || boldMatch) {
+    // Bullet with bold prefix: - **Label:** rest  OR  * **Label:** rest
+    const bulletBoldMatch = line.match(/^\s*[\-*•]\s+\*\*(.{3,}?)\*\*:?\s*(.*)/);
+    // Non-bullet bold at start of line: **Label:** rest
+    const inlineBoldMatch = !bulletBoldMatch && line.match(/^\s*\*\*(.{5,}?)\*\*:?\s*(.*)/);
+
+    if (h3Match || boldMatch || inlineBoldMatch) {
       if (current) steps.push(current);
-      current = { label: (h3Match?.[1] || boldMatch?.[1] || "").replace(/\*+/g, "").trim(), items: [] };
+      const label = (h3Match?.[1] || boldMatch?.[1] || inlineBoldMatch?.[1] || "").replace(/\*+/g, "").replace(/:$/, "").trim();
+      current = { label, items: [] };
+      // If inline bold has trailing text, add it as first item
+      const trailing = inlineBoldMatch?.[2]?.trim();
+      if (trailing) current.items.push(trailing);
+    } else if (bulletBoldMatch && current) {
+      // Sub-step within current phase: **Semana 1:** description
+      const subLabel = bulletBoldMatch[1].replace(/\*+/g, "").replace(/:$/, "").trim();
+      const subDetail = bulletBoldMatch[2]?.trim() || "";
+      current.items.push(subDetail ? `${subLabel}: ${subDetail}` : subLabel);
     } else if (current) {
       const item = line.replace(/^[\s\-*•]+/, "").trim();
       if (item && !item.startsWith("|") && !item.startsWith("---")) {
