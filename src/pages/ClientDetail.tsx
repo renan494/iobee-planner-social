@@ -39,7 +39,7 @@ export default function ClientDetail() {
   const [editCompetitors, setEditCompetitors] = useState("");
   const [editDifferentials, setEditDifferentials] = useState("");
   const [editProductsServices, setEditProductsServices] = useState("");
-  const [editPostingFrequency, setEditPostingFrequency] = useState("");
+  
   const [editBrandValues, setEditBrandValues] = useState("");
   const [editCurrentSocialPresence, setEditCurrentSocialPresence] = useState("");
   const [editSaving, setEditSaving] = useState(false);
@@ -99,7 +99,7 @@ export default function ClientDetail() {
     setEditCompetitors(((data as any)?.competitors || []).join(", "));
     setEditDifferentials((data as any)?.differentials || "");
     setEditProductsServices((data as any)?.products_services || "");
-    setEditPostingFrequency((data as any)?.posting_frequency || "");
+    
     setEditBrandValues((data as any)?.brand_values || "");
     setEditCurrentSocialPresence((data as any)?.current_social_presence || "");
     setEditOpen(true);
@@ -120,7 +120,7 @@ export default function ClientDetail() {
         competitors: editCompetitors.trim() ? editCompetitors.split(",").map((c: string) => c.trim()).filter(Boolean) : null,
         differentials: editDifferentials.trim() || null,
         products_services: editProductsServices.trim() || null,
-        posting_frequency: editPostingFrequency.trim() || null,
+        
         brand_values: editBrandValues.trim() || null,
         current_social_presence: editCurrentSocialPresence.trim() || null,
       } as any).eq("name", clientName);
@@ -400,10 +400,6 @@ export default function ClientDetail() {
                 <div className="space-y-1.5">
                   <Label htmlFor="edit-competitors">Concorrentes (separados por vírgula)</Label>
                   <Input id="edit-competitors" placeholder="Ex: @marca1, @marca2, empresa X" value={editCompetitors} onChange={(e) => setEditCompetitors(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-frequency">Frequência de postagem desejada</Label>
-                  <Input id="edit-frequency" placeholder="Ex: 5x por semana, diário, 3x por semana..." value={editPostingFrequency} onChange={(e) => setEditPostingFrequency(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="edit-brand-values">Valores da marca</Label>

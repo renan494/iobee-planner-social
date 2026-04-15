@@ -30,7 +30,7 @@ export default function Clients() {
   const [newToneOfVoice, setNewToneOfVoice] = useState("");
   const [newDifferentials, setNewDifferentials] = useState("");
   const [newProductsServices, setNewProductsServices] = useState("");
-  const [newPostingFrequency, setNewPostingFrequency] = useState("");
+  
   const [newBrandValues, setNewBrandValues] = useState("");
   const [newCurrentSocialPresence, setNewCurrentSocialPresence] = useState("");
   const [newCompetitors, setNewCompetitors] = useState("");
@@ -118,7 +118,7 @@ export default function Clients() {
         toneOfVoice: newToneOfVoice.trim() || undefined,
         differentials: newDifferentials.trim() || undefined,
         productsServices: newProductsServices.trim() || undefined,
-        postingFrequency: newPostingFrequency.trim() || undefined,
+        
         brandValues: newBrandValues.trim() || undefined,
         currentSocialPresence: newCurrentSocialPresence.trim() || undefined,
         competitors: newCompetitors.trim() ? newCompetitors.split(",").map(c => c.trim()).filter(Boolean) : undefined,
@@ -135,7 +135,7 @@ export default function Clients() {
       setNewToneOfVoice("");
       setNewDifferentials("");
       setNewProductsServices("");
-      setNewPostingFrequency("");
+      
       setNewBrandValues("");
       setNewCurrentSocialPresence("");
       setNewCompetitors("");
@@ -282,10 +282,6 @@ export default function Clients() {
             <div className="space-y-2">
               <Label htmlFor="current-social-presence">Presença atual nas redes</Label>
               <Textarea id="current-social-presence" placeholder="Descreva os canais atuais, número de seguidores, frequência..." value={newCurrentSocialPresence} onChange={(e) => setNewCurrentSocialPresence(e.target.value)} rows={2} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="posting-frequency">Frequência de postagem desejada</Label>
-              <Input id="posting-frequency" placeholder="Ex: 5x por semana, 3 reels + 2 carrosséis..." value={newPostingFrequency} onChange={(e) => setNewPostingFrequency(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="competitors">Concorrentes (separados por vírgula)</Label>
