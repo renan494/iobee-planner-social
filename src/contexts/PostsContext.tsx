@@ -16,7 +16,7 @@ interface PostsContextType {
   addAnalyst: (name: string) => Promise<void>;
   updateAnalyst: (oldName: string, newName: string) => Promise<void>;
   removeAnalyst: (name: string) => Promise<void>;
-  addClient: (data: { name: string; instagramHandle?: string; facebookUrl?: string; linkedinUrl?: string; gmbUrl?: string; objective?: string; avatarUrl?: string }) => Promise<void>;
+  addClient: (data: ClientFormData) => Promise<void>;
   deleteClient: (name: string) => Promise<void>;
 }
 
@@ -174,7 +174,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (!error) await fetchAnalysts();
   }, [fetchAnalysts]);
 
-  const addClient = useCallback(async (data: { name: string; instagramHandle?: string; facebookUrl?: string; linkedinUrl?: string; gmbUrl?: string; objective?: string; avatarUrl?: string }) => {
+  const addClient = useCallback(async (data: ClientFormData) => {
     const { error } = await supabase.from("clients").insert({
       name: data.name,
       instagram_handle: data.instagramHandle || null,
@@ -183,6 +183,15 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       gmb_url: data.gmbUrl || null,
       objective: data.objective || null,
       avatar_url: data.avatarUrl || null,
+      niche: data.niche || null,
+      target_audience: data.targetAudience || null,
+      tone_of_voice: data.toneOfVoice || null,
+      differentials: data.differentials || null,
+      products_services: data.productsServices || null,
+      posting_frequency: data.postingFrequency || null,
+      brand_values: data.brandValues || null,
+      current_social_presence: data.currentSocialPresence || null,
+      competitors: data.competitors?.length ? data.competitors : null,
     } as any);
     if (error) throw error;
     await fetchClients();
