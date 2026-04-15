@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, User, Plus } from "lucide-react";
+import { Users, User, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -15,7 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Clients() {
-  const { posts, clients, addClient } = usePosts();
+  const { posts, clients, addClient, deleteClient } = usePosts();
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClientName, setNewClientName] = useState("");

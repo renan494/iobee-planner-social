@@ -17,6 +17,7 @@ interface PostsContextType {
   updateAnalyst: (oldName: string, newName: string) => Promise<void>;
   removeAnalyst: (name: string) => Promise<void>;
   addClient: (data: { name: string; instagramHandle?: string; facebookUrl?: string; linkedinUrl?: string; gmbUrl?: string; objective?: string; avatarUrl?: string }) => Promise<void>;
+  deleteClient: (name: string) => Promise<void>;
 }
 
 const PostsContext = createContext<PostsContextType | null>(null);
@@ -187,8 +188,14 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     await fetchClients();
   }, [fetchClients]);
 
+  const deleteClient = useCallback(async (name: string) => {
+    const { error } = await supabase.from("clients").delete().eq("name", name);
+    if (error) throw error;
+    await fetchClients();
+  }, [fetchClients]);
+
   return (
-    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, updatePostArt, updatePost, deletePost, addAnalyst, updateAnalyst, removeAnalyst, addClient }}>
+    <PostsContext.Provider value={{ posts, clients, analysts, loading, addPost, addPosts, updatePostDate, updatePostArt, updatePost, deletePost, addAnalyst, updateAnalyst, removeAnalyst, addClient, deleteClient }}>
       {children}
     </PostsContext.Provider>
   );
