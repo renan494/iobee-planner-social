@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
 import StrategyContent from "@/components/StrategyContent";
 import StrategyDebateChat from "@/components/StrategyDebateChat";
+import StrategySlideViewer from "@/components/strategy-slides/StrategySlideViewer";
 
 type ClientData = {
   id: string;
