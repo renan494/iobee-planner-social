@@ -260,7 +260,7 @@ export default function CreatePost() {
       const ea = entry.analyst === "__new__" ? entry.newAnalyst.trim() : entry.analyst;
 
       const draftData = {
-        user_id: "anonymous",
+        user_id: user?.id || "",
         client: ec || null,
         analyst: ea || null,
         title: entry.title.trim() || null,
