@@ -25,6 +25,15 @@ export default function Clients() {
   const [newLinkedinUrl, setNewLinkedinUrl] = useState("");
   const [newGmbUrl, setNewGmbUrl] = useState("");
   const [newObjective, setNewObjective] = useState("");
+  const [newNiche, setNewNiche] = useState("");
+  const [newTargetAudience, setNewTargetAudience] = useState("");
+  const [newToneOfVoice, setNewToneOfVoice] = useState("");
+  const [newDifferentials, setNewDifferentials] = useState("");
+  const [newProductsServices, setNewProductsServices] = useState("");
+  const [newPostingFrequency, setNewPostingFrequency] = useState("");
+  const [newBrandValues, setNewBrandValues] = useState("");
+  const [newCurrentSocialPresence, setNewCurrentSocialPresence] = useState("");
+  const [newCompetitors, setNewCompetitors] = useState("");
   const [uploading, setUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -104,6 +113,15 @@ export default function Clients() {
         gmbUrl: newGmbUrl.trim() || undefined,
         objective: newObjective.trim() || undefined,
         avatarUrl: avatarPreview || undefined,
+        niche: newNiche.trim() || undefined,
+        targetAudience: newTargetAudience.trim() || undefined,
+        toneOfVoice: newToneOfVoice.trim() || undefined,
+        differentials: newDifferentials.trim() || undefined,
+        productsServices: newProductsServices.trim() || undefined,
+        postingFrequency: newPostingFrequency.trim() || undefined,
+        brandValues: newBrandValues.trim() || undefined,
+        currentSocialPresence: newCurrentSocialPresence.trim() || undefined,
+        competitors: newCompetitors.trim() ? newCompetitors.split(",").map(c => c.trim()).filter(Boolean) : undefined,
       });
       toast({ title: "Cliente cadastrado", description: `"${trimmed}" foi adicionado com sucesso.` });
       setNewClientName("");
@@ -112,6 +130,15 @@ export default function Clients() {
       setNewLinkedinUrl("");
       setNewGmbUrl("");
       setNewObjective("");
+      setNewNiche("");
+      setNewTargetAudience("");
+      setNewToneOfVoice("");
+      setNewDifferentials("");
+      setNewProductsServices("");
+      setNewPostingFrequency("");
+      setNewBrandValues("");
+      setNewCurrentSocialPresence("");
+      setNewCompetitors("");
       setAvatarPreview(null);
       setDialogOpen(false);
     } catch (err) {
@@ -188,11 +215,12 @@ export default function Clients() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Cadastrar Novo Cliente</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Avatar */}
             <div className="flex items-center gap-4">
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               <button
@@ -210,61 +238,77 @@ export default function Clients() {
                 {uploading ? "Enviando..." : "Clique para adicionar foto de perfil"}
               </div>
             </div>
+
+            {/* Dados Básicos */}
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-2">Dados Básicos</p>
             <div className="space-y-2">
               <Label htmlFor="client-name">Nome *</Label>
-              <Input
-                id="client-name"
-                placeholder="Ex: iOBEE"
-                value={newClientName}
-                onChange={(e) => setNewClientName(e.target.value)}
-                autoFocus
-              />
+              <Input id="client-name" placeholder="Ex: iOBEE" value={newClientName} onChange={(e) => setNewClientName(e.target.value)} autoFocus />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="instagram">@ do Instagram</Label>
-              <Input
-                id="instagram"
-                placeholder="@iobee.digital"
-                value={newInstagram}
-                onChange={(e) => setNewInstagram(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="facebook-url">URL do Facebook</Label>
-              <Input
-                id="facebook-url"
-                placeholder="https://facebook.com/iobee"
-                value={newFacebookUrl}
-                onChange={(e) => setNewFacebookUrl(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="linkedin-url">URL do LinkedIn</Label>
-              <Input
-                id="linkedin-url"
-                placeholder="https://linkedin.com/company/iobee"
-                value={newLinkedinUrl}
-                onChange={(e) => setNewLinkedinUrl(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="gmb-url">URL do Google Meu Negócio</Label>
-              <Input
-                id="gmb-url"
-                placeholder="https://g.page/iobee"
-                value={newGmbUrl}
-                onChange={(e) => setNewGmbUrl(e.target.value)}
-              />
+              <Label htmlFor="niche">Nicho / Segmento</Label>
+              <Input id="niche" placeholder="Ex: Marketing Digital, Gastronomia, Moda..." value={newNiche} onChange={(e) => setNewNiche(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="objective">Objetivo</Label>
-              <Textarea
-                id="objective"
-                placeholder="Descreva o objetivo do cliente..."
-                value={newObjective}
-                onChange={(e) => setNewObjective(e.target.value)}
-                rows={3}
-              />
+              <Textarea id="objective" placeholder="Ex: Aumentar awareness e gerar leads qualificados..." value={newObjective} onChange={(e) => setNewObjective(e.target.value)} rows={2} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="products-services">Produtos / Serviços</Label>
+              <Textarea id="products-services" placeholder="Descreva os principais produtos ou serviços do cliente..." value={newProductsServices} onChange={(e) => setNewProductsServices(e.target.value)} rows={2} />
+            </div>
+
+            {/* Público e Posicionamento */}
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-2">Público e Posicionamento</p>
+            <div className="space-y-2">
+              <Label htmlFor="target-audience">Público-alvo</Label>
+              <Textarea id="target-audience" placeholder="Ex: Mulheres 25-45 anos, classe B, interessadas em bem-estar..." value={newTargetAudience} onChange={(e) => setNewTargetAudience(e.target.value)} rows={2} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tone-of-voice">Tom de Voz</Label>
+              <Input id="tone-of-voice" placeholder="Ex: Profissional e acolhedor, Jovem e descontraído..." value={newToneOfVoice} onChange={(e) => setNewToneOfVoice(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="brand-values">Valores da Marca</Label>
+              <Input id="brand-values" placeholder="Ex: Inovação, Transparência, Sustentabilidade..." value={newBrandValues} onChange={(e) => setNewBrandValues(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="differentials">Diferenciais</Label>
+              <Textarea id="differentials" placeholder="O que diferencia este cliente dos concorrentes..." value={newDifferentials} onChange={(e) => setNewDifferentials(e.target.value)} rows={2} />
+            </div>
+
+            {/* Presença Digital */}
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-2">Presença Digital</p>
+            <div className="space-y-2">
+              <Label htmlFor="current-social-presence">Presença atual nas redes</Label>
+              <Textarea id="current-social-presence" placeholder="Descreva os canais atuais, número de seguidores, frequência..." value={newCurrentSocialPresence} onChange={(e) => setNewCurrentSocialPresence(e.target.value)} rows={2} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="posting-frequency">Frequência de postagem desejada</Label>
+              <Input id="posting-frequency" placeholder="Ex: 5x por semana, 3 reels + 2 carrosséis..." value={newPostingFrequency} onChange={(e) => setNewPostingFrequency(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="competitors">Concorrentes (separados por vírgula)</Label>
+              <Input id="competitors" placeholder="Ex: @concorrente1, @concorrente2, @concorrente3" value={newCompetitors} onChange={(e) => setNewCompetitors(e.target.value)} />
+            </div>
+
+            {/* Redes Sociais */}
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-2">Links das Redes</p>
+            <div className="space-y-2">
+              <Label htmlFor="instagram">@ do Instagram</Label>
+              <Input id="instagram" placeholder="@iobee.digital" value={newInstagram} onChange={(e) => setNewInstagram(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="facebook-url">URL do Facebook</Label>
+              <Input id="facebook-url" placeholder="https://facebook.com/iobee" value={newFacebookUrl} onChange={(e) => setNewFacebookUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="linkedin-url">URL do LinkedIn</Label>
+              <Input id="linkedin-url" placeholder="https://linkedin.com/company/iobee" value={newLinkedinUrl} onChange={(e) => setNewLinkedinUrl(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="gmb-url">URL do Google Meu Negócio</Label>
+              <Input id="gmb-url" placeholder="https://g.page/iobee" value={newGmbUrl} onChange={(e) => setNewGmbUrl(e.target.value)} />
             </div>
           </div>
           <DialogFooter>
