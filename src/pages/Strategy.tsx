@@ -289,26 +289,26 @@ export default function Strategy() {
         </CardContent>
       </Card>
 
-      {/* Streaming / Generated Content */}
-      {(generating || streamContent) && (
+      {/* Streaming Content */}
+      {generating && streamContent && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
-            {generating ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <span className="text-sm font-semibold text-foreground">Gerando estratégia...</span>
-              </>
-            ) : (
-              <>
-                <FileText className="h-5 w-5 text-primary" />
-                <span className="text-sm font-semibold text-foreground">Estratégia gerada</span>
-              </>
-            )}
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <span className="text-sm font-semibold text-foreground">Gerando estratégia...</span>
           </div>
           <StrategyContent content={streamContent} isStreaming={generating} />
-          {!generating && streamContent && selectedClient && (
-            <StrategyDebateChat strategyContent={streamContent} clientName={selectedClient.name} />
-          )}
+        </div>
+      )}
+
+      {/* Generated Content — Slide Viewer */}
+      {!generating && streamContent && selectedClient && (
+        <div className="mb-6">
+          <StrategySlideViewer
+            content={streamContent}
+            clientName={selectedClient.name}
+            onClose={() => setStreamContent("")}
+          />
+          <StrategyDebateChat strategyContent={streamContent} clientName={selectedClient.name} />
         </div>
       )}
 
