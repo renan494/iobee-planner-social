@@ -307,7 +307,7 @@ export default function StrategySlideViewer({ content, clientName, date, onClose
   }, [isFullscreen]);
 
   return (
-    <div ref={containerRef} className={`flex flex-col bg-[#1a1a1a] ${isFullscreen ? "fixed inset-0 z-[9999]" : "h-[700px] rounded-2xl overflow-hidden border border-border shadow-2xl"}`}>
+    <div ref={containerRef} className={`flex flex-col bg-[#1a1a1a] ${isFullscreen ? "fixed inset-0 z-[9999]" : "h-[80vh] min-h-[500px] max-h-[900px] rounded-2xl overflow-hidden border border-border shadow-2xl"}`}>
       {/* Top bar */}
       <div className={`flex items-center justify-between px-4 h-12 bg-[#222] border-b border-white/10 shrink-0 transition-opacity duration-300 ${isFullscreen && !showControls ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
         <div className="flex items-center gap-3">
