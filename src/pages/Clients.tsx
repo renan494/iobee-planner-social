@@ -25,6 +25,15 @@ export default function Clients() {
   const [newLinkedinUrl, setNewLinkedinUrl] = useState("");
   const [newGmbUrl, setNewGmbUrl] = useState("");
   const [newObjective, setNewObjective] = useState("");
+  const [newNiche, setNewNiche] = useState("");
+  const [newTargetAudience, setNewTargetAudience] = useState("");
+  const [newToneOfVoice, setNewToneOfVoice] = useState("");
+  const [newDifferentials, setNewDifferentials] = useState("");
+  const [newProductsServices, setNewProductsServices] = useState("");
+  const [newPostingFrequency, setNewPostingFrequency] = useState("");
+  const [newBrandValues, setNewBrandValues] = useState("");
+  const [newCurrentSocialPresence, setNewCurrentSocialPresence] = useState("");
+  const [newCompetitors, setNewCompetitors] = useState("");
   const [uploading, setUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -104,6 +113,15 @@ export default function Clients() {
         gmbUrl: newGmbUrl.trim() || undefined,
         objective: newObjective.trim() || undefined,
         avatarUrl: avatarPreview || undefined,
+        niche: newNiche.trim() || undefined,
+        targetAudience: newTargetAudience.trim() || undefined,
+        toneOfVoice: newToneOfVoice.trim() || undefined,
+        differentials: newDifferentials.trim() || undefined,
+        productsServices: newProductsServices.trim() || undefined,
+        postingFrequency: newPostingFrequency.trim() || undefined,
+        brandValues: newBrandValues.trim() || undefined,
+        currentSocialPresence: newCurrentSocialPresence.trim() || undefined,
+        competitors: newCompetitors.trim() ? newCompetitors.split(",").map(c => c.trim()).filter(Boolean) : undefined,
       });
       toast({ title: "Cliente cadastrado", description: `"${trimmed}" foi adicionado com sucesso.` });
       setNewClientName("");
@@ -112,6 +130,15 @@ export default function Clients() {
       setNewLinkedinUrl("");
       setNewGmbUrl("");
       setNewObjective("");
+      setNewNiche("");
+      setNewTargetAudience("");
+      setNewToneOfVoice("");
+      setNewDifferentials("");
+      setNewProductsServices("");
+      setNewPostingFrequency("");
+      setNewBrandValues("");
+      setNewCurrentSocialPresence("");
+      setNewCompetitors("");
       setAvatarPreview(null);
       setDialogOpen(false);
     } catch (err) {
