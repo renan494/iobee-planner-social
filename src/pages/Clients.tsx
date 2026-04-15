@@ -151,10 +151,18 @@ export default function Clients() {
                   <User className="h-5 w-5 text-muted-foreground" />
                 </AvatarFallback>
               </Avatar>
-              <div>
+              <div className="flex-1 min-w-0">
                 <CardTitle className="text-base">{c.name}</CardTitle>
                 <p className="text-xs text-muted-foreground">{c.total} posts</p>
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+                onClick={(e) => { e.stopPropagation(); setDeleteTarget(c.name); }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex flex-wrap gap-1.5">
