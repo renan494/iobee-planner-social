@@ -55,6 +55,19 @@ export default function Clients() {
   }, [clients]);
 
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
+  const handleDeleteClient = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteClient(deleteTarget);
+      toast({ title: "Cliente removido", description: `"${deleteTarget}" foi excluído.` });
+    } catch {
+      toast({ title: "Erro", description: "Não foi possível excluir o cliente.", variant: "destructive" });
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
