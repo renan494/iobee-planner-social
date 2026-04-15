@@ -356,7 +356,11 @@ export default function Strategy() {
                   </div>
                   {expandedId === s.id && (
                     <CardContent className="border-t pt-4">
-                      <StrategyContent content={s.content} />
+                      <StrategySlideViewer
+                        content={s.content}
+                        clientName={selectedClient?.name || ""}
+                        date={new Date(s.created_at).toLocaleDateString("pt-BR")}
+                      />
                       <StrategyDebateChat strategyContent={s.content} clientName={selectedClient?.name || ""} />
                     </CardContent>
                   )}
