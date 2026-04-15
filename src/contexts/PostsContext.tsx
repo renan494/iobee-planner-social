@@ -2,6 +2,25 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import { supabase } from "@/integrations/supabase/client";
 import { getClients, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
 
+export interface ClientFormData {
+  name: string;
+  instagramHandle?: string;
+  facebookUrl?: string;
+  linkedinUrl?: string;
+  gmbUrl?: string;
+  objective?: string;
+  avatarUrl?: string;
+  niche?: string;
+  targetAudience?: string;
+  toneOfVoice?: string;
+  differentials?: string;
+  productsServices?: string;
+  postingFrequency?: string;
+  brandValues?: string;
+  currentSocialPresence?: string;
+  competitors?: string[];
+}
+
 interface PostsContextType {
   posts: Post[];
   clients: string[];
