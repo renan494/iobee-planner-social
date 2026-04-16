@@ -1,0 +1,308 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+function errorResponse(message: string, status = 500, code?: string) {
+  return new Response(JSON.stringify({ error: message, code }), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+function getYouTubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([\w-]{11})/);
+  return m ? m[1] : null;
+}
+
+function isMetaAdLibrary(url: string): boolean {
+  return /(?:facebook|fb)\.com\/ads\/library/i.test(url);
+}
+
+function isInstagramUrl(url: string): boolean {
+  return /(?:instagram\.com|instagr\.am)\/(p|reel|reels|tv)\//i.test(url);
+}
+
+async function fetchWithFirecrawl(url: string, kind: "meta" | "instagram"): Promise<{ text: string | null; error?: string }> {
+  const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
+  if (!FIRECRAWL_API_KEY) return { text: null, error: "Firecrawl não configurado." };
+
+  try {
+    const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ url, formats: ["markdown"], onlyMainContent: true, waitFor: 4000 }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      console.error("Firecrawl error:", res.status, errText);
+      if (res.status === 402) return { text: null, error: "Créditos do Firecrawl esgotados." };
+      return { text: null, error: `Firecrawl retornou ${res.status}` };
+    }
+
+    const data = await res.json();
+    const markdown = data?.data?.markdown || data?.markdown || "";
+    if (!markdown || markdown.length < 50) return { text: null, error: "Não foi possível extrair conteúdo." };
+
+    let adText = markdown;
+
+    if (kind === "meta") {
+      const sponsoredMatch = adText.match(/\*\*\s*(Sponsored|Patrocinado)\s*\*\*/i);
+      if (sponsoredMatch && sponsoredMatch.index !== undefined) {
+        adText = adText.slice(sponsoredMatch.index + sponsoredMatch[0].length);
+      } else {
+        const libIdMatch = adText.match(/Library ID:\s*\d+[\s\S]{0,500}?\n\n/i);
+        if (libIdMatch && libIdMatch.index !== undefined) {
+          adText = adText.slice(libIdMatch.index + libIdMatch[0].length);
+        }
+      }
+      const closeIdx = adText.search(/\n+\s*Close\s*$/im);
+      if (closeIdx > 0) adText = adText.slice(0, closeIdx);
+    }
+
+    if (kind === "instagram") {
+      // Strip Instagram chrome: login prompts, "More from", followers, etc.
+      adText = adText
+        .replace(/Log in[\s\S]*?Continue/gi, "")
+        .replace(/Sign up[\s\S]*?account/gi, "")
+        .replace(/See translation/gi, "")
+        .replace(/View all \d+ comments?/gi, "")
+        .replace(/More from \w+/gi, "");
+    }
+
+    const cleaned = adText
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      .replace(/https?:\/\/\S+/g, "")
+      .replace(/Sorry, we're having trouble playing this video\.?/gi, "")
+      .replace(/Learn more/gi, "")
+      .replace(/\*\*/g, "")
+      .replace(/\\\\/g, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/[ \t]+/g, " ")
+      .trim();
+
+    if (cleaned.length < 30) return { text: null, error: "Conteúdo insuficiente — pode ser apenas mídia visual. Cole a transcrição manualmente." };
+    return { text: cleaned };
+  } catch (e: any) {
+    console.error("Firecrawl exception:", e);
+    return { text: null, error: e?.message || "Erro ao chamar Firecrawl" };
+  }
+}
+
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#10;/g, " ")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)))
+    .trim();
+}
+
+function parseTimedTextXML(xml: string): string {
+  const matches = xml.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g);
+  const lines: string[] = [];
+  for (const m of matches) {
+    const decoded = decodeEntities(m[1].replace(/<[^>]+>/g, ""));
+    if (decoded) lines.push(decoded);
+  }
+  return lines.join(" ").replace(/\s+/g, " ").trim();
+}
+
+async function tryTimedTextDirect(videoId: string): Promise<string | null> {
+  for (const lang of ["pt-BR", "pt", "en", "es"]) {
+    for (const kind of ["", "&kind=asr"]) {
+      try {
+        const url = `https://www.youtube.com/api/timedtext?v=${videoId}&lang=${lang}${kind}`;
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const xml = await res.text();
+        if (!xml || xml.length < 50) continue;
+        const transcript = parseTimedTextXML(xml);
+        if (transcript.length > 30) return transcript;
+      } catch {}
+    }
+  }
+  return null;
+}
+
+async function fetchYouTubeTranscript(videoId: string): Promise<string | null> {
+  try {
+    const watchRes = await fetch(`https://www.youtube.com/watch?v=${videoId}&hl=pt-BR`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+      },
+    });
+    if (watchRes.ok) {
+      const html = await watchRes.text();
+      const match = html.match(/"captionTracks":(\[.*?\])/);
+      if (match) {
+        try {
+          const tracks = JSON.parse(match[1]);
+          if (tracks.length) {
+            const track =
+              tracks.find((t: any) => t.languageCode?.startsWith("pt")) ||
+              tracks.find((t: any) => t.languageCode?.startsWith("en")) ||
+              tracks[0];
+            if (track?.baseUrl) {
+              const baseUrl = track.baseUrl.replace(/\\u0026/g, "&");
+              const captionRes = await fetch(baseUrl);
+              if (captionRes.ok) {
+                const xml = await captionRes.text();
+                const transcript = parseTimedTextXML(xml);
+                if (transcript.length > 30) return transcript;
+              }
+            }
+          }
+        } catch (e) { console.error("captionTracks parse error:", e); }
+      }
+    }
+  } catch (e) { console.error("watch page fetch error:", e); }
+  return await tryTimedTextDirect(videoId);
+}
+
+async function callAI(messages: Array<{ role: string; content: string }>, temperature = 0.7) {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY não configurada");
+
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: "google/gemini-2.5-flash", messages, temperature }),
+  });
+
+  if (!response.ok) {
+    if (response.status === 429) throw { status: 429, message: "Limite de requisições atingido." };
+    if (response.status === 402) throw { status: 402, message: "Créditos da IA esgotados." };
+    throw new Error("Erro na geração com IA");
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || "";
+}
+
+function buildAnalysisPrompt(transcript: string, contextoExtra: string) {
+  return `Você é um copywriter sênior com cabeça de social media strategist. Você analisa criativos de referência (Reels, posts virais, anúncios da Meta, vídeos do YouTube) e gera VARIAÇÕES novas mantendo a essência da mensagem mas com nova roupagem — pronto pra postar nas redes sociais brasileiras.
+
+## TRANSCRIÇÃO / COPY ORIGINAL:
+"""
+${transcript.slice(0, 6000)}
+"""
+
+${contextoExtra ? `## CONTEXTO ADICIONAL:\n${contextoExtra}\n` : ""}
+
+## SUA TAREFA — ENGENHARIA REVERSA:
+
+### Etapa 1: ANÁLISE
+Identifique no original:
+- **Promessa central**: o que está sendo prometido
+- **Público-alvo**: para quem está falando
+- **Hook usado**: o gancho dos primeiros segundos (o que parou o scroll)
+- **Estrutura narrativa**: como a mensagem se desenvolve
+- **CTA**: a chamada para ação final
+- **Tom de voz**: formal, casual, agressivo, consultivo, divertido, etc.
+
+### Etapa 2: NOVO ROTEIRO
+Reescreva do zero um roteiro NOVO mantendo a essência da mensagem central, mas com:
+- **Novo hook** (obrigatoriamente diferente do original — pense em parar o scroll no feed)
+- **Nova estrutura narrativa** (não copie a sequência do original)
+- **Novo CTA** (mesma intenção, palavras diferentes, contextualizado para social)
+
+### Etapa 3: 3 HOOKS ALTERNATIVOS PARA TESTE A/B
+Crie 3 hooks ADICIONAIS, cada um com um ângulo psicológico DIFERENTE entre si (ex: pergunta provocativa, declaração polêmica, dado surpreendente, história em 1ª pessoa, contradição, antes/depois). Cada hook deve ter no MÁXIMO 2 frases curtas — pronto pra ser falado nos primeiros 3 segundos do vídeo.
+
+NÃO use frameworks rígidos. Construa o roteiro de forma natural, fluida, como um copywriter que vive no Instagram escreveria — priorizando ritmo, clareza e conexão.
+
+## FORMATO DE RESPOSTA (JSON):
+{
+  "analise": {
+    "promessa": "...",
+    "publico": "...",
+    "hook_original": "...",
+    "estrutura": "...",
+    "cta_original": "...",
+    "tom": "..."
+  },
+  "variacao": {
+    "novo_hook": "...",
+    "roteiro": "Roteiro completo do novo vídeo, formatado em parágrafos curtos como falaria na câmera. Use quebras de linha (\\n\\n) entre os blocos.",
+    "novo_cta": "...",
+    "duracao_estimada": "Ex: 30-45 segundos",
+    "observacoes": "Dicas de gravação, entonação, cortes ou b-roll sugeridos"
+  },
+  "hooks_alternativos": [
+    { "hook": "...", "angulo": "Ex: Pergunta provocativa" },
+    { "hook": "...", "angulo": "Ex: Dado surpreendente" },
+    { "hook": "...", "angulo": "Ex: História em 1ª pessoa" }
+  ]
+}
+
+REGRAS:
+- Português do Brasil, linguagem natural e falada
+- Roteiro pronto pra gravar (sem marcações técnicas de câmera)
+- Mantenha a essência da promessa, mude completamente a embalagem
+- Sem clichês, sem frases genéricas
+- Responda APENAS o JSON, sem markdown.`;
+}
+
+function parseJSON(content: string) {
+  const cleaned = content.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+  return JSON.parse(cleaned);
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  try {
+    const body = await req.json();
+    const { action, url, transcript, contexto_extra } = body;
+
+    if (action === "extract") {
+      if (!url || typeof url !== "string") return errorResponse("URL é obrigatória", 400);
+
+      if (isMetaAdLibrary(url)) {
+        const { text, error } = await fetchWithFirecrawl(url, "meta");
+        if (!text) return errorResponse(error || "Não foi possível ler este anúncio.", 422, "META_SCRAPE_FAILED");
+        return new Response(JSON.stringify({ transcript: text, source: "meta_ad_library" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      if (isInstagramUrl(url)) {
+        const { text, error } = await fetchWithFirecrawl(url, "instagram");
+        if (!text) return errorResponse(error || "Não foi possível ler este post do Instagram. Cole a legenda manualmente.", 422, "INSTAGRAM_SCRAPE_FAILED");
+        return new Response(JSON.stringify({ transcript: text, source: "instagram" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      const ytId = getYouTubeId(url);
+      if (!ytId) return errorResponse("URL não suportada. Use Meta Ad Library, Instagram (post/reel) ou YouTube — ou cole o texto manualmente.", 422, "UNSUPPORTED_PLATFORM");
+
+      const transcriptText = await fetchYouTubeTranscript(ytId);
+      if (!transcriptText) return errorResponse("Não foi possível extrair a legenda deste vídeo. Cole a transcrição manualmente.", 422, "NO_CAPTIONS");
+
+      return new Response(JSON.stringify({ transcript: transcriptText, source: "youtube" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    if (action === "generate") {
+      if (!transcript || typeof transcript !== "string" || transcript.trim().length < 30) return errorResponse("Transcrição muito curta ou ausente.", 400);
+
+      const prompt = buildAnalysisPrompt(transcript, contexto_extra || "");
+      const content = await callAI([
+        { role: "system", content: "Você é um copywriter sênior com cabeça de social media. Responda APENAS em JSON válido." },
+        { role: "user", content: prompt },
+      ]);
+
+      const result = parseJSON(content);
+      return new Response(JSON.stringify({ result }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    return errorResponse("Action inválida. Use 'extract' ou 'generate'.", 400);
+  } catch (error: any) {
+    console.error("reverse-engineer-copy error:", error);
+    const status = error?.status || 500;
+    const message = error?.message || (error instanceof Error ? error.message : "Erro desconhecido");
+    return errorResponse(message, status);
+  }
+});
