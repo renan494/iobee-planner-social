@@ -17,6 +17,8 @@ import { PostBadge } from "@/components/PostBadge";
 import { toast } from "sonner";
 import { ClientReportPreview } from "@/components/ClientReportPreview";
 import { PostDetailModal } from "@/components/PostDetailModal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClientCopyHistory } from "@/components/ClientCopyHistory";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
@@ -211,141 +213,159 @@ export default function ClientDetail() {
             ))}
           </div>
 
-          {/* Posts table */}
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Título</TableHead>
-                    <TableHead>Headline</TableHead>
-                    <TableHead>Formato</TableHead>
-                    <TableHead>Funil</TableHead>
-                    <TableHead>Canais</TableHead>
-                    <TableHead>Analista</TableHead>
-                    <TableHead className="w-20"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {clientPosts.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
-                        Nenhum post encontrado para este cliente.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    clientPosts.map((post) => (
-                      <React.Fragment key={post.id}>
-                      <TableRow className="group cursor-pointer hover:bg-[hsl(var(--primary)/0.08)] transition-colors" onClick={() => setSelectedPost(post)}>
-                        <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
-                        <TableCell className="font-medium">{post.title}</TableCell>
-                        <TableCell className="text-muted-foreground">{post.headline}</TableCell>
-                        <TableCell><PostBadge format={post.format} /></TableCell>
-                        <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {(post.channels || []).length > 0 ? (
-                              (post.channels || []).map((ch) => (
-                                <span key={ch} className="rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{ch}</span>
-                              ))
-                            ) : (
-                              <span className="text-xs text-muted-foreground/50">—</span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>{post.analyst}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-0.5">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
-                              onClick={(e) => { e.stopPropagation(); setPreviewPost(previewPost?.id === post.id ? null : post); }}
-                              title="Visualizar post"
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary"
-                              onClick={(e) => { e.stopPropagation(); setSelectedPost(post); }}
-                              title="Editar post"
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        </TableCell>
+          {/* Tabs: Posts / Copies / Engenharia Reversa */}
+          <Tabs defaultValue="posts" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="posts">Posts ({clientPosts.length})</TabsTrigger>
+              <TabsTrigger value="copies">Copies por framework</TabsTrigger>
+              <TabsTrigger value="reverse">Engenharia reversa</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="posts">
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Título</TableHead>
+                        <TableHead>Headline</TableHead>
+                        <TableHead>Formato</TableHead>
+                        <TableHead>Funil</TableHead>
+                        <TableHead>Canais</TableHead>
+                        <TableHead>Analista</TableHead>
+                        <TableHead className="w-20"></TableHead>
                       </TableRow>
-                      {previewPost?.id === post.id && (
+                    </TableHeader>
+                    <TableBody>
+                      {clientPosts.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={8} className="p-0 border-t-0">
-                            <div className="bg-muted/30 border-t border-b border-border p-6 animate-in slide-in-from-top-2 duration-200">
-                              <div className="flex gap-6">
-                                {/* Phone mockup */}
-                                <div className="shrink-0">
-                                  <div className="relative w-[160px] rounded-[1.5rem] border-[5px] border-foreground/80 bg-background shadow-xl overflow-hidden">
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-foreground/80 rounded-b-lg z-10" />
-                                    <div className="aspect-[9/16] bg-muted flex items-center justify-center overflow-hidden">
-                                      {(post.format === "carousel" && post.artUrls && post.artUrls.length > 0) ? (
-                                        <img src={post.artUrls[0]} alt={post.title} className="w-full h-full object-cover" />
-                                      ) : post.artUrl ? (
-                                        <img src={post.artUrl} alt={post.title} className="w-full h-full object-cover" />
-                                      ) : (
-                                        <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                                          <FileText className="h-6 w-6" />
-                                          <span className="text-[10px]">Sem arte</span>
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div className="h-4 flex items-center justify-center">
-                                      <div className="w-10 h-1 rounded-full bg-foreground/30" />
-                                    </div>
-                                  </div>
-                                </div>
-                                {/* Details */}
-                                <div className="flex-1 min-w-0 space-y-3">
-                                  <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-bold text-foreground">{post.title}</h3>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setPreviewPost(null)}>
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground">{post.headline}</p>
-                                  <div className="flex flex-wrap gap-2 text-sm">
-                                    <Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge>
-                                    <Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge>
-                                    {(post.channels || []).map((ch) => (
-                                      <Badge key={ch} variant="outline" className="text-xs">{ch}</Badge>
-                                    ))}
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <div><span className="font-medium text-foreground">Data:</span> <span className="text-muted-foreground">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</span></div>
-                                    <div><span className="font-medium text-foreground">Analista:</span> <span className="text-muted-foreground">{post.analyst}</span></div>
-                                  </div>
-                                  {post.legend && (
-                                    <div className="border-l-2 border-primary/40 pl-3">
-                                      <p className="text-xs font-semibold text-foreground mb-1">Legenda</p>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-line line-clamp-6">{post.legend}</p>
-                                    </div>
-                                  )}
-                                  {post.hashtags.length > 0 && (
-                                    <p className="text-xs text-muted-foreground">{post.hashtags.map((h) => `#${h}`).join(" ")}</p>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
+                          <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                            Nenhum post encontrado para este cliente.
                           </TableCell>
                         </TableRow>
+                      ) : (
+                        clientPosts.map((post) => (
+                          <React.Fragment key={post.id}>
+                          <TableRow className="group cursor-pointer hover:bg-[hsl(var(--primary)/0.08)] transition-colors" onClick={() => setSelectedPost(post)}>
+                            <TableCell className="whitespace-nowrap">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</TableCell>
+                            <TableCell className="font-medium">{post.title}</TableCell>
+                            <TableCell className="text-muted-foreground">{post.headline}</TableCell>
+                            <TableCell><PostBadge format={post.format} /></TableCell>
+                            <TableCell><Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge></TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {(post.channels || []).length > 0 ? (
+                                  (post.channels || []).map((ch) => (
+                                    <span key={ch} className="rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{ch}</span>
+                                  ))
+                                ) : (
+                                  <span className="text-xs text-muted-foreground/50">—</span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>{post.analyst}</TableCell>
+                            <TableCell>
+                              <div className="flex gap-0.5">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
+                                  onClick={(e) => { e.stopPropagation(); setPreviewPost(previewPost?.id === post.id ? null : post); }}
+                                  title="Visualizar post"
+                                >
+                                  <Eye className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary"
+                                  onClick={(e) => { e.stopPropagation(); setSelectedPost(post); }}
+                                  title="Editar post"
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          {previewPost?.id === post.id && (
+                            <TableRow>
+                              <TableCell colSpan={8} className="p-0 border-t-0">
+                                <div className="bg-muted/30 border-t border-b border-border p-6 animate-in slide-in-from-top-2 duration-200">
+                                  <div className="flex gap-6">
+                                    {/* Phone mockup */}
+                                    <div className="shrink-0">
+                                      <div className="relative w-[160px] rounded-[1.5rem] border-[5px] border-foreground/80 bg-background shadow-xl overflow-hidden">
+                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-foreground/80 rounded-b-lg z-10" />
+                                        <div className="aspect-[9/16] bg-muted flex items-center justify-center overflow-hidden">
+                                          {(post.format === "carousel" && post.artUrls && post.artUrls.length > 0) ? (
+                                            <img src={post.artUrls[0]} alt={post.title} className="w-full h-full object-cover" />
+                                          ) : post.artUrl ? (
+                                            <img src={post.artUrl} alt={post.title} className="w-full h-full object-cover" />
+                                          ) : (
+                                            <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                                              <FileText className="h-6 w-6" />
+                                              <span className="text-[10px]">Sem arte</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="h-4 flex items-center justify-center">
+                                          <div className="w-10 h-1 rounded-full bg-foreground/30" />
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {/* Details */}
+                                    <div className="flex-1 min-w-0 space-y-3">
+                                      <div className="flex items-center justify-between">
+                                        <h3 className="text-lg font-bold text-foreground">{post.title}</h3>
+                                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setPreviewPost(null)}>
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                      <p className="text-sm text-muted-foreground">{post.headline}</p>
+                                      <div className="flex flex-wrap gap-2 text-sm">
+                                        <Badge variant="secondary">{FORMAT_LABELS[post.format]}</Badge>
+                                        <Badge variant="outline">{FUNNEL_LABELS[post.funnelStage]}</Badge>
+                                        {(post.channels || []).map((ch) => (
+                                          <Badge key={ch} variant="outline" className="text-xs">{ch}</Badge>
+                                        ))}
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-2 text-sm">
+                                        <div><span className="font-medium text-foreground">Data:</span> <span className="text-muted-foreground">{new Date(post.date + "T12:00:00").toLocaleDateString("pt-BR")}</span></div>
+                                        <div><span className="font-medium text-foreground">Analista:</span> <span className="text-muted-foreground">{post.analyst}</span></div>
+                                      </div>
+                                      {post.legend && (
+                                        <div className="border-l-2 border-primary/40 pl-3">
+                                          <p className="text-xs font-semibold text-foreground mb-1">Legenda</p>
+                                          <p className="text-sm text-muted-foreground whitespace-pre-line line-clamp-6">{post.legend}</p>
+                                        </div>
+                                      )}
+                                      {post.hashtags.length > 0 && (
+                                        <p className="text-xs text-muted-foreground">{post.hashtags.map((h) => `#${h}`).join(" ")}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                          </React.Fragment>
+                        ))
                       )}
-                      </React.Fragment>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="copies">
+              <ClientCopyHistory clientName={clientName} mode="frameworks" />
+            </TabsContent>
+
+            <TabsContent value="reverse">
+              <ClientCopyHistory clientName={clientName} mode="reverse" />
+            </TabsContent>
+          </Tabs>
         </>
       )}
 
