@@ -15,6 +15,7 @@ import { FRAMEWORKS, FORMATS, type Framework } from "@/lib/copyFrameworks";
 export default function CopyFramework() {
   const { framework } = useParams<{ framework: Framework }>();
   const config = framework ? FRAMEWORKS[framework] : undefined;
+  const navigate = useNavigate();
   const { clients } = usePosts();
 
   const [format, setFormat] = useState("");
