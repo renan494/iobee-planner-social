@@ -122,6 +122,59 @@ export type Database = {
         }
         Relationships: []
       }
+      copies: {
+        Row: {
+          campaign_type: string | null
+          client_id: string | null
+          created_at: string
+          format: string | null
+          framework: string
+          generated_copy: string | null
+          id: string
+          produto: string | null
+          publico_alvo: string | null
+          sections: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_type?: string | null
+          client_id?: string | null
+          created_at?: string
+          format?: string | null
+          framework: string
+          generated_copy?: string | null
+          id?: string
+          produto?: string | null
+          publico_alvo?: string | null
+          sections?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_type?: string | null
+          client_id?: string | null
+          created_at?: string
+          format?: string | null
+          framework?: string
+          generated_copy?: string | null
+          id?: string
+          produto?: string | null
+          publico_alvo?: string | null
+          sections?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copies_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drafts: {
         Row: {
           analyst: string | null
@@ -226,6 +279,62 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      reverse_engineered_copies: {
+        Row: {
+          analise: Json
+          client_id: string | null
+          contexto_extra: string | null
+          created_at: string
+          hooks_alternativos: Json | null
+          id: string
+          source: string
+          source_url: string | null
+          title: string | null
+          transcript: string
+          updated_at: string
+          user_id: string
+          variacao: Json
+        }
+        Insert: {
+          analise?: Json
+          client_id?: string | null
+          contexto_extra?: string | null
+          created_at?: string
+          hooks_alternativos?: Json | null
+          id?: string
+          source?: string
+          source_url?: string | null
+          title?: string | null
+          transcript: string
+          updated_at?: string
+          user_id: string
+          variacao?: Json
+        }
+        Update: {
+          analise?: Json
+          client_id?: string | null
+          contexto_extra?: string | null
+          created_at?: string
+          hooks_alternativos?: Json | null
+          id?: string
+          source?: string
+          source_url?: string | null
+          title?: string | null
+          transcript?: string
+          updated_at?: string
+          user_id?: string
+          variacao?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reverse_engineered_copies_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       strategies: {
         Row: {
