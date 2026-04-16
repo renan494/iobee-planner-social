@@ -9,9 +9,9 @@ export default function CopyHub() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-3xl font-extrabold text-foreground">Gerador de Copy</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="pt-2">
+        <h1 className="font-heading text-3xl font-extrabold text-foreground">Roteiros</h1>
+        <p className="text-sm text-muted-foreground mt-2">
           Crie copies persuasivas com cabeça de social media. Escolha o framework ou faça engenharia reversa de um criativo de referência.
         </p>
       </div>
