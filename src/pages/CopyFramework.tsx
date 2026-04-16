@@ -190,6 +190,16 @@ export default function CopyFramework() {
     }
   };
 
+  const handleTransformIntoPost = () => {
+    if (!finalCopy) return;
+    const params = new URLSearchParams();
+    params.set("copy", finalCopy);
+    if (clientName) params.set("client", clientName);
+    if (produto.trim()) params.set("title", produto.trim());
+    navigate(`/criar?${params.toString()}`);
+    toast.success("Copy enviada para Produzir Conteúdo!");
+  };
+
   const Icon = config.icon;
 
   return (
