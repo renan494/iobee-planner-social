@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Copy, Check, RotateCcw, Lightbulb, Wand2, Loader2, Link2, ExternalLink, ArrowLeft, FileText, Save, RefreshCw } from "lucide-react";
+import { Copy, Check, RotateCcw, Lightbulb, Wand2, Loader2, Link2, ExternalLink, ArrowLeft, FileText, Save, RefreshCw, PenTool } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { usePosts } from "@/contexts/PostsContext";
@@ -15,6 +15,7 @@ import { FRAMEWORKS, FORMATS, type Framework } from "@/lib/copyFrameworks";
 export default function CopyFramework() {
   const { framework } = useParams<{ framework: Framework }>();
   const config = framework ? FRAMEWORKS[framework] : undefined;
+  const navigate = useNavigate();
   const { clients } = usePosts();
 
   const [format, setFormat] = useState("");
@@ -187,6 +188,16 @@ export default function CopyFramework() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleTransformIntoPost = () => {
+    if (!finalCopy) return;
+    const params = new URLSearchParams();
+    params.set("copy", finalCopy);
+    if (clientName) params.set("client", clientName);
+    if (produto.trim()) params.set("title", produto.trim());
+    navigate(`/criar?${params.toString()}`);
+    toast.success("Copy enviada para Produzir Conteúdo!");
   };
 
   const Icon = config.icon;
@@ -388,6 +399,9 @@ export default function CopyFramework() {
           <Button variant="outline" onClick={handleReset} size="sm"><RotateCcw className="w-4 h-4 mr-1" /> Limpar</Button>
           <Button onClick={handleCopy} disabled={!allFilled} variant="outline" size="sm">
             {copied ? (<><Check className="w-4 h-4 mr-1" /> Copiado!</>) : (<><Copy className="w-4 h-4 mr-1" /> Copiar</>)}
+          </Button>
+          <Button onClick={handleTransformIntoPost} disabled={!allFilled} variant="outline" size="sm">
+            <PenTool className="w-4 h-4 mr-1" /> Transformar em post
           </Button>
           <Button onClick={handleSaveCopy} disabled={!allFilled || !clientName || isSaving} className="font-semibold" size="sm">
             {saved ? (<><Check className="w-4 h-4 mr-1" /> Salvo!</>) : isSaving ? (<><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Salvando...</>) : (<><Save className="w-4 h-4 mr-1" /> Salvar no cliente</>)}
