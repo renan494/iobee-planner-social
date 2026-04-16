@@ -400,6 +400,9 @@ export default function CopyFramework() {
           <Button onClick={handleCopy} disabled={!allFilled} variant="outline" size="sm">
             {copied ? (<><Check className="w-4 h-4 mr-1" /> Copiado!</>) : (<><Copy className="w-4 h-4 mr-1" /> Copiar</>)}
           </Button>
+          <Button onClick={handleTransformIntoPost} disabled={!allFilled} variant="outline" size="sm">
+            <PenTool className="w-4 h-4 mr-1" /> Transformar em post
+          </Button>
           <Button onClick={handleSaveCopy} disabled={!allFilled || !clientName || isSaving} className="font-semibold" size="sm">
             {saved ? (<><Check className="w-4 h-4 mr-1" /> Salvo!</>) : isSaving ? (<><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Salvando...</>) : (<><Save className="w-4 h-4 mr-1" /> Salvar no cliente</>)}
           </Button>
