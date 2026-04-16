@@ -33,7 +33,7 @@ const items = [
   { title: "Estratégia", url: "/estrategia", icon: Sparkles },
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Produzir Conteúdo", url: "/criar", icon: PenTool },
-  { title: "Copy", url: "/copy", icon: Wand2 },
+  { title: "Roteiros", url: "/copy", icon: Wand2 },
   { title: "Rascunhos", url: "/rascunhos", icon: FileEdit },
   { title: "Calendário", url: "/calendario", icon: CalendarDays },
   { title: "Analistas", url: "/analistas", icon: UserCog },
