@@ -16,6 +16,9 @@ import Analysts from "./pages/Analysts";
 import AnalystDetail from "./pages/AnalystDetail";
 import Drafts from "./pages/Drafts";
 import Strategy from "./pages/Strategy";
+import CopyHub from "./pages/CopyHub";
+import CopyFramework from "./pages/CopyFramework";
+import ReverseEngineerCopy from "./pages/ReverseEngineerCopy";
 import AdminUsers from "./pages/AdminUsers";
 import MyProfile from "./pages/MyProfile";
 import Login from "./pages/Login";
@@ -48,6 +51,9 @@ function ProtectedRoutes() {
             <Route path="/criar" element={<CreatePost />} />
             <Route path="/rascunhos" element={<Drafts />} />
             <Route path="/estrategia" element={<Strategy />} />
+            <Route path="/copy" element={<CopyHub />} />
+            <Route path="/copy/engenharia-reversa" element={<ReverseEngineerCopy />} />
+            <Route path="/copy/:framework" element={<CopyFramework />} />
             <Route path="/calendario" element={<CalendarPage />} />
             <Route path="/clientes" element={<Clients />} />
             <Route path="/clientes/:name" element={<ClientDetail />} />
