@@ -17,6 +17,8 @@ import { PostBadge } from "@/components/PostBadge";
 import { toast } from "sonner";
 import { ClientReportPreview } from "@/components/ClientReportPreview";
 import { PostDetailModal } from "@/components/PostDetailModal";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClientCopyHistory } from "@/components/ClientCopyHistory";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
