@@ -91,6 +91,23 @@ export default function CreatePost() {
 
   const [entries, setEntries] = useState<PostEntry[]>([createEmptyEntry()]);
 
+  // Prefill from copy module via query params
+  useEffect(() => {
+    const copyText = searchParams.get("copy");
+    if (!copyText) return;
+    const clientParam = searchParams.get("client") || "";
+    const titleParam = searchParams.get("title") || "";
+    setEntries((prev) => {
+      const first = prev[0];
+      return [{
+        ...first,
+        client: clientParam || first.client,
+        title: titleParam || first.title,
+        content: copyText,
+      }, ...prev.slice(1)];
+    });
+  }, [searchParams]);
+
   // Load draft if ?draft=id
   useEffect(() => {
     const draftId = searchParams.get("draft");
