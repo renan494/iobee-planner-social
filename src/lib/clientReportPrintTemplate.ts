@@ -195,6 +195,11 @@ export function createClientReportPrintTemplate({
                   })();
             return `
             <article class="post-card" style="--accent: ${accent}">
+              <div class="post-card__watermark" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1028.56" preserveAspectRatio="xMidYMid meet">
+                  <path fill="currentColor" d="M1061.21,517.56h0c10.95.02,19.59-9.26,18.73-20.18C1072.4,401.83,1012.5,0,538.55,0S37.04,370.88,37.38,492.32c.03,10.33-8.36,18.7-18.69,18.69h0c-10.85-.02-19.41,9.14-18.64,19.96,6.78,95.16,63.53,497.61,538.51,497.61,432.8,0,499.24-340.39,503.89-492.84.31-10.15,8.61-18.18,18.76-18.16ZM154.55,515.04c4.57-57.9,1.52-341.33,384-341.33s387.05,283.43,387.05,341.33-24.39,339.81-387.05,339.81c-396.19,0-379.43-281.9-384-339.81Z"/>
+                </svg>
+              </div>
               <div class="post-card__index" aria-hidden="true">
                 <span class="post-card__index-num">${String(index + 1).padStart(2, "0")}</span>
                 <span class="post-card__index-total">/${String(sortedPosts.length).padStart(2, "0")}</span>
@@ -810,10 +815,30 @@ export function createClientReportPrintTemplate({
             page-break-after: avoid;
           }
 
+          .post-card__watermark {
+            position: absolute;
+            top: -28mm;
+            right: -32mm;
+            width: 150mm;
+            height: 150mm;
+            color: var(--accent, ${COLORS.accent});
+            opacity: 0.10;
+            pointer-events: none;
+            z-index: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .post-card__watermark svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+          }
+
           .post-card__index {
             position: absolute;
-            top: 4mm;
-            right: 6mm;
+            top: 14mm;
+            right: 14mm;
             display: flex;
             align-items: baseline;
             gap: 0.5mm;
@@ -822,11 +847,12 @@ export function createClientReportPrintTemplate({
             line-height: 0.9;
             letter-spacing: -0.04em;
             color: var(--accent, ${COLORS.accent});
-            opacity: 0.18;
+            opacity: 0.95;
             pointer-events: none;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
-            z-index: 1;
+            z-index: 2;
+            mix-blend-mode: multiply;
           }
 
           .post-card__index-num {
@@ -851,6 +877,8 @@ export function createClientReportPrintTemplate({
             display: flex;
             flex-direction: column;
             min-width: 0;
+            position: relative;
+            z-index: 1;
           }
 
           .post-card__header {
