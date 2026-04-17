@@ -19,6 +19,7 @@ import { ClientReportPreview } from "@/components/ClientReportPreview";
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientCopyHistory } from "@/components/ClientCopyHistory";
+import { PageContainer } from "@/components/PageContainer";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
@@ -137,7 +138,7 @@ export default function ClientDetail() {
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
+    <PageContainer>
       <div className="mb-4 flex items-center justify-between">
         <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => showReport ? setShowReport(false) : navigate("/clientes")}>
           <ArrowLeft className="h-4 w-4" /> {showReport ? "Voltar" : "Voltar"}
@@ -513,6 +514,6 @@ export default function ClientDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 }

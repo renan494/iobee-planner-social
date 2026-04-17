@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { PageContainer } from "@/components/PageContainer";
 
 interface ManagedUser {
   id: string;
@@ -177,7 +178,7 @@ export default function AdminUsers() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+    <PageContainer maxWidth="3xl">
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
           <Shield className="h-5 w-5 text-primary" />
@@ -294,6 +295,6 @@ export default function AdminUsers() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 }

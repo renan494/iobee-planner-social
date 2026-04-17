@@ -11,6 +11,7 @@ import { useActivity } from "@/contexts/ActivityContext";
 import { toast } from "@/hooks/use-toast";
 import { FORMAT_LABELS } from "@/data/posts";
 import type { PostFormat, FunnelStage } from "@/data/posts";
+import { PageContainer } from "@/components/PageContainer";
 
 interface Draft {
   id: string;
@@ -83,7 +84,7 @@ export default function Drafts() {
   const isComplete = (d: Draft) => !!(d.client && d.analyst && d.date && d.title);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+    <PageContainer maxWidth="4xl">
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
           <FileEdit className="h-5 w-5 text-primary" />
@@ -145,6 +146,6 @@ export default function Drafts() {
           ))}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

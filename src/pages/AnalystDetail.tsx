@@ -15,6 +15,7 @@ import { PostDetailModal } from "@/components/PostDetailModal";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Eye, Pencil } from "lucide-react";
+import { PageContainer } from "@/components/PageContainer";
 
 export default function AnalystDetail() {
   const { name } = useParams<{ name: string }>();
@@ -57,7 +58,7 @@ export default function AnalystDetail() {
   const hasFilters = clientFilter !== "all" || dateFrom || dateTo;
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
+    <PageContainer>
       <div className="mb-4">
         <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => navigate("/analistas")}>
           <ArrowLeft className="h-4 w-4" /> Voltar
@@ -228,6 +229,6 @@ export default function AnalystDetail() {
         onUpdatePost={async (id, fields) => { await updatePost(id, fields); setSelectedPost((p) => p ? { ...p, ...fields } : null); }}
         onDeletePost={async (id) => { await deletePost(id); setSelectedPost(null); }}
       />
-    </div>
+    </PageContainer>
   );
 }

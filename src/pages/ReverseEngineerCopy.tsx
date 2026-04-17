@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { usePosts } from "@/contexts/PostsContext";
+import { PageContainer } from "@/components/PageContainer";
 
 interface AnalysisResult {
   analise: { promessa: string; publico: string; hook_original: string; estrutura: string; cta_original: string; tom: string; };
@@ -212,7 +213,7 @@ export default function ReverseEngineerCopy() {
     s === "instagram" ? "Instagram" : "Manual";
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 space-y-6">
+    <PageContainer className="space-y-6">
       <Link to="/copy" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" /> Voltar pra Copy
       </Link>
@@ -533,6 +534,6 @@ export default function ReverseEngineerCopy() {
           )}
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }
