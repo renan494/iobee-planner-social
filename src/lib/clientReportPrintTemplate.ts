@@ -1,0 +1,477 @@
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { FORMAT_LABELS, FUNNEL_LABELS, type Post } from "@/data/posts";
+
+const REPORT_TITLE = "iOBEE Social Lab · Relatório de Conteúdo";
+
+const COLORS = {
+  accent: "#FDB600",
+  accentSoft: "#FFF4CC",
+  dark: "#140F00",
+  body: "#463F34",
+  muted: "#787364",
+  line: "#E8E0CB",
+  surface: "#FFF9E6",
+  white: "#FFFFFF",
+};
+
+export interface ClientReportPrintTemplateOptions {
+  clientName: string;
+  posts: Post[];
+  exportedAt: Date;
+  filtersApplied: boolean;
+}
+
+function formatDate(dateStr: string) {
+  return format(new Date(`${dateStr}T12:00:00`), "dd/MM/yyyy");
+}
+
+function formatLongDate(dateStr: string) {
+  return format(new Date(`${dateStr}T12:00:00`), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+}
+
+function escapeHtml(value: string | null | undefined) {
+  return (value ?? "—")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function nl2br(value: string | null | undefined) {
+  return escapeHtml(value).replace(/\n/g, "<br />");
+}
+
+export function createClientReportPrintTemplate({
+  clientName,
+  posts,
+  exportedAt,
+  filtersApplied,
+}: ClientReportPrintTemplateOptions) {
+  const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
+  const analysts = [...new Set(sortedPosts.map((post) => post.analyst.trim()).filter(Boolean))];
+
+  const byFormat = sortedPosts.reduce<Record<string, number>>((acc, post) => {
+    acc[post.format] = (acc[post.format] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const rangeStart = sortedPosts[0]?.date;
+  const rangeEnd = sortedPosts[sortedPosts.length - 1]?.date;
+
+  const periodText = rangeStart && rangeEnd
+    ? rangeStart === rangeEnd
+      ? formatLongDate(rangeStart)
+      : `${formatDate(rangeStart)} — ${formatDate(rangeEnd)}`
+    : "Período personalizado";
+
+  const formatSummary = Object.entries(byFormat)
+    .filter(([, count]) => count > 0)
+    .map(([postFormat, count]) => `${FORMAT_LABELS[postFormat as keyof typeof FORMAT_LABELS]} · ${count}`)
+    .join(" • ") || "Nenhum formato registrado";
+
+  const summaryRows = sortedPosts.length > 0
+    ? sortedPosts
+        .map(
+          (post) => `
+            <tr>
+              <td>${formatDate(post.date)}</td>
+              <td>${escapeHtml(post.title)}</td>
+              <td>${escapeHtml(FORMAT_LABELS[post.format])}</td>
+              <td>${escapeHtml(FUNNEL_LABELS[post.funnelStage])}</td>
+              <td>${escapeHtml((post.channels || []).join(", ") || "—")}</td>
+              <td>${escapeHtml(post.analyst)}</td>
+            </tr>`,
+        )
+        .join("")
+    : `
+      <tr>
+        <td>—</td>
+        <td>Nenhum post encontrado para este período.</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>`;
+
+  const detailCards = sortedPosts.length > 0
+    ? sortedPosts
+        .map(
+          (post, index) => `
+            <article class="post-card">
+              <div class="post-card__header">
+                <div>
+                  <p class="eyebrow">Post ${index + 1}</p>
+                  <h3>${escapeHtml(post.title)}</h3>
+                </div>
+                <span class="pill">${escapeHtml(FORMAT_LABELS[post.format])}</span>
+              </div>
+
+              <dl class="detail-grid">
+                <div><dt>Data</dt><dd>${formatDate(post.date)}</dd></div>
+                <div><dt>Funil</dt><dd>${escapeHtml(FUNNEL_LABELS[post.funnelStage])}</dd></div>
+                <div><dt>Analista</dt><dd>${escapeHtml(post.analyst)}</dd></div>
+                <div><dt>Canais</dt><dd>${escapeHtml((post.channels || []).join(", ") || "—")}</dd></div>
+              </dl>
+
+              <div class="content-block">
+                <p class="content-label">Headline</p>
+                <p>${nl2br(post.headline)}</p>
+              </div>
+
+              ${post.legend ? `
+                <div class="content-block content-block--soft">
+                  <p class="content-label">Legenda</p>
+                  <p>${nl2br(post.legend)}</p>
+                </div>` : ""}
+
+              ${post.hashtags.length > 0 ? `
+                <div class="content-block">
+                  <p class="content-label">Hashtags</p>
+                  <p>${escapeHtml(post.hashtags.map((tag) => `#${tag}`).join(" "))}</p>
+                </div>` : ""}
+
+              ${post.reference ? `
+                <div class="content-block">
+                  <p class="content-label">Referência</p>
+                  <p>${escapeHtml(post.reference)}</p>
+                </div>` : ""}
+            </article>`,
+        )
+        .join("")
+    : '<article class="post-card"><p>Nenhum conteúdo disponível para exportação.</p></article>';
+
+  const exportedLabel = format(exportedAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+
+  return `
+    <!doctype html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>${escapeHtml(`${clientName} - relatório fiel`)}</title>
+        <style>
+          @page {
+            size: A4;
+            margin: 14mm;
+          }
+
+          * { box-sizing: border-box; }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+            color: ${COLORS.body};
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            background: ${COLORS.white};
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          body {
+            font-size: 11pt;
+            line-height: 1.45;
+          }
+
+          .page-cover {
+            min-height: calc(297mm - 28mm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            break-after: page;
+          }
+
+          .top-bar,
+          .section-bar {
+            width: 100%;
+            height: 6px;
+            background: ${COLORS.accent};
+            border-radius: 999px;
+          }
+
+          .cover-brand {
+            margin-top: 18mm;
+            font-size: 13pt;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: ${COLORS.dark};
+          }
+
+          .cover-content {
+            display: grid;
+            gap: 8mm;
+            max-width: 150mm;
+          }
+
+          .cover-kicker,
+          .eyebrow,
+          .section-label,
+          dt {
+            margin: 0;
+            font-size: 8pt;
+            line-height: 1.2;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: ${COLORS.muted};
+          }
+
+          h1, h2, h3, p {
+            margin: 0;
+          }
+
+          h1 {
+            font-size: 28pt;
+            line-height: 1;
+            color: ${COLORS.dark};
+          }
+
+          h2 {
+            font-size: 16pt;
+            line-height: 1.15;
+            color: ${COLORS.dark};
+          }
+
+          h3 {
+            font-size: 13pt;
+            line-height: 1.2;
+            color: ${COLORS.dark};
+          }
+
+          .cover-note {
+            max-width: 120mm;
+            color: ${COLORS.body};
+          }
+
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 4mm;
+          }
+
+          .stat-card,
+          .post-card,
+          .content-block--soft {
+            border: 1px solid ${COLORS.line};
+            background: ${COLORS.surface};
+            border-radius: 4mm;
+          }
+
+          .stat-card {
+            padding: 4mm;
+            min-height: 28mm;
+          }
+
+          .section + .section {
+            margin-top: 10mm;
+          }
+
+          .section-header {
+            display: grid;
+            gap: 3mm;
+            margin-bottom: 5mm;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+
+          th, td {
+            border: 1px solid ${COLORS.line};
+            padding: 2.8mm;
+            text-align: left;
+            vertical-align: top;
+            word-break: break-word;
+          }
+
+          th {
+            background: ${COLORS.dark};
+            color: ${COLORS.white};
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+          }
+
+          tbody tr:nth-child(even) td {
+            background: ${COLORS.surface};
+          }
+
+          .details-start {
+            break-before: page;
+            page-break-before: always;
+          }
+
+          .post-list {
+            display: grid;
+            gap: 5mm;
+          }
+
+          .post-card {
+            padding: 5mm;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            background: ${COLORS.white};
+          }
+
+          .post-card__header {
+            display: flex;
+            justify-content: space-between;
+            gap: 4mm;
+            align-items: flex-start;
+            margin-bottom: 4mm;
+          }
+
+          .pill {
+            flex-shrink: 0;
+            border-radius: 999px;
+            padding: 1.5mm 3mm;
+            background: ${COLORS.accentSoft};
+            color: ${COLORS.dark};
+            font-size: 8pt;
+            font-weight: 700;
+          }
+
+          .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 3mm 4mm;
+            margin: 0 0 4mm;
+          }
+
+          dd {
+            margin: 1mm 0 0;
+            color: ${COLORS.dark};
+            font-weight: 500;
+          }
+
+          .content-block {
+            margin-top: 3mm;
+          }
+
+          .content-block--soft {
+            padding: 3mm;
+          }
+
+          .content-label {
+            margin-bottom: 1mm;
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: ${COLORS.muted};
+          }
+
+          .meta-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 4mm;
+            font-size: 8.5pt;
+            color: ${COLORS.muted};
+          }
+
+          @media screen {
+            body {
+              background: #f6f1e5;
+              padding: 8mm 0;
+            }
+
+            main {
+              width: 210mm;
+              margin: 0 auto;
+              background: ${COLORS.white};
+              box-shadow: 0 12px 40px rgba(20, 15, 0, 0.12);
+              padding: 14mm;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <main>
+          <section class="page-cover">
+            <div>
+              <div class="top-bar"></div>
+              <p class="cover-brand">iOBEE Social Lab</p>
+            </div>
+
+            <div class="cover-content">
+              <p class="cover-kicker">Relatório de Conteúdo</p>
+              <h1>${escapeHtml(clientName)}</h1>
+              <p class="cover-note">
+                Versão simplificada e fiel para exportação em PDF, priorizando consistência visual e abertura sem falhas.
+                ${filtersApplied ? " Relatório gerado com filtros de período aplicados." : ""}
+              </p>
+
+              <div class="stats-grid">
+                <article class="stat-card">
+                  <p class="eyebrow">Posts</p>
+                  <h2>${sortedPosts.length}</h2>
+                </article>
+                <article class="stat-card">
+                  <p class="eyebrow">Período</p>
+                  <p>${escapeHtml(periodText)}</p>
+                </article>
+                <article class="stat-card">
+                  <p class="eyebrow">Analistas</p>
+                  <p>${escapeHtml(analysts.join(", ") || "—")}</p>
+                </article>
+              </div>
+
+              <div>
+                <p class="eyebrow">Distribuição de formatos</p>
+                <p>${escapeHtml(formatSummary)}</p>
+              </div>
+            </div>
+
+            <div class="meta-footer">
+              <span>${REPORT_TITLE}</span>
+              <span>Gerado em ${escapeHtml(exportedLabel)}</span>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-header">
+              <div class="section-bar"></div>
+              <p class="section-label">Resumo editorial</p>
+              <h2>Resumo de posts</h2>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Título</th>
+                  <th>Formato</th>
+                  <th>Funil</th>
+                  <th>Canais</th>
+                  <th>Analista</th>
+                </tr>
+              </thead>
+              <tbody>${summaryRows}</tbody>
+            </table>
+          </section>
+
+          <section class="section details-start">
+            <div class="section-header">
+              <div class="section-bar"></div>
+              <p class="section-label">Detalhamento dos posts</p>
+              <h2>Conteúdo detalhado</h2>
+            </div>
+
+            <div class="post-list">${detailCards}</div>
+          </section>
+        </main>
+      </body>
+    </html>`;
+}
