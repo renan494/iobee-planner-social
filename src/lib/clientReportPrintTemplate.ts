@@ -1014,20 +1014,13 @@ export function createClientReportPrintTemplate({
           .content-block--scroll {
             flex: 1;
             min-height: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
           }
 
           .content-block--scroll .content-text {
             font-size: 7.5pt;
             line-height: 1.3;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
             column-count: 2;
             column-gap: 4mm;
-            column-fill: auto;
           }
 
           .content-label {
