@@ -24,6 +24,7 @@ export interface ClientReportPrintTemplateOptions {
   exportedAt: Date;
   filtersApplied: boolean;
   avatarDataUrl?: string | null;
+  artDataUrls?: Map<string, string | null>;
 }
 
 const IOBEE_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 233.94" style="width:100%;height:100%"><g><g><path fill="#f9b510" d="M1024.24,219.38v-28.26c0-.14-.07-.26-.19-.33l-24.48-14.13c-.12-.07-.26-.07-.38,0l-24.48,14.13c-.12.07-.19.19-.19.33v28.26c0,.14.07.26.19.33l24.48,14.13c.12.07.26.07.38,0l24.48-14.13c.12-.07.19-.19.19-.33Z"/><path fill="#f9b510" d="M1080,219.38v-28.26c0-.14-.07-.26-.19-.33l-24.48-14.13c-.12-.07-.26-.07-.38,0l-24.48,14.13c-.12.07-.19.19-.19.33v28.26c0,.14.07.26.19.33l24.48,14.13c.12.07.26.07.38,0l24.48-14.13c.12-.07.19-.19.19-.33Z"/><path fill="#f9b510" d="M1052.15,170.86v-28.26c0-.14-.07-.26-.19-.33l-24.48-14.13c-.12-.07-.26-.07-.38,0l-24.48,14.13c-.12.07-.19.19-.19.33v28.26c0,.14.07.26.19.33l24.48,14.13c.12.07.26.07.38,0l24.48-14.13c.12-.07.19-.19.19-.33Z"/></g><path fill="#f9b510" d="M289.78,119.19h0c2.42,0,4.34-2.05,4.15-4.47-1.67-21.15-14.93-110.11-119.85-110.11S63.05,86.71,63.13,113.6c0,2.29-1.85,4.14-4.14,4.14h0c-2.4,0-4.3,2.02-4.13,4.42,1.5,21.07,14.06,110.16,119.22,110.16,95.82,0,110.52-75.36,111.55-109.11.07-2.25,1.91-4.02,4.15-4.02ZM89.07,118.63c1.01-12.82.34-75.56,85.01-75.56s85.69,62.75,85.69,75.56-5.4,75.23-85.69,75.23c-87.71,0-84-62.41-85.01-75.23Z"/></g><g><path fill="#140f00" d="M455.65,107.15v.08c0,5.04,3.88,9.17,8.89,9.62,35.17,3.18,53.16,20.12,53.16,46.35,0,73.73-88.07,70.73-88.07,70.73h-117.43V.39h113.43s78.06-4.34,80.07,62.05c.67,26.02-14.35,44.7-50.04,44.7ZM430.97,200.56s50.04,3,50.04-36.7c0-35.36-47.71-34.03-47.71-34.03h-87.74l.33,70.73h85.07ZM418.96,93.8s50.04,1.34,50.04-30.69c0-27.69-48.37-26.69-48.37-26.69h-74.73v57.38h73.06Z"/><g><path fill="#140f00" d="M38.03,65.61v166.96H0V65.61h38.03Z"/><path fill="#140f00" d="M38.03,0v34.59H0V0h38.03Z"/></g><path fill="#140f00" d="M727.03.39h-191.83v233.53h191.83v-36.03l-153.8.33v-65.05h129.44v-32.03h-112.9c-1.87,0-3.38,1.52-3.38,3.38h0c0,1.87-1.51,3.38-3.38,3.38h-.6s-9.2,0-9.2,0v-7.81h0v-63.68h153.81V.39Z"/><path fill="#140f00" d="M936.35.39h-191.83v233.53h191.83v-36.03l-153.8.33v-65.05h129.44v-32.03h-112.9c-1.87,0-3.38,1.52-3.38,3.38h0c0,1.87-1.51,3.38-3.38,3.38h-9.8v-5.83s0-1.98,0-1.98h0v-63.68h153.81V.39Z"/></g></svg>`;
@@ -62,6 +63,7 @@ export function createClientReportPrintTemplate({
   exportedAt,
   filtersApplied,
   avatarDataUrl,
+  artDataUrls,
 }: ClientReportPrintTemplateOptions) {
   const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
   const analysts = [...new Set(sortedPosts.map((post) => post.analyst.trim()).filter(Boolean))];
@@ -120,18 +122,22 @@ export function createClientReportPrintTemplate({
         .map(
           (post, index) => {
             const accent = FORMAT_ACCENT[post.format] || COLORS.accent;
+            const artDataUrl = artDataUrls?.get(post.id) ?? null;
             return `
             <article class="post-card" style="--accent: ${accent}">
               <div class="post-card__rail"></div>
               <div class="post-card__body">
                 <header class="post-card__header">
-                  <div>
+                  <div class="post-card__heading">
                     <p class="eyebrow">Post ${String(index + 1).padStart(2, "0")} · ${formatDate(post.date)}</p>
                     <h3>${escapeHtml(post.title)}</h3>
+                    <span class="tag tag--format" style="--tag-color: ${accent}; margin-top: 3mm;">
+                      ${escapeHtml(FORMAT_LABELS[post.format])}
+                    </span>
                   </div>
-                  <span class="tag tag--format" style="--tag-color: ${accent}">
-                    ${escapeHtml(FORMAT_LABELS[post.format])}
-                  </span>
+                  ${artDataUrl
+                    ? `<img class="post-card__thumb" src="${artDataUrl}" alt="Arte do post" />`
+                    : ""}
                 </header>
 
                 <div class="meta-row">
@@ -661,6 +667,22 @@ export function createClientReportPrintTemplate({
             font-weight: 700;
             margin-top: 1.5mm;
             letter-spacing: -0.005em;
+          }
+
+          .post-card__heading {
+            flex: 1;
+            min-width: 0;
+          }
+
+          .post-card__thumb {
+            width: 60mm;
+            height: 60mm;
+            object-fit: cover;
+            border-radius: 2mm;
+            border: 0.3mm solid ${COLORS.line};
+            background: ${COLORS.surface};
+            flex-shrink: 0;
+            display: block;
           }
 
           .eyebrow {

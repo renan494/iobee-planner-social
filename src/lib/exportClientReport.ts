@@ -64,7 +64,18 @@ export async function exportClientReportPdf({
     throw new Error("Could not open the print document.");
   }
 
-  const avatarDataUrl = avatarUrl ? await toDataUrl(avatarUrl) : null;
+  const [avatarDataUrl, artEntries] = await Promise.all([
+    avatarUrl ? toDataUrl(avatarUrl) : Promise.resolve(null),
+    Promise.all(
+      posts.map(async (post) => {
+        const firstArt = post.artUrls?.[0] ?? post.artUrl ?? null;
+        if (!firstArt) return [post.id, null] as const;
+        const dataUrl = await toDataUrl(firstArt);
+        return [post.id, dataUrl] as const;
+      }),
+    ),
+  ]);
+  const artDataUrls = new Map(artEntries);
 
   printDocument.open();
   printDocument.write(
@@ -74,6 +85,7 @@ export async function exportClientReportPdf({
       exportedAt,
       filtersApplied,
       avatarDataUrl,
+      artDataUrls,
     }),
   );
   printDocument.close();
