@@ -669,6 +669,22 @@ export function createClientReportPrintTemplate({
             letter-spacing: -0.005em;
           }
 
+          .post-card__heading {
+            flex: 1;
+            min-width: 0;
+          }
+
+          .post-card__thumb {
+            width: 60mm;
+            height: 60mm;
+            object-fit: cover;
+            border-radius: 2mm;
+            border: 0.3mm solid ${COLORS.line};
+            background: ${COLORS.surface};
+            flex-shrink: 0;
+            display: block;
+          }
+
           .eyebrow {
             font-size: 7pt;
             letter-spacing: 0.18em;
