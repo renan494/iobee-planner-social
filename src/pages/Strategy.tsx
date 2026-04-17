@@ -405,7 +405,8 @@ export default function Strategy() {
                     </CardContent>
                   )}
                 </Card>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
