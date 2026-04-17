@@ -799,7 +799,7 @@ export function createClientReportPrintTemplate({
             page-break-inside: avoid;
             break-after: page;
             page-break-after: always;
-            height: 251mm;
+            height: 240mm;
           }
 
           .post-card:last-child {
