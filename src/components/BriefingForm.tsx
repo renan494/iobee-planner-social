@@ -1,12 +1,47 @@
 import { useRef, useState, useEffect } from "react";
-import { Folder, Pencil, Trash2, Check, Sparkles } from "lucide-react";
+import { Folder, Pencil, Trash2, Check, Sparkles, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+
+/** Label com ícone de "?" e tooltip mostrando exemplo prático ao passar o mouse. */
+function LabelWithHint({
+  htmlFor,
+  className,
+  children,
+  hint,
+}: {
+  htmlFor?: string;
+  className?: string;
+  children: React.ReactNode;
+  hint: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Label htmlFor={htmlFor} className={className}>{children}</Label>
+      <Tooltip delayDuration={150}>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            tabIndex={-1}
+            className="inline-flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground/70 hover:text-foreground transition-colors"
+            aria-label="Ver exemplo"
+          >
+            <HelpCircle className="h-3.5 w-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top" align="start" className="max-w-xs text-xs leading-relaxed">
+          {hint}
+        </TooltipContent>
+      </Tooltip>
+    </div>
+  );
+}
 
 export type SocialNetworkKey =
   | "instagram"
