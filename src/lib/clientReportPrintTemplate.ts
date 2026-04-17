@@ -815,10 +815,30 @@ export function createClientReportPrintTemplate({
             page-break-after: avoid;
           }
 
+          .post-card__watermark {
+            position: absolute;
+            top: -28mm;
+            right: -32mm;
+            width: 150mm;
+            height: 150mm;
+            color: var(--accent, ${COLORS.accent});
+            opacity: 0.10;
+            pointer-events: none;
+            z-index: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .post-card__watermark svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+          }
+
           .post-card__index {
             position: absolute;
-            top: 4mm;
-            right: 6mm;
+            top: 14mm;
+            right: 14mm;
             display: flex;
             align-items: baseline;
             gap: 0.5mm;
@@ -827,11 +847,12 @@ export function createClientReportPrintTemplate({
             line-height: 0.9;
             letter-spacing: -0.04em;
             color: var(--accent, ${COLORS.accent});
-            opacity: 0.18;
+            opacity: 0.95;
             pointer-events: none;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
-            z-index: 1;
+            z-index: 2;
+            mix-blend-mode: multiply;
           }
 
           .post-card__index-num {
