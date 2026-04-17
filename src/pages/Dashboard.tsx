@@ -22,7 +22,7 @@ const FORMAT_CONFIG: Record<PostFormat, { label: string; subtitle: string; icon:
 };
 
 export default function Dashboard() {
-  const { posts, analysts } = usePosts();
+  const { posts, analysts, loading } = usePosts();
   const { activities, clearActivities } = useActivity();
   
   const navigate = useNavigate();
