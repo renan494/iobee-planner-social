@@ -122,7 +122,15 @@ export function createClientReportPrintTemplate({
         .map(
           (post, index) => {
             const accent = FORMAT_ACCENT[post.format] || COLORS.accent;
-            const artDataUrl = artDataUrls?.get(post.id) ?? null;
+            const arts = artDataUrls?.get(post.id) ?? [];
+            const thumbBlock = arts.length === 0
+              ? ""
+              : arts.length === 1
+                ? `<img class="post-card__thumb" src="${arts[0]}" alt="Arte do post" />`
+                : `<div class="post-card__thumb-grid">${arts
+                    .slice(0, 4)
+                    .map((src) => `<img src="${src}" alt="Arte do post" />`)
+                    .join("")}</div>`;
             return `
             <article class="post-card" style="--accent: ${accent}">
               <div class="post-card__rail"></div>
@@ -135,9 +143,7 @@ export function createClientReportPrintTemplate({
                       ${escapeHtml(FORMAT_LABELS[post.format])}
                     </span>
                   </div>
-                  ${artDataUrl
-                    ? `<img class="post-card__thumb" src="${artDataUrl}" alt="Arte do post" />`
-                    : ""}
+                  ${thumbBlock}
                 </header>
 
                 <div class="meta-row">
