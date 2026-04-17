@@ -476,29 +476,32 @@ serve(async (req) => {
         }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
-      // Instagram — scrape + transcrever áudio do Reel
+      // Instagram — embed scrape (sem Firecrawl) + transcrever áudio
       if (isInstagramUrl(url)) {
-        const { markdown, error } = await fetchScrapeRaw(url, 4500);
-        if (!markdown) return errorResponse(error || "Não foi possível ler este post do Instagram. Cole a legenda manualmente.", 422, "INSTAGRAM_SCRAPE_FAILED");
+        const shortcode = getInstagramShortcode(url);
+        if (!shortcode) return errorResponse("URL do Instagram inválida.", 400, "INSTAGRAM_INVALID_URL");
 
-        const writtenCopy = extractInstagramCaption(markdown);
+        const { videoUrl, caption, error: embedError } = await fetchInstagramViaEmbed(shortcode);
+        const writtenCopy = caption ? cleanText(caption) : "";
+
         let videoTranscript: string | null = null;
-        let videoError: string | undefined;
+        let videoError: string | undefined = embedError;
 
-        if (transcribeAudio) {
-          const videoUrl = extractVideoUrl(markdown);
-          if (videoUrl) {
-            const result = await transcribeVideoWithGemini(videoUrl);
-            videoTranscript = result.transcript;
-            videoError = result.error;
-          } else {
-            videoError = "Vídeo não encontrado neste post (pode ser foto/carrossel ou Instagram bloqueou o scrape).";
-          }
+        if (transcribeAudio && videoUrl) {
+          const result = await transcribeVideoWithGemini(videoUrl);
+          videoTranscript = result.transcript;
+          if (!videoTranscript) videoError = result.error;
+        } else if (transcribeAudio && !videoUrl) {
+          videoError = embedError || "Vídeo não encontrado (Instagram pode ter bloqueado o scrape ou é foto/carrossel).";
         }
 
         const finalTranscript = videoTranscript || writtenCopy;
         if (!finalTranscript || finalTranscript.length < 30) {
-          return errorResponse(videoError || "Conteúdo insuficiente. Cole a transcrição manualmente.", 422, "INSTAGRAM_SCRAPE_FAILED");
+          return errorResponse(
+            videoError || "Não foi possível extrair conteúdo deste post. Cole a transcrição manualmente na aba 'Transcrição manual'.",
+            422,
+            "INSTAGRAM_SCRAPE_FAILED"
+          );
         }
 
         return new Response(JSON.stringify({
