@@ -700,7 +700,29 @@ export function createClientReportPrintTemplate({
             display: block;
           }
 
-          .post-card__thumb-grid {
+          .post-card__thumb--placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5mm;
+            background: ${COLORS.lineSoft};
+            border: 0.3mm dashed ${COLORS.mutedSoft};
+            color: ${COLORS.muted};
+          }
+
+          .post-card__thumb--placeholder svg {
+            width: 16mm;
+            height: 16mm;
+            opacity: 0.55;
+          }
+
+          .post-card__thumb--placeholder span {
+            font-size: 7.5pt;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-weight: 700;
+          }
             width: 60mm;
             height: 60mm;
             display: grid;
