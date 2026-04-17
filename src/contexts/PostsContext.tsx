@@ -102,7 +102,11 @@ export function PostsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    Promise.all([fetchPosts(), fetchAnalysts(), fetchClients()]).then(() => setLoading(false));
+    // Fire all 3 in parallel, but unblock the app as soon as posts are ready.
+    // Analysts/clients keep loading in background and update the UI when done.
+    fetchPosts().finally(() => setLoading(false));
+    fetchAnalysts();
+    fetchClients();
   }, [fetchPosts, fetchAnalysts, fetchClients]);
 
   // Merge clients from posts + registered clients table
