@@ -186,44 +186,48 @@ export function createClientReportPrintTemplate({
               <div class="post-card__rail"></div>
               <div class="post-card__body">
                 <header class="post-card__header">
-                  <div class="post-card__heading">
-                    <p class="eyebrow">Post ${String(index + 1).padStart(2, "0")} · ${formatDate(post.date)}</p>
-                    <h3>${escapeHtml(post.title)}</h3>
-                    <span class="tag tag--format" style="--tag-color: ${accent}; margin-top: 3mm;">
-                      ${escapeHtml(FORMAT_LABELS[post.format])}
-                    </span>
-                  </div>
-                  ${thumbBlock}
+                  <p class="eyebrow">Post ${String(index + 1).padStart(2, "0")} · ${formatDate(post.date)}</p>
+                  <h3>${escapeHtml(post.title)}</h3>
+                  <span class="tag tag--format" style="--tag-color: ${accent}; margin-top: 2mm;">
+                    ${escapeHtml(FORMAT_LABELS[post.format])}
+                  </span>
                 </header>
 
-                <div class="meta-row">
-                  <div><span class="meta-label">Funil</span><span class="meta-value">${escapeHtml(FUNNEL_LABELS[post.funnelStage])}</span></div>
-                  <div><span class="meta-label">Analista</span><span class="meta-value">${escapeHtml(post.analyst)}</span></div>
-                  <div><span class="meta-label">Canais</span><span class="meta-value">${escapeHtml((post.channels || []).join(" · ") || "—")}</span></div>
+                <div class="post-card__columns">
+                  <aside class="post-card__col-left">
+                    ${thumbBlock}
+                    <div class="meta-stack">
+                      <div><span class="meta-label">Funil</span><span class="meta-value">${escapeHtml(FUNNEL_LABELS[post.funnelStage])}</span></div>
+                      <div><span class="meta-label">Analista</span><span class="meta-value">${escapeHtml(post.analyst)}</span></div>
+                      <div><span class="meta-label">Canais</span><span class="meta-value">${escapeHtml((post.channels || []).join(" · ") || "—")}</span></div>
+                    </div>
+                  </aside>
+
+                  <div class="post-card__col-right">
+                    <div class="content-block">
+                      <p class="content-label">Headline</p>
+                      <p class="content-text content-text--lead">${nl2br(post.headline)}</p>
+                    </div>
+
+                    ${post.legend ? `
+                      <div class="content-block content-block--soft content-block--scroll">
+                        <p class="content-label">Legenda</p>
+                        <p class="content-text">${nl2br(post.legend)}</p>
+                      </div>` : ""}
+
+                    ${post.hashtags.length > 0 ? `
+                      <div class="content-block">
+                        <p class="content-label">Hashtags</p>
+                        <p class="content-text content-text--accent">${escapeHtml(post.hashtags.map((tag) => `#${tag}`).join("  "))}</p>
+                      </div>` : ""}
+
+                    ${post.reference ? `
+                      <div class="content-block">
+                        <p class="content-label">Referência</p>
+                        <p class="content-text content-text--mono">${escapeHtml(post.reference)}</p>
+                      </div>` : ""}
+                  </div>
                 </div>
-
-                <div class="content-block">
-                  <p class="content-label">Headline</p>
-                  <p class="content-text content-text--lead">${nl2br(post.headline)}</p>
-                </div>
-
-                ${post.legend ? `
-                  <div class="content-block content-block--soft">
-                    <p class="content-label">Legenda</p>
-                    <p class="content-text">${nl2br(post.legend)}</p>
-                  </div>` : ""}
-
-                ${post.hashtags.length > 0 ? `
-                  <div class="content-block">
-                    <p class="content-label">Hashtags</p>
-                    <p class="content-text content-text--accent">${escapeHtml(post.hashtags.map((tag) => `#${tag}`).join("  "))}</p>
-                  </div>` : ""}
-
-                ${post.reference ? `
-                  <div class="content-block">
-                    <p class="content-label">Referência</p>
-                    <p class="content-text content-text--mono">${escapeHtml(post.reference)}</p>
-                  </div>` : ""}
               </div>
             </article>`;
           },
@@ -780,6 +784,7 @@ export function createClientReportPrintTemplate({
             page-break-inside: avoid;
             break-after: page;
             page-break-after: always;
+            min-height: 245mm;
           }
 
           .post-card:last-child {
@@ -803,6 +808,7 @@ export function createClientReportPrintTemplate({
             pointer-events: none;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            z-index: 1;
           }
 
           .post-card__index-num {
@@ -823,34 +829,65 @@ export function createClientReportPrintTemplate({
 
           .post-card__body {
             flex: 1;
-            padding: 5mm 6mm;
-          }
-
-          .post-card__header {
+            padding: 6mm 7mm;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 5mm;
-            margin-bottom: 4mm;
-          }
-
-          .post-card__header h3 {
-            font-size: 13pt;
-            line-height: 1.2;
-            color: ${COLORS.ink};
-            font-weight: 700;
-            margin-top: 1mm;
-            letter-spacing: -0.005em;
-          }
-
-          .post-card__heading {
-            flex: 1;
+            flex-direction: column;
             min-width: 0;
           }
 
+          .post-card__header {
+            margin-bottom: 5mm;
+            padding-right: 32mm;
+          }
+
+          .post-card__header h3 {
+            font-size: 15pt;
+            line-height: 1.2;
+            color: ${COLORS.ink};
+            font-weight: 700;
+            margin-top: 1.5mm;
+            letter-spacing: -0.005em;
+          }
+
+          .post-card__columns {
+            display: flex;
+            gap: 7mm;
+            flex: 1;
+            min-height: 0;
+          }
+
+          .post-card__col-left {
+            width: 60mm;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4mm;
+          }
+
+          .post-card__col-right {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+          }
+
+          .meta-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5mm;
+            border-top: 0.3mm solid ${COLORS.lineSoft};
+            padding-top: 3mm;
+          }
+
+          .meta-stack > div {
+            display: flex;
+            flex-direction: column;
+          }
+
           .post-card__thumb {
-            width: 70mm;
-            height: 70mm;
+            width: 60mm;
+            height: 60mm;
             object-fit: cover;
             border-radius: 2mm;
             border: 0.3mm solid ${COLORS.line};
@@ -884,8 +921,8 @@ export function createClientReportPrintTemplate({
           }
 
           .post-card__thumb-grid {
-            width: 70mm;
-            height: 70mm;
+            width: 60mm;
+            height: 60mm;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
@@ -972,6 +1009,18 @@ export function createClientReportPrintTemplate({
             border-radius: 2mm;
             padding: 3mm 3.5mm;
             border-left: 0.6mm solid ${COLORS.accent};
+          }
+
+          .content-block--scroll {
+            flex: 1;
+            min-height: 0;
+          }
+
+          .content-block--scroll .content-text {
+            font-size: 7.5pt;
+            line-height: 1.3;
+            column-count: 2;
+            column-gap: 4mm;
           }
 
           .content-label {
@@ -1115,11 +1164,6 @@ export function createClientReportPrintTemplate({
           </section>
 
           <section class="section details-start">
-            <div class="section-header">
-              <span class="section-eyebrow">02 · Conteúdo</span>
-              <h2>Detalhamento dos posts</h2>
-            </div>
-
             <div class="post-list">${detailCards}</div>
           </section>
         </main>
