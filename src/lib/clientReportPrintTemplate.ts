@@ -154,14 +154,18 @@ export function createClientReportPrintTemplate({
 
   // Pick legend density tier so it always fits in the fixed-height card.
   // Tiers tuned for ~110mm tall x 110mm wide legend box (≈1 column ~ 38 chars/line).
+  // Above OVERFLOW_THRESHOLD chars, the card is allowed to flow to a 2nd page
+  // and the legend renders in a single comfortable column instead of being squeezed.
+  const OVERFLOW_THRESHOLD = 3500;
   const pickLegendTier = (legend: string | null | undefined) => {
     const len = (legend ?? "").length;
-    if (len <= 280)   return { fontSize: "10pt",  lineHeight: 1.45, cols: 1 };
-    if (len <= 700)   return { fontSize: "9pt",   lineHeight: 1.4,  cols: 1 };
-    if (len <= 1400)  return { fontSize: "8.5pt", lineHeight: 1.35, cols: 2 };
-    if (len <= 2400)  return { fontSize: "7.5pt", lineHeight: 1.3,  cols: 2 };
-    if (len <= 3600)  return { fontSize: "7pt",   lineHeight: 1.25, cols: 3 };
-    return                  { fontSize: "6.5pt", lineHeight: 1.2,  cols: 3 };
+    if (len > OVERFLOW_THRESHOLD) return { fontSize: "9pt", lineHeight: 1.5, cols: 1, overflow: true };
+    if (len <= 280)   return { fontSize: "10pt",  lineHeight: 1.45, cols: 1, overflow: false };
+    if (len <= 700)   return { fontSize: "9pt",   lineHeight: 1.4,  cols: 1, overflow: false };
+    if (len <= 1400)  return { fontSize: "8.5pt", lineHeight: 1.35, cols: 2, overflow: false };
+    if (len <= 2400)  return { fontSize: "7.5pt", lineHeight: 1.3,  cols: 2, overflow: false };
+    if (len <= 3600)  return { fontSize: "7pt",   lineHeight: 1.25, cols: 3, overflow: false };
+    return                  { fontSize: "6.5pt", lineHeight: 1.2,  cols: 3, overflow: false };
   };
 
   const detailCards = sortedPosts.length > 0
