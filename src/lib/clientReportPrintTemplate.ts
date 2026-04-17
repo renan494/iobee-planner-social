@@ -338,11 +338,13 @@ export function createClientReportPrintTemplate({
           /* ===== COVER ===== */
 
           .page-cover {
-            min-height: calc(297mm - 28mm);
+            height: 269mm;
             display: flex;
             flex-direction: column;
             break-after: page;
+            page-break-after: always;
             position: relative;
+            overflow: hidden;
           }
 
           .cover-top {
