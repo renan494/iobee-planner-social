@@ -723,6 +723,8 @@ export function createClientReportPrintTemplate({
             text-transform: uppercase;
             font-weight: 700;
           }
+
+          .post-card__thumb-grid {
             width: 60mm;
             height: 60mm;
             display: grid;
@@ -743,6 +745,9 @@ export function createClientReportPrintTemplate({
             border-radius: 1.2mm;
             display: block;
           }
+
+          .eyebrow {
+            font-size: 7pt;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             font-weight: 700;
