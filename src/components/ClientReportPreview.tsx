@@ -49,6 +49,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         clientName,
         posts: sortedPosts,
         filtersApplied: Boolean(hasFilters),
+        avatarUrl,
       });
     } catch {
       toast.error("Não foi possível abrir a versão fiel para salvar em PDF.");

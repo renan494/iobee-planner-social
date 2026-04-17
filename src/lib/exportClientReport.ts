@@ -15,6 +15,23 @@ interface ExportClientReportPdfOptions {
   posts: Post[];
   exportedAt?: Date;
   filtersApplied?: boolean;
+  avatarUrl?: string | null;
+}
+
+async function toDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, { mode: "cors" });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(typeof reader.result === "string" ? reader.result : null);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
 }
 
 export async function exportClientReportPdf({
@@ -22,6 +39,7 @@ export async function exportClientReportPdf({
   posts,
   exportedAt = new Date(),
   filtersApplied = false,
+  avatarUrl = null,
 }: ExportClientReportPdfOptions) {
   if (typeof window === "undefined" || typeof document === "undefined") {
     throw new Error("PDF export is only available in the browser.");
@@ -46,6 +64,8 @@ export async function exportClientReportPdf({
     throw new Error("Could not open the print document.");
   }
 
+  const avatarDataUrl = avatarUrl ? await toDataUrl(avatarUrl) : null;
+
   printDocument.open();
   printDocument.write(
     createClientReportPrintTemplate({
@@ -53,6 +73,7 @@ export async function exportClientReportPdf({
       posts,
       exportedAt,
       filtersApplied,
+      avatarDataUrl,
     }),
   );
   printDocument.close();
