@@ -92,13 +92,26 @@ serve(async (req) => {
 
         if (clientRow) {
           clientRecord = clientRow;
-          const { data: strat } = await admin
-            .from("strategies")
-            .select("content, updated_at")
-            .eq("client_id", clientRow.id)
-            .order("updated_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
+          // Prefer the explicitly active strategy; fall back to most recent
+          let strat: any = null;
+          if (clientRow.active_strategy_id) {
+            const { data } = await admin
+              .from("strategies")
+              .select("content, updated_at")
+              .eq("id", clientRow.active_strategy_id)
+              .maybeSingle();
+            if (data?.content) strat = data;
+          }
+          if (!strat) {
+            const { data } = await admin
+              .from("strategies")
+              .select("content, updated_at")
+              .eq("client_id", clientRow.id)
+              .order("updated_at", { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (data?.content) strat = data;
+          }
           if (strat?.content) strategyContent = strat.content;
         }
       }
