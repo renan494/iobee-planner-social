@@ -5,12 +5,12 @@ import { ptBR } from "date-fns/locale";
 import { FORMAT_LABELS, FUNNEL_LABELS, type Post, type PostFormat } from "@/data/posts";
 
 const COLORS = {
-  yellow: [253, 182, 0] as const,
-  dark: [20, 15, 0] as const,
-  warm: [255, 249, 230] as const,
-  line: [232, 224, 203] as const,
-  gray: [120, 115, 100] as const,
-  body: [70, 64, 52] as const,
+  yellow: [253, 182, 0] as [number, number, number],
+  dark: [20, 15, 0] as [number, number, number],
+  warm: [255, 249, 230] as [number, number, number],
+  line: [232, 224, 203] as [number, number, number],
+  gray: [120, 115, 100] as [number, number, number],
+  body: [70, 64, 52] as [number, number, number],
 };
 
 function formatDate(dateStr: string) {
