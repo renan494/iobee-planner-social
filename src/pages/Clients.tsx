@@ -216,102 +216,128 @@ export default function Clients() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Cadastrar Novo Cliente</DialogTitle>
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+          <DialogHeader className="px-8 pt-8 pb-2">
+            <DialogTitle className="text-2xl font-bold tracking-tight">Cadastrar novo cliente</DialogTitle>
+            <p className="text-sm text-muted-foreground">Preencha o briefing para alimentar estratégias e geração de conteúdo com IA.</p>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-6 px-8 pb-6 pt-4">
             {/* Avatar */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5 rounded-2xl border bg-card p-5">
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-secondary border-2 border-dashed border-border hover:border-primary/50 transition-colors overflow-hidden"
+                className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-secondary border-2 border-dashed border-border hover:border-primary/50 transition-colors overflow-hidden"
               >
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
                 ) : (
-                  <User className="h-6 w-6 text-muted-foreground" />
+                  <User className="h-7 w-7 text-muted-foreground" />
                 )}
               </button>
-              <div className="text-sm text-muted-foreground">
-                {uploading ? "Enviando..." : "Clique para adicionar foto de perfil"}
+              <div>
+                <p className="text-base font-semibold text-foreground">Foto de perfil</p>
+                <p className="text-sm text-muted-foreground">{uploading ? "Enviando..." : "Clique no círculo para enviar uma imagem (PNG/JPG)."}</p>
               </div>
             </div>
 
             {/* Dados Básicos */}
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-2">Dados Básicos</p>
-            <div className="space-y-2">
-              <Label htmlFor="client-name">Nome *</Label>
-              <Input id="client-name" placeholder="Ex: iOBEE" value={newClientName} onChange={(e) => setNewClientName(e.target.value)} autoFocus />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="niche">Nicho / Segmento</Label>
-              <Input id="niche" placeholder="Ex: Marketing Digital, Gastronomia, Moda..." value={newNiche} onChange={(e) => setNewNiche(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="objective">Objetivo</Label>
-              <Textarea id="objective" placeholder="Ex: Aumentar awareness e gerar leads qualificados..." value={newObjective} onChange={(e) => setNewObjective(e.target.value)} rows={2} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="products-services">Produtos / Serviços</Label>
-              <Textarea id="products-services" placeholder="Descreva os principais produtos ou serviços do cliente..." value={newProductsServices} onChange={(e) => setNewProductsServices(e.target.value)} rows={2} />
-            </div>
+            <section className="rounded-2xl border bg-card p-6 space-y-5">
+              <header>
+                <h3 className="text-base font-bold text-foreground">Dados básicos</h3>
+                <p className="text-xs text-muted-foreground">Identificação e visão geral do negócio.</p>
+              </header>
+              <div className="space-y-2">
+                <Label htmlFor="client-name" className="text-sm">Nome *</Label>
+                <Input id="client-name" className="h-11 text-base" placeholder="Ex: iOBEE" value={newClientName} onChange={(e) => setNewClientName(e.target.value)} autoFocus />
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="niche" className="text-sm">Nicho / Segmento</Label>
+                  <Input id="niche" className="h-11 text-base" placeholder="Ex: Marketing Digital, Gastronomia..." value={newNiche} onChange={(e) => setNewNiche(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tone-of-voice" className="text-sm">Tom de voz</Label>
+                  <Input id="tone-of-voice" className="h-11 text-base" placeholder="Ex: Profissional e acolhedor" value={newToneOfVoice} onChange={(e) => setNewToneOfVoice(e.target.value)} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="objective" className="text-sm">Objetivo</Label>
+                <Textarea id="objective" className="text-base" placeholder="Ex: Aumentar awareness e gerar leads qualificados..." value={newObjective} onChange={(e) => setNewObjective(e.target.value)} rows={3} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="products-services" className="text-sm">Produtos / Serviços</Label>
+                <Textarea id="products-services" className="text-base" placeholder="Descreva os principais produtos ou serviços do cliente..." value={newProductsServices} onChange={(e) => setNewProductsServices(e.target.value)} rows={3} />
+              </div>
+            </section>
 
             {/* Público e Posicionamento */}
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-2">Público e Posicionamento</p>
-            <div className="space-y-2">
-              <Label htmlFor="target-audience">Público-alvo</Label>
-              <Textarea id="target-audience" placeholder="Ex: Mulheres 25-45 anos, classe B, interessadas em bem-estar..." value={newTargetAudience} onChange={(e) => setNewTargetAudience(e.target.value)} rows={2} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tone-of-voice">Tom de Voz</Label>
-              <Input id="tone-of-voice" placeholder="Ex: Profissional e acolhedor, Jovem e descontraído..." value={newToneOfVoice} onChange={(e) => setNewToneOfVoice(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="brand-values">Valores da Marca</Label>
-              <Input id="brand-values" placeholder="Ex: Inovação, Transparência, Sustentabilidade..." value={newBrandValues} onChange={(e) => setNewBrandValues(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="differentials">Diferenciais</Label>
-              <Textarea id="differentials" placeholder="O que diferencia este cliente dos concorrentes..." value={newDifferentials} onChange={(e) => setNewDifferentials(e.target.value)} rows={2} />
-            </div>
+            <section className="rounded-2xl border bg-card p-6 space-y-5">
+              <header>
+                <h3 className="text-base font-bold text-foreground">Público e posicionamento</h3>
+                <p className="text-xs text-muted-foreground">Para quem falamos e como nos diferenciamos.</p>
+              </header>
+              <div className="space-y-2">
+                <Label htmlFor="target-audience" className="text-sm">Público-alvo</Label>
+                <Textarea id="target-audience" className="text-base" placeholder="Ex: Mulheres 25-45, classe B, interessadas em bem-estar..." value={newTargetAudience} onChange={(e) => setNewTargetAudience(e.target.value)} rows={3} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="brand-values" className="text-sm">Valores da marca</Label>
+                <Input id="brand-values" className="h-11 text-base" placeholder="Ex: Inovação, Transparência, Sustentabilidade..." value={newBrandValues} onChange={(e) => setNewBrandValues(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="differentials" className="text-sm">Diferenciais</Label>
+                <Textarea id="differentials" className="text-base" placeholder="O que diferencia este cliente dos concorrentes..." value={newDifferentials} onChange={(e) => setNewDifferentials(e.target.value)} rows={3} />
+              </div>
+            </section>
 
             {/* Presença Digital */}
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-2">Presença Digital</p>
-            <div className="space-y-2">
-              <Label htmlFor="current-social-presence">Presença atual nas redes</Label>
-              <Textarea id="current-social-presence" placeholder="Descreva os canais atuais, número de seguidores, frequência..." value={newCurrentSocialPresence} onChange={(e) => setNewCurrentSocialPresence(e.target.value)} rows={2} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="competitors">Concorrentes (separados por vírgula)</Label>
-              <Input id="competitors" placeholder="Ex: @concorrente1, @concorrente2, @concorrente3" value={newCompetitors} onChange={(e) => setNewCompetitors(e.target.value)} />
-            </div>
+            <section className="rounded-2xl border bg-card p-6 space-y-5">
+              <header>
+                <h3 className="text-base font-bold text-foreground">Presença digital</h3>
+                <p className="text-xs text-muted-foreground">Cenário atual e referências de mercado.</p>
+              </header>
+              <div className="space-y-2">
+                <Label htmlFor="current-social-presence" className="text-sm">Presença atual nas redes</Label>
+                <Textarea id="current-social-presence" className="text-base" placeholder="Canais atuais, seguidores, frequência..." value={newCurrentSocialPresence} onChange={(e) => setNewCurrentSocialPresence(e.target.value)} rows={3} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="competitors" className="text-sm">Concorrentes (separados por vírgula)</Label>
+                <Input id="competitors" className="h-11 text-base" placeholder="Ex: @concorrente1, @concorrente2, @concorrente3" value={newCompetitors} onChange={(e) => setNewCompetitors(e.target.value)} />
+              </div>
+            </section>
 
-            {/* Redes Sociais */}
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pt-2">Links das Redes</p>
-            <div className="space-y-2">
-              <Label htmlFor="instagram">@ do Instagram</Label>
-              <Input id="instagram" placeholder="@iobee.digital" value={newInstagram} onChange={(e) => setNewInstagram(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="facebook-url">URL do Facebook</Label>
-              <Input id="facebook-url" placeholder="https://facebook.com/iobee" value={newFacebookUrl} onChange={(e) => setNewFacebookUrl(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="linkedin-url">URL do LinkedIn</Label>
-              <Input id="linkedin-url" placeholder="https://linkedin.com/company/iobee" value={newLinkedinUrl} onChange={(e) => setNewLinkedinUrl(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="gmb-url">URL do Google Meu Negócio</Label>
-              <Input id="gmb-url" placeholder="https://g.page/iobee" value={newGmbUrl} onChange={(e) => setNewGmbUrl(e.target.value)} />
-            </div>
+            {/* Links das Redes */}
+            <section className="rounded-2xl border bg-card p-6 space-y-5">
+              <header>
+                <h3 className="text-base font-bold text-foreground">Links das redes</h3>
+                <p className="text-xs text-muted-foreground">URLs públicas para análise e referência.</p>
+              </header>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="instagram" className="text-sm">@ do Instagram</Label>
+                  <Input id="instagram" className="h-11 text-base" placeholder="@iobee.digital" value={newInstagram} onChange={(e) => setNewInstagram(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="facebook-url" className="text-sm">URL do Facebook</Label>
+                  <Input id="facebook-url" className="h-11 text-base" placeholder="https://facebook.com/iobee" value={newFacebookUrl} onChange={(e) => setNewFacebookUrl(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="linkedin-url" className="text-sm">URL do LinkedIn</Label>
+                  <Input id="linkedin-url" className="h-11 text-base" placeholder="https://linkedin.com/company/iobee" value={newLinkedinUrl} onChange={(e) => setNewLinkedinUrl(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gmb-url" className="text-sm">URL do Google Meu Negócio</Label>
+                  <Input id="gmb-url" className="h-11 text-base" placeholder="https://g.page/iobee" value={newGmbUrl} onChange={(e) => setNewGmbUrl(e.target.value)} />
+                </div>
+              </div>
+            </section>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleAddClient} disabled={saving || !newClientName.trim()}>
-              {saving ? "Salvando..." : "Cadastrar"}
+          <DialogFooter className="px-8 pb-8 pt-2 gap-2">
+            <Button variant="outline" size="lg" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button size="lg" onClick={handleAddClient} disabled={saving || !newClientName.trim()}>
+              {saving ? "Salvando..." : "Cadastrar cliente"}
             </Button>
           </DialogFooter>
         </DialogContent>
