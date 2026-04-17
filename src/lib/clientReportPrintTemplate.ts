@@ -122,18 +122,22 @@ export function createClientReportPrintTemplate({
         .map(
           (post, index) => {
             const accent = FORMAT_ACCENT[post.format] || COLORS.accent;
+            const artDataUrl = artDataUrls?.get(post.id) ?? null;
             return `
             <article class="post-card" style="--accent: ${accent}">
               <div class="post-card__rail"></div>
               <div class="post-card__body">
                 <header class="post-card__header">
-                  <div>
+                  <div class="post-card__heading">
                     <p class="eyebrow">Post ${String(index + 1).padStart(2, "0")} · ${formatDate(post.date)}</p>
                     <h3>${escapeHtml(post.title)}</h3>
+                    <span class="tag tag--format" style="--tag-color: ${accent}; margin-top: 3mm;">
+                      ${escapeHtml(FORMAT_LABELS[post.format])}
+                    </span>
                   </div>
-                  <span class="tag tag--format" style="--tag-color: ${accent}">
-                    ${escapeHtml(FORMAT_LABELS[post.format])}
-                  </span>
+                  ${artDataUrl
+                    ? `<img class="post-card__thumb" src="${artDataUrl}" alt="Arte do post" />`
+                    : ""}
                 </header>
 
                 <div class="meta-row">
