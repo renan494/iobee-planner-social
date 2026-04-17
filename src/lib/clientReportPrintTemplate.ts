@@ -761,8 +761,7 @@ export function createClientReportPrintTemplate({
           }
 
           .post-list {
-            display: grid;
-            gap: 7mm;
+            display: block;
           }
 
           .post-card {
@@ -774,6 +773,13 @@ export function createClientReportPrintTemplate({
             background: ${COLORS.white};
             break-inside: avoid;
             page-break-inside: avoid;
+            break-after: page;
+            page-break-after: always;
+          }
+
+          .post-card:last-child {
+            break-after: auto;
+            page-break-after: auto;
           }
 
           .post-card__rail {
@@ -784,7 +790,7 @@ export function createClientReportPrintTemplate({
 
           .post-card__body {
             flex: 1;
-            padding: 6mm 7mm;
+            padding: 5mm 6mm;
           }
 
           .post-card__header {
@@ -792,15 +798,15 @@ export function createClientReportPrintTemplate({
             justify-content: space-between;
             align-items: flex-start;
             gap: 5mm;
-            margin-bottom: 5mm;
+            margin-bottom: 4mm;
           }
 
           .post-card__header h3 {
-            font-size: 14pt;
-            line-height: 1.25;
+            font-size: 13pt;
+            line-height: 1.2;
             color: ${COLORS.ink};
             font-weight: 700;
-            margin-top: 1.5mm;
+            margin-top: 1mm;
             letter-spacing: -0.005em;
           }
 
@@ -810,8 +816,8 @@ export function createClientReportPrintTemplate({
           }
 
           .post-card__thumb {
-            width: 60mm;
-            height: 60mm;
+            width: 70mm;
+            height: 70mm;
             object-fit: cover;
             border-radius: 2mm;
             border: 0.3mm solid ${COLORS.line};
