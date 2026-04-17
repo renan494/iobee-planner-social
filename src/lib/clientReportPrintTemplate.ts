@@ -136,10 +136,15 @@ export function createClientReportPrintTemplate({
               ? placeholder
               : arts.length === 1
                 ? `<img class="post-card__thumb" src="${arts[0]}" alt="Arte do post" />`
-                : `<div class="post-card__thumb-grid">${arts
-                    .slice(0, 4)
-                    .map((src) => `<img src="${src}" alt="Arte do post" />`)
-                    .join("")}</div>`;
+                : (() => {
+                    const slides = arts.slice(0, 4);
+                    const total = Math.min(arts.length, 4);
+                    return `<div class="post-card__thumb-grid">${slides
+                      .map(
+                        (src, i) => `<div class="post-card__thumb-grid__cell"><img src="${src}" alt="Arte do post ${i + 1}" /><span class="post-card__thumb-grid__counter">${i + 1}/${total}</span></div>`,
+                      )
+                      .join("")}</div>`;
+                  })();
             return `
             <article class="post-card" style="--accent: ${accent}">
               <div class="post-card__rail"></div>
