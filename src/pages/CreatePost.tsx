@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Hash, ImagePlus, PenTool, X, Plus, Trash2, Save, ChevronDown, ChevronUp, ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { CalendarIcon, Hash, ImagePlus, PenTool, X, Plus, Trash2, Save, ChevronDown, ChevronUp, ArrowLeft, Sparkles, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,15 +82,74 @@ function createEmptyEntry(): PostEntry {
   };
 }
 
+// Briefing fields the AI generator actually uses to enrich the prompt
+const BRIEFING_FIELDS = [
+  "tone_of_voice",
+  "audience_pains",
+  "target_audience",
+  "content_pillars",
+  "differentials",
+  "cta_preferences",
+  "brand_values",
+  "main_offer",
+  "hashtags_base",
+  "banned_topics",
+  "niche",
+  "objective",
+] as const;
+
+type BriefingStatus = {
+  filled: number;
+  total: number;
+  hasCore: boolean; // tone + audience + (pains OR pillars OR differentials)
+};
+
+function computeBriefingStatus(row: Record<string, any> | undefined): BriefingStatus {
+  if (!row) return { filled: 0, total: BRIEFING_FIELDS.length, hasCore: false };
+  let filled = 0;
+  for (const f of BRIEFING_FIELDS) {
+    const v = row[f];
+    if (Array.isArray(v) ? v.length > 0 : typeof v === "string" ? v.trim().length > 0 : Boolean(v)) {
+      filled += 1;
+    }
+  }
+  const hasTone = Boolean(row.tone_of_voice?.toString().trim());
+  const hasAudience = Boolean(row.target_audience?.toString().trim());
+  const hasDepth = Boolean(
+    row.audience_pains?.toString().trim() ||
+    row.content_pillars?.toString().trim() ||
+    row.differentials?.toString().trim()
+  );
+  return { filled, total: BRIEFING_FIELDS.length, hasCore: hasTone && hasAudience && hasDepth };
+}
+
 export default function CreatePost() {
   const { clients, analysts, addPost, addPosts, addAnalyst } = usePosts();
   const { logActivity } = useActivity();
   const { user } = useAuth();
-  
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [entries, setEntries] = useState<PostEntry[]>([createEmptyEntry()]);
+  const [briefings, setBriefings] = useState<Record<string, BriefingStatus>>({});
+
+  // Load briefing status for all clients (one shot)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("clients")
+        .select("name, tone_of_voice, audience_pains, target_audience, content_pillars, differentials, cta_preferences, brand_values, main_offer, hashtags_base, banned_topics, niche, objective");
+      if (cancelled || !data) return;
+      const map: Record<string, BriefingStatus> = {};
+      for (const row of data as any[]) {
+        map[row.name] = computeBriefingStatus(row);
+      }
+      setBriefings(map);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Prefill from copy module via query params
   useEffect(() => {
@@ -328,6 +387,8 @@ export default function CreatePost() {
             idx={idx}
             total={entries.length}
             clients={clients}
+            briefings={briefings}
+            onNavigate={navigate}
             analysts={analysts}
             onUpdate={(patch) => updateEntry(idx, patch)}
             onRemove={() => removeEntry(idx)}
@@ -397,12 +458,14 @@ export default function CreatePost() {
 }
 
 function PostEntryForm({
-  entry, idx, total, clients, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag, onGenerateAI,
+  entry, idx, total, clients, briefings, onNavigate, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag, onGenerateAI,
 }: {
   entry: PostEntry;
   idx: number;
   total: number;
   clients: string[];
+  briefings: Record<string, BriefingStatus>;
+  onNavigate: (path: string) => void;
   analysts: string[];
   onUpdate: (patch: Partial<PostEntry>) => void;
   onRemove: () => void;
@@ -411,6 +474,7 @@ function PostEntryForm({
   onGenerateAI: () => void;
 }) {
   const effectiveClient = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
+  const briefing = effectiveClient ? briefings[effectiveClient] : undefined;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm">
@@ -440,7 +504,27 @@ function PostEntryForm({
           {/* Client & Analyst */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Cliente *</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label>Cliente *</Label>
+                {effectiveClient && briefing && (
+                  briefing.hasCore ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Briefing conectado · {briefing.filled}/{briefing.total}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => onNavigate(`/clientes/${encodeURIComponent(effectiveClient)}`)}
+                      className="inline-flex items-center gap-1 rounded-full border border-destructive/30 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive hover:bg-destructive/20 transition-colors"
+                      title="Clique para completar o briefing"
+                    >
+                      <AlertCircle className="h-3 w-3" />
+                      Briefing incompleto · {briefing.filled}/{briefing.total}
+                    </button>
+                  )
+                )}
+              </div>
               <Select value={entry.client} onValueChange={(v) => onUpdate({ client: v })}>
                 <SelectTrigger><SelectValue placeholder="Selecione o cliente" /></SelectTrigger>
                 <SelectContent>
@@ -539,9 +623,17 @@ function PostEntryForm({
 
           {/* AI Generation */}
           <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-primary">
-              <Sparkles className="h-4 w-4" />
-              Gerar com IA
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                <Sparkles className="h-4 w-4" />
+                Gerar com IA
+              </div>
+              {effectiveClient && briefing?.hasCore && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-primary">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Vai usar briefing
+                </span>
+              )}
             </div>
             <div className="flex gap-2 items-end">
               <Textarea
