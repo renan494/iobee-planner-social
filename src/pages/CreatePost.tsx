@@ -385,7 +385,7 @@ export default function CreatePost() {
           {entries.length === 1 ? "Criar Post" : `Criar ${entries.length} Posts`}
         </Button>
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
@@ -688,6 +688,6 @@ function PostEntryForm({
           </div>
         </div>
       )}
-    </PageContainer>
+    </div>
   );
 }
