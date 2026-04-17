@@ -502,7 +502,27 @@ function PostEntryForm({
           {/* Client & Analyst */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Cliente *</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label>Cliente *</Label>
+                {effectiveClient && briefing && (
+                  briefing.hasCore ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Briefing conectado · {briefing.filled}/{briefing.total}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/clientes/${encodeURIComponent(effectiveClient)}`)}
+                      className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 hover:bg-amber-500/20 transition-colors dark:text-amber-400"
+                      title="Clique para completar o briefing"
+                    >
+                      <AlertCircle className="h-3 w-3" />
+                      Briefing incompleto · {briefing.filled}/{briefing.total}
+                    </button>
+                  )
+                )}
+              </div>
               <Select value={entry.client} onValueChange={(v) => onUpdate({ client: v })}>
                 <SelectTrigger><SelectValue placeholder="Selecione o cliente" /></SelectTrigger>
                 <SelectContent>
