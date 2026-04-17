@@ -180,12 +180,22 @@ export default function ClientDetail() {
         </div>
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold text-foreground">{clientName}</h1>
-          <button onClick={openEditDialog} className="rounded-full p-1.5 text-muted-foreground/40 hover:text-primary hover:bg-primary/10 transition-colors">
-            <Pencil className="h-4 w-4" />
-          </button>
         </div>
           <p className="text-sm text-muted-foreground">{clientPosts.length} posts · {analysts.length} analista(s)</p>
       </div>
+
+      {editingBriefing ? (
+        <BriefingForm
+          values={briefingForm}
+          onChange={setBriefingForm}
+          onCancel={() => setEditingBriefing(false)}
+          onSave={handleSaveBriefing}
+          saving={briefingSaving}
+          lockName
+          avatarUrl={avatarUrl}
+          saveLabel="Salvar Briefing"
+        />
+      ) : null}
 
       {showReport ? (
         <ClientReportPreview
