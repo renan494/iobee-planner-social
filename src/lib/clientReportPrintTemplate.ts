@@ -819,6 +819,36 @@ export function createClientReportPrintTemplate({
             page-break-after: avoid;
           }
 
+          /* Overflow mode: post with very long legend (>3500 chars) is allowed
+             to flow to a 2nd page. We drop the fixed height and the in-card
+             clipping, and let the columns container expand naturally. The
+             watermark + giant index stay anchored to the top of page 1
+             (they are absolutely positioned to the article box). */
+          .post-card--overflow {
+            height: auto;
+            min-height: 240mm;
+            overflow: visible;
+            break-inside: auto;
+            page-break-inside: auto;
+          }
+
+          .post-card--overflow .post-card__columns {
+            min-height: 0;
+            flex: none;
+          }
+
+          .post-card--overflow .content-block--soft {
+            break-inside: auto;
+            page-break-inside: auto;
+          }
+
+          .content-label__hint {
+            font-weight: 600;
+            color: var(--accent, ${COLORS.accent});
+            letter-spacing: 0.04em;
+            text-transform: none;
+          }
+
           .post-card__watermark {
             position: absolute;
             top: -28mm;
