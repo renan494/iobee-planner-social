@@ -514,6 +514,89 @@ export function createClientReportPrintTemplate({
             font-weight: 700;
           }
 
+          .funnel-row {
+            margin-top: 8mm;
+          }
+
+          .funnel-row__head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 3mm;
+          }
+
+          .funnel-row__total {
+            font-size: 8pt;
+            font-weight: 700;
+            color: ${COLORS.muted};
+            letter-spacing: 0.06em;
+          }
+
+          .funnel-bar {
+            display: flex;
+            width: 100%;
+            height: 4mm;
+            border-radius: 999px;
+            overflow: hidden;
+            background: ${COLORS.lineSoft};
+            border: 0.3mm solid ${COLORS.line};
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .funnel-bar__segment {
+            height: 100%;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .funnel-bar--empty {
+            opacity: 0.6;
+          }
+
+          .funnel-legend {
+            margin-top: 3.5mm;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6mm;
+          }
+
+          .funnel-legend__item {
+            display: inline-flex;
+            align-items: center;
+            gap: 2mm;
+            font-size: 9pt;
+            color: ${COLORS.ink};
+          }
+
+          .funnel-legend__dot {
+            width: 2.6mm;
+            height: 2.6mm;
+            border-radius: 50%;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .funnel-legend__label {
+            font-weight: 700;
+          }
+
+          .funnel-legend__value {
+            color: ${COLORS.body};
+            font-weight: 600;
+          }
+
+          .funnel-legend__pct {
+            color: ${COLORS.muted};
+            font-weight: 600;
+          }
+
+          .funnel-empty {
+            margin-top: 2.5mm;
+            font-size: 9pt;
+            color: ${COLORS.muted};
+          }
+
           .cover-foot {
             margin-top: auto;
             padding-top: 10mm;
