@@ -82,15 +82,74 @@ function createEmptyEntry(): PostEntry {
   };
 }
 
+// Briefing fields the AI generator actually uses to enrich the prompt
+const BRIEFING_FIELDS = [
+  "tone_of_voice",
+  "audience_pains",
+  "target_audience",
+  "content_pillars",
+  "differentials",
+  "cta_preferences",
+  "brand_values",
+  "main_offer",
+  "hashtags_base",
+  "banned_topics",
+  "niche",
+  "objective",
+] as const;
+
+type BriefingStatus = {
+  filled: number;
+  total: number;
+  hasCore: boolean; // tone + audience + (pains OR pillars OR differentials)
+};
+
+function computeBriefingStatus(row: Record<string, any> | undefined): BriefingStatus {
+  if (!row) return { filled: 0, total: BRIEFING_FIELDS.length, hasCore: false };
+  let filled = 0;
+  for (const f of BRIEFING_FIELDS) {
+    const v = row[f];
+    if (Array.isArray(v) ? v.length > 0 : typeof v === "string" ? v.trim().length > 0 : Boolean(v)) {
+      filled += 1;
+    }
+  }
+  const hasTone = Boolean(row.tone_of_voice?.toString().trim());
+  const hasAudience = Boolean(row.target_audience?.toString().trim());
+  const hasDepth = Boolean(
+    row.audience_pains?.toString().trim() ||
+    row.content_pillars?.toString().trim() ||
+    row.differentials?.toString().trim()
+  );
+  return { filled, total: BRIEFING_FIELDS.length, hasCore: hasTone && hasAudience && hasDepth };
+}
+
 export default function CreatePost() {
   const { clients, analysts, addPost, addPosts, addAnalyst } = usePosts();
   const { logActivity } = useActivity();
   const { user } = useAuth();
-  
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [entries, setEntries] = useState<PostEntry[]>([createEmptyEntry()]);
+  const [briefings, setBriefings] = useState<Record<string, BriefingStatus>>({});
+
+  // Load briefing status for all clients (one shot)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("clients")
+        .select("name, tone_of_voice, audience_pains, target_audience, content_pillars, differentials, cta_preferences, brand_values, main_offer, hashtags_base, banned_topics, niche, objective");
+      if (cancelled || !data) return;
+      const map: Record<string, BriefingStatus> = {};
+      for (const row of data as any[]) {
+        map[row.name] = computeBriefingStatus(row);
+      }
+      setBriefings(map);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Prefill from copy module via query params
   useEffect(() => {
