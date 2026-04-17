@@ -361,7 +361,7 @@ export default function CreatePost() {
   };
 
   return (
-    <PageContainer maxWidth="3xl">
+    <PageContainer maxWidth="5xl">
       <div className="mb-4">
         <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4" /> Voltar
