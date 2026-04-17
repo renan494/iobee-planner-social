@@ -68,10 +68,19 @@ export async function exportClientReportPdf({
     avatarUrl ? toDataUrl(avatarUrl) : Promise.resolve(null),
     Promise.all(
       posts.map(async (post) => {
-        const firstArt = post.artUrls?.[0] ?? post.artUrl ?? null;
-        if (!firstArt) return [post.id, null] as const;
-        const dataUrl = await toDataUrl(firstArt);
-        return [post.id, dataUrl] as const;
+        const isCarousel = post.format === "carousel";
+        const limit = isCarousel ? 4 : 1;
+        const sources = (post.artUrls && post.artUrls.length > 0
+          ? post.artUrls
+          : post.artUrl
+            ? [post.artUrl]
+            : []
+        ).slice(0, limit);
+        if (sources.length === 0) return [post.id, [] as string[]] as const;
+        const dataUrls = (await Promise.all(sources.map(toDataUrl))).filter(
+          (u): u is string => !!u,
+        );
+        return [post.id, dataUrls] as const;
       }),
     ),
   ]);
