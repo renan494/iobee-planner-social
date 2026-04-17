@@ -106,6 +106,8 @@ export default function ReverseEngineerCopy() {
         setTranscript(payload.transcript);
         setSource(payload.source || "manual");
         setSourceUrl(url.trim());
+        setTranscriptKind(payload.transcript_kind === "audio" ? "audio" : payload.transcript_kind === "written" ? "written" : null);
+        setVideoWarning(payload.video_warning || null);
         toast.success("Conteúdo extraído!");
         setTab("manual");
       }
