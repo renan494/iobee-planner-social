@@ -3,12 +3,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Wand2, ArrowRight } from "lucide-react";
 import { FRAMEWORKS, type Framework, type FrameworkConfig } from "@/lib/copyFrameworks";
+import { PageContainer } from "@/components/PageContainer";
 
 export default function CopyHub() {
   const navigate = useNavigate();
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 space-y-6">
+    <PageContainer className="space-y-6">
       <div>
         <h1 className="font-heading text-3xl font-extrabold text-foreground">Roteiros</h1>
         <p className="text-sm text-muted-foreground mt-2">
@@ -85,6 +86,6 @@ export default function CopyHub() {
           </div>
         </Card>
       </button>
-    </div>
+    </PageContainer>
   );
 }

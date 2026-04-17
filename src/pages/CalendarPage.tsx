@@ -36,6 +36,7 @@ import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
 import { useNavigate } from "react-router-dom";
 import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
+import { PageContainer } from "@/components/PageContainer";
 
 
 export default function CalendarPage() {
@@ -140,7 +141,7 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 space-y-4">
+    <PageContainer className="py-6 space-y-4">
       {/* Row 1: Navigation + Import/Export */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <CalendarHeader
@@ -249,6 +250,6 @@ export default function CalendarPage() {
         onImport={handleImport}
         existingClients={clients}
       />
-    </div>
+    </PageContainer>
   );
 }

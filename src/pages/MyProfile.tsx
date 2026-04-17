@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { PageContainer } from "@/components/PageContainer";
 
 export default function MyProfile() {
   const { user } = useAuth();
@@ -48,7 +49,7 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+    <PageContainer maxWidth="2xl">
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
           <UserCircle className="h-5 w-5 text-primary" />
@@ -124,6 +125,6 @@ export default function MyProfile() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }

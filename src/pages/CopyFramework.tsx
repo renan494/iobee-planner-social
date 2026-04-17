@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { usePosts } from "@/contexts/PostsContext";
 import { FRAMEWORKS, FORMATS, type Framework } from "@/lib/copyFrameworks";
+import { PageContainer } from "@/components/PageContainer";
 
 export default function CopyFramework() {
   const { framework } = useParams<{ framework: Framework }>();
@@ -203,7 +204,7 @@ export default function CopyFramework() {
   const Icon = config.icon;
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 space-y-6">
+    <PageContainer className="space-y-6">
       <Link to="/copy" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" /> Voltar
       </Link>
@@ -408,6 +409,6 @@ export default function CopyFramework() {
           </Button>
         </div>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

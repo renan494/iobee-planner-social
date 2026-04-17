@@ -14,6 +14,7 @@ import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, type PostFormat } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PageContainer } from "@/components/PageContainer";
 
 export default function Clients() {
   const { posts, clients, addClient, deleteClient } = usePosts();
@@ -149,7 +150,7 @@ export default function Clients() {
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
+    <PageContainer>
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
@@ -332,6 +333,6 @@ export default function Clients() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </PageContainer>
   );
 }

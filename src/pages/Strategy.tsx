@@ -11,6 +11,7 @@ import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, Ale
 import StrategyContent from "@/components/StrategyContent";
 import StrategyDebateChat from "@/components/StrategyDebateChat";
 import StrategySlideViewer from "@/components/strategy-slides/StrategySlideViewer";
+import { PageContainer } from "@/components/PageContainer";
 
 type ClientData = {
   id: string;
@@ -178,7 +179,7 @@ export default function Strategy() {
   }
 
   return (
-    <div className="mx-auto max-w-[1000px] px-4 py-8 sm:px-6">
+    <PageContainer maxWidth="1000">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
@@ -370,6 +371,6 @@ export default function Strategy() {
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

@@ -29,6 +29,7 @@ import { useActivity } from "@/contexts/ActivityContext";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { PageContainer } from "@/components/PageContainer";
 
 interface PostEntry {
   id: string;
@@ -301,7 +302,7 @@ export default function CreatePost() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+    <PageContainer maxWidth="3xl">
       <div className="mb-4">
         <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4" /> Voltar
@@ -687,6 +688,6 @@ function PostEntryForm({
           </div>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

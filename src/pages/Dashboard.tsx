@@ -11,6 +11,7 @@ import { useActivity } from "@/contexts/ActivityContext";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { PostFormat } from "@/data/posts";
+import { PageContainer } from "@/components/PageContainer";
 
 const FORMAT_CONFIG: Record<PostFormat, { label: string; subtitle: string; icon: typeof Image; color: string }> = {
   static: { label: "Estáticos", subtitle: "posts criados", icon: Image, color: "bg-[hsl(var(--format-static))]" },
@@ -53,7 +54,7 @@ export default function Dashboard() {
   }, [filteredPosts, analysts]);
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
+    <PageContainer>
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
           <TrendingUp className="h-5 w-5 text-primary" />
@@ -178,6 +179,6 @@ export default function Dashboard() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   );
 }
