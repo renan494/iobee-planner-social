@@ -186,44 +186,48 @@ export function createClientReportPrintTemplate({
               <div class="post-card__rail"></div>
               <div class="post-card__body">
                 <header class="post-card__header">
-                  <div class="post-card__heading">
-                    <p class="eyebrow">Post ${String(index + 1).padStart(2, "0")} · ${formatDate(post.date)}</p>
-                    <h3>${escapeHtml(post.title)}</h3>
-                    <span class="tag tag--format" style="--tag-color: ${accent}; margin-top: 3mm;">
-                      ${escapeHtml(FORMAT_LABELS[post.format])}
-                    </span>
-                  </div>
-                  ${thumbBlock}
+                  <p class="eyebrow">Post ${String(index + 1).padStart(2, "0")} · ${formatDate(post.date)}</p>
+                  <h3>${escapeHtml(post.title)}</h3>
+                  <span class="tag tag--format" style="--tag-color: ${accent}; margin-top: 2mm;">
+                    ${escapeHtml(FORMAT_LABELS[post.format])}
+                  </span>
                 </header>
 
-                <div class="meta-row">
-                  <div><span class="meta-label">Funil</span><span class="meta-value">${escapeHtml(FUNNEL_LABELS[post.funnelStage])}</span></div>
-                  <div><span class="meta-label">Analista</span><span class="meta-value">${escapeHtml(post.analyst)}</span></div>
-                  <div><span class="meta-label">Canais</span><span class="meta-value">${escapeHtml((post.channels || []).join(" · ") || "—")}</span></div>
+                <div class="post-card__columns">
+                  <aside class="post-card__col-left">
+                    ${thumbBlock}
+                    <div class="meta-stack">
+                      <div><span class="meta-label">Funil</span><span class="meta-value">${escapeHtml(FUNNEL_LABELS[post.funnelStage])}</span></div>
+                      <div><span class="meta-label">Analista</span><span class="meta-value">${escapeHtml(post.analyst)}</span></div>
+                      <div><span class="meta-label">Canais</span><span class="meta-value">${escapeHtml((post.channels || []).join(" · ") || "—")}</span></div>
+                    </div>
+                  </aside>
+
+                  <div class="post-card__col-right">
+                    <div class="content-block">
+                      <p class="content-label">Headline</p>
+                      <p class="content-text content-text--lead">${nl2br(post.headline)}</p>
+                    </div>
+
+                    ${post.legend ? `
+                      <div class="content-block content-block--soft content-block--scroll">
+                        <p class="content-label">Legenda</p>
+                        <p class="content-text">${nl2br(post.legend)}</p>
+                      </div>` : ""}
+
+                    ${post.hashtags.length > 0 ? `
+                      <div class="content-block">
+                        <p class="content-label">Hashtags</p>
+                        <p class="content-text content-text--accent">${escapeHtml(post.hashtags.map((tag) => `#${tag}`).join("  "))}</p>
+                      </div>` : ""}
+
+                    ${post.reference ? `
+                      <div class="content-block">
+                        <p class="content-label">Referência</p>
+                        <p class="content-text content-text--mono">${escapeHtml(post.reference)}</p>
+                      </div>` : ""}
+                  </div>
                 </div>
-
-                <div class="content-block">
-                  <p class="content-label">Headline</p>
-                  <p class="content-text content-text--lead">${nl2br(post.headline)}</p>
-                </div>
-
-                ${post.legend ? `
-                  <div class="content-block content-block--soft">
-                    <p class="content-label">Legenda</p>
-                    <p class="content-text">${nl2br(post.legend)}</p>
-                  </div>` : ""}
-
-                ${post.hashtags.length > 0 ? `
-                  <div class="content-block">
-                    <p class="content-label">Hashtags</p>
-                    <p class="content-text content-text--accent">${escapeHtml(post.hashtags.map((tag) => `#${tag}`).join("  "))}</p>
-                  </div>` : ""}
-
-                ${post.reference ? `
-                  <div class="content-block">
-                    <p class="content-label">Referência</p>
-                    <p class="content-text content-text--mono">${escapeHtml(post.reference)}</p>
-                  </div>` : ""}
               </div>
             </article>`;
           },
