@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { PageContainer } from "@/components/PageContainer";
 import { BriefingForm, emptyBriefing, type BriefingFormValues } from "@/components/BriefingForm";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Clients() {
   const { posts, clients, addClient, deleteClient } = usePosts();
