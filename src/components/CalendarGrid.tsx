@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import {
   startOfMonth,
   endOfMonth,
@@ -23,19 +24,22 @@ interface CalendarGridProps {
   onPostClick: (post: Post) => void;
 }
 
-export function CalendarGrid({ currentDate, posts, onPostClick }: CalendarGridProps) {
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(currentDate);
-  const calendarStart = startOfWeek(monthStart, { locale: ptBR });
-  const calendarEnd = endOfWeek(monthEnd, { locale: ptBR });
-  const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+function CalendarGridImpl({ currentDate, posts, onPostClick }: CalendarGridProps) {
+  const { days, postsByDate } = useMemo(() => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const calendarStart = startOfWeek(monthStart, { locale: ptBR });
+    const calendarEnd = endOfWeek(monthEnd, { locale: ptBR });
+    const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-  const postsByDate = new Map<string, Post[]>();
-  posts.forEach((p) => {
-    const key = p.date;
-    if (!postsByDate.has(key)) postsByDate.set(key, []);
-    postsByDate.get(key)!.push(p);
-  });
+    const postsByDate = new Map<string, Post[]>();
+    posts.forEach((p) => {
+      const key = p.date;
+      if (!postsByDate.has(key)) postsByDate.set(key, []);
+      postsByDate.get(key)!.push(p);
+    });
+    return { days, postsByDate };
+  }, [currentDate, posts]);
 
   return (
     <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
@@ -113,3 +117,5 @@ export function CalendarGrid({ currentDate, posts, onPostClick }: CalendarGridPr
     </div>
   );
 }
+
+export const CalendarGrid = memo(CalendarGridImpl);
