@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,63 +8,75 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PostsProvider } from "@/contexts/PostsContext";
 import { ActivityProvider } from "@/contexts/ActivityContext";
 import { AppLayout } from "@/components/AppLayout";
-import Dashboard from "./pages/Dashboard";
-import CreatePost from "./pages/CreatePost";
-import CalendarPage from "./pages/CalendarPage";
-import Clients from "./pages/Clients";
-import ClientDetail from "./pages/ClientDetail";
-import Analysts from "./pages/Analysts";
-import AnalystDetail from "./pages/AnalystDetail";
-import Drafts from "./pages/Drafts";
-import Strategy from "./pages/Strategy";
-import CopyHub from "./pages/CopyHub";
-import CopyFramework from "./pages/CopyFramework";
-import ReverseEngineerCopy from "./pages/ReverseEngineerCopy";
-import AdminUsers from "./pages/AdminUsers";
-import MyProfile from "./pages/MyProfile";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
-const queryClient = new QueryClient();
+// Eager: critical first-paint route
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+
+// Lazy: secondary routes (code-splitting reduces initial bundle)
+const CreatePost = lazy(() => import("./pages/CreatePost"));
+const CalendarPage = lazy(() => import("./pages/CalendarPage"));
+const Clients = lazy(() => import("./pages/Clients"));
+const ClientDetail = lazy(() => import("./pages/ClientDetail"));
+const Analysts = lazy(() => import("./pages/Analysts"));
+const AnalystDetail = lazy(() => import("./pages/AnalystDetail"));
+const Drafts = lazy(() => import("./pages/Drafts"));
+const Strategy = lazy(() => import("./pages/Strategy"));
+const CopyHub = lazy(() => import("./pages/CopyHub"));
+const CopyFramework = lazy(() => import("./pages/CopyFramework"));
+const ReverseEngineerCopy = lazy(() => import("./pages/ReverseEngineerCopy"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers"));
+const MyProfile = lazy(() => import("./pages/MyProfile"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+function FullScreenLoader() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-background">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+}
 
 function ProtectedRoutes() {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  if (loading) return <FullScreenLoader />;
+  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <PostsProvider>
       <ActivityProvider>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/criar" element={<CreatePost />} />
-            <Route path="/rascunhos" element={<Drafts />} />
-            <Route path="/estrategia" element={<Strategy />} />
-            <Route path="/copy" element={<CopyHub />} />
-            <Route path="/copy/engenharia-reversa" element={<ReverseEngineerCopy />} />
-            <Route path="/copy/:framework" element={<CopyFramework />} />
-            <Route path="/calendario" element={<CalendarPage />} />
-            <Route path="/clientes" element={<Clients />} />
-            <Route path="/clientes/:name" element={<ClientDetail />} />
-            <Route path="/analistas" element={<Analysts />} />
-            <Route path="/analistas/:name" element={<AnalystDetail />} />
-            <Route path="/admin/usuarios" element={<AdminUsers />} />
-            <Route path="/perfil" element={<MyProfile />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<FullScreenLoader />}>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/criar" element={<CreatePost />} />
+              <Route path="/rascunhos" element={<Drafts />} />
+              <Route path="/estrategia" element={<Strategy />} />
+              <Route path="/copy" element={<CopyHub />} />
+              <Route path="/copy/engenharia-reversa" element={<ReverseEngineerCopy />} />
+              <Route path="/copy/:framework" element={<CopyFramework />} />
+              <Route path="/calendario" element={<CalendarPage />} />
+              <Route path="/clientes" element={<Clients />} />
+              <Route path="/clientes/:name" element={<ClientDetail />} />
+              <Route path="/analistas" element={<Analysts />} />
+              <Route path="/analistas/:name" element={<AnalystDetail />} />
+              <Route path="/admin/usuarios" element={<AdminUsers />} />
+              <Route path="/perfil" element={<MyProfile />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </ActivityProvider>
     </PostsProvider>
   );
@@ -71,19 +84,8 @@ function ProtectedRoutes() {
 
 function LoginRoute() {
   const { user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
-
+  if (loading) return <FullScreenLoader />;
+  if (user) return <Navigate to="/" replace />;
   return <Login />;
 }
 
