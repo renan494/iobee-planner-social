@@ -28,18 +28,19 @@ export function useAdminCheck() {
     // Deduplicate concurrent fetches
     let req = inflight.get(user.id);
     if (!req) {
-      req = supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle()
-        .then(({ data }) => {
-          const result = !!data;
-          cache.set(user!.id, result);
-          inflight.delete(user!.id);
-          return result;
-        });
+      req = Promise.resolve(
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle()
+      ).then(({ data }) => {
+        const result = !!data;
+        cache.set(user!.id, result);
+        inflight.delete(user!.id);
+        return result;
+      });
       inflight.set(user.id, req);
     }
     req.then((result) => setIsAdmin(result));
