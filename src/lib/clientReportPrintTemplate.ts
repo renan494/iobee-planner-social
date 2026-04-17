@@ -154,14 +154,18 @@ export function createClientReportPrintTemplate({
 
   // Pick legend density tier so it always fits in the fixed-height card.
   // Tiers tuned for ~110mm tall x 110mm wide legend box (≈1 column ~ 38 chars/line).
+  // Above OVERFLOW_THRESHOLD chars, the card is allowed to flow to a 2nd page
+  // and the legend renders in a single comfortable column instead of being squeezed.
+  const OVERFLOW_THRESHOLD = 3500;
   const pickLegendTier = (legend: string | null | undefined) => {
     const len = (legend ?? "").length;
-    if (len <= 280)   return { fontSize: "10pt",  lineHeight: 1.45, cols: 1 };
-    if (len <= 700)   return { fontSize: "9pt",   lineHeight: 1.4,  cols: 1 };
-    if (len <= 1400)  return { fontSize: "8.5pt", lineHeight: 1.35, cols: 2 };
-    if (len <= 2400)  return { fontSize: "7.5pt", lineHeight: 1.3,  cols: 2 };
-    if (len <= 3600)  return { fontSize: "7pt",   lineHeight: 1.25, cols: 3 };
-    return                  { fontSize: "6.5pt", lineHeight: 1.2,  cols: 3 };
+    if (len > OVERFLOW_THRESHOLD) return { fontSize: "9pt", lineHeight: 1.5, cols: 1, overflow: true };
+    if (len <= 280)   return { fontSize: "10pt",  lineHeight: 1.45, cols: 1, overflow: false };
+    if (len <= 700)   return { fontSize: "9pt",   lineHeight: 1.4,  cols: 1, overflow: false };
+    if (len <= 1400)  return { fontSize: "8.5pt", lineHeight: 1.35, cols: 2, overflow: false };
+    if (len <= 2400)  return { fontSize: "7.5pt", lineHeight: 1.3,  cols: 2, overflow: false };
+    if (len <= 3600)  return { fontSize: "7pt",   lineHeight: 1.25, cols: 3, overflow: false };
+    return                  { fontSize: "6.5pt", lineHeight: 1.2,  cols: 3, overflow: false };
   };
 
   const detailCards = sortedPosts.length > 0
@@ -194,7 +198,7 @@ export function createClientReportPrintTemplate({
                       .join("")}</div>`;
                   })();
             return `
-            <article class="post-card" style="--accent: ${accent}">
+            <article class="post-card${legendTier.overflow ? " post-card--overflow" : ""}" style="--accent: ${accent}">
               <div class="post-card__watermark" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1028.56" preserveAspectRatio="xMidYMid meet">
                   <path fill="currentColor" d="M1061.21,517.56h0c10.95.02,19.59-9.26,18.73-20.18C1072.4,401.83,1012.5,0,538.55,0S37.04,370.88,37.38,492.32c.03,10.33-8.36,18.7-18.69,18.69h0c-10.85-.02-19.41,9.14-18.64,19.96,6.78,95.16,63.53,497.61,538.51,497.61,432.8,0,499.24-340.39,503.89-492.84.31-10.15,8.61-18.18,18.76-18.16ZM154.55,515.04c4.57-57.9,1.52-341.33,384-341.33s387.05,283.43,387.05,341.33-24.39,339.81-387.05,339.81c-396.19,0-379.43-281.9-384-339.81Z"/>
@@ -231,9 +235,9 @@ export function createClientReportPrintTemplate({
                     </div>
 
                     ${post.legend ? `
-                      <div class="content-block content-block--soft content-block--scroll">
-                        <p class="content-label">Legenda</p>
-                        <p class="content-text legend-text" style="font-size:${legendTier.fontSize};line-height:${legendTier.lineHeight};column-count:${legendTier.cols};">${nl2br(post.legend)}</p>
+                      <div class="content-block content-block--soft${legendTier.overflow ? "" : " content-block--scroll"}">
+                        <p class="content-label">Legenda${legendTier.overflow ? ` <span class="content-label__hint">· conteúdo extenso, pode ocupar 2 páginas</span>` : ""}</p>
+                        <p class="content-text legend-text" style="font-size:${legendTier.fontSize};line-height:${legendTier.lineHeight};${legendTier.overflow ? "" : `column-count:${legendTier.cols};`}">${nl2br(post.legend)}</p>
                       </div>` : ""}
 
                     ${post.hashtags.length > 0 ? `
@@ -813,6 +817,36 @@ export function createClientReportPrintTemplate({
           .post-card:last-child {
             break-after: avoid;
             page-break-after: avoid;
+          }
+
+          /* Overflow mode: post with very long legend (>3500 chars) is allowed
+             to flow to a 2nd page. We drop the fixed height and the in-card
+             clipping, and let the columns container expand naturally. The
+             watermark + giant index stay anchored to the top of page 1
+             (they are absolutely positioned to the article box). */
+          .post-card--overflow {
+            height: auto;
+            min-height: 240mm;
+            overflow: visible;
+            break-inside: auto;
+            page-break-inside: auto;
+          }
+
+          .post-card--overflow .post-card__columns {
+            min-height: 0;
+            flex: none;
+          }
+
+          .post-card--overflow .content-block--soft {
+            break-inside: auto;
+            page-break-inside: auto;
+          }
+
+          .content-label__hint {
+            font-weight: 600;
+            color: var(--accent, ${COLORS.accent});
+            letter-spacing: 0.04em;
+            text-transform: none;
           }
 
           .post-card__watermark {
