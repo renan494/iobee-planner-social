@@ -76,7 +76,7 @@ export async function exportClientReportPdf({
             ? [post.artUrl]
             : []
         ).slice(0, limit);
-        if (sources.length === 0) return [post.id, []] as const;
+        if (sources.length === 0) return [post.id, [] as string[]] as const;
         const dataUrls = (await Promise.all(sources.map(toDataUrl))).filter(
           (u): u is string => !!u,
         );
