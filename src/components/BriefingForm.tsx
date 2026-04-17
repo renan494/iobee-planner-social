@@ -297,7 +297,7 @@ export function BriefingForm({
 
       {/* Nome */}
       <div className="mb-6 space-y-2">
-        <Label htmlFor="bf-name" className={labelClass}>Nome do cliente *</Label>
+        <LabelWithHint htmlFor="bf-name" className={labelClass} hint='Nome oficial da marca como deve aparecer em copies, capas e relatórios. Ex: "iOBEE", "Padaria do João".'>Nome do cliente *</LabelWithHint>
         <Input
           id="bf-name"
           className={cn(fieldInputClass, lockName && "opacity-70 cursor-not-allowed")}
@@ -311,11 +311,11 @@ export function BriefingForm({
       {/* Segmento + @Instagram */}
       <div className="mb-6 grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="bf-niche" className={labelClass}>Segmento / Nicho</Label>
+          <LabelWithHint htmlFor="bf-niche" className={labelClass} hint='Em uma frase, o que a marca faz e para quem. Ex: "Agência de marketing digital para clínicas de estética no Sul" — quanto mais específico, melhor a IA segmenta os ângulos.'>Segmento / Nicho</LabelWithHint>
           <Input id="bf-niche" className={fieldInputClass} placeholder="Ex: Agência de marketing digital" value={values.niche} onChange={(e) => update("niche", e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="bf-ig" className={labelClass}>@ do Instagram principal</Label>
+          <LabelWithHint htmlFor="bf-ig" className={labelClass} hint='@ principal sem o "https://". A IA usa isso para citar a marca em CTAs ("siga @suamarca") e cruzar com referências.'>@ do Instagram principal</LabelWithHint>
           <Input id="bf-ig" className={fieldInputClass} placeholder="@suamarca" value={values.instagramHandle} onChange={(e) => update("instagramHandle", e.target.value)} />
         </div>
       </div>
@@ -323,40 +323,40 @@ export function BriefingForm({
       {/* Frequência + Oferta principal */}
       <div className="mb-6 grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="bf-freq" className={labelClass}>Frequência de postagem desejada</Label>
+          <LabelWithHint htmlFor="bf-freq" className={labelClass} hint='Quantos posts e stories por semana / mês. Ex: "3 carrosséis + 2 reels + 5 stories por semana". A IA distribui pilares respeitando essa cadência.'>Frequência de postagem desejada</LabelWithHint>
           <Input id="bf-freq" className={fieldInputClass} placeholder="Ex: 5 posts + 3 stories por semana" value={values.postingFrequency} onChange={(e) => update("postingFrequency", e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="bf-offer" className={labelClass}>Oferta principal a vender no social</Label>
+          <LabelWithHint htmlFor="bf-offer" className={labelClass} hint='Produto ou serviço-âncora que o conteúdo precisa empurrar. Ex: "Mentoria 1:1 de R$ 2.997 com 6 vagas/mês". É o destino final dos CTAs.'>Oferta principal a vender no social</LabelWithHint>
           <Input id="bf-offer" className={fieldInputClass} placeholder="Ex: Mentoria 1:1, Curso X..." value={values.mainOffer} onChange={(e) => update("mainOffer", e.target.value)} />
         </div>
       </div>
 
       {/* Público + Dores */}
       <div className="mb-6 space-y-2">
-        <Label htmlFor="bf-audience" className={labelClass}>Público-alvo (idade, gênero, localização, interesses)</Label>
+        <LabelWithHint htmlFor="bf-audience" className={labelClass} hint={'Persona detalhada. Ex: "Mulheres 28–40, classe B/C, mães, moram em capitais, seguem perfis de finanças e maternidade, querem renda extra mas não têm tempo para curso longo." Quanto mais real, melhor.'}>Público-alvo (idade, gênero, localização, interesses)</LabelWithHint>
         <Textarea id="bf-audience" className={fieldTextareaClass} placeholder="Descreva o público em detalhes..." value={values.targetAudience} onChange={(e) => update("targetAudience", e.target.value)} />
       </div>
 
       <div className="mb-6 space-y-2">
-        <Label htmlFor="bf-pains" className={labelClass}>Dores, desejos e objeções do público</Label>
+        <LabelWithHint htmlFor="bf-pains" className={labelClass} hint={'Frases REAIS que o público diz. Ex: "Já tentei 3 dietas e sempre volto a engordar", "Tenho medo de gastar e não funcionar", "Não tenho tempo para treinar 1h por dia". Isso vira hook de reels e abertura de copy.'}>Dores, desejos e objeções do público</LabelWithHint>
         <Textarea id="bf-pains" className={fieldTextareaClass} placeholder="Ex: Não consegue gerar leads consistentes; tem medo de investir e não dar retorno..." value={values.audiencePains} onChange={(e) => update("audiencePains", e.target.value)} />
       </div>
 
       {/* Objetivo */}
       <div className="mb-6 space-y-2">
-        <Label htmlFor="bf-objective" className={labelClass}>Objetivo macro no social media</Label>
+        <LabelWithHint htmlFor="bf-objective" className={labelClass} hint={'Meta mensurável dos próximos 90 dias no orgânico. Ex: "Sair de 8k para 20k seguidores no IG e gerar 30 leads qualificados/mês via DM". A IA mira aqui ao escolher formatos.'}>Objetivo macro no social media</LabelWithHint>
         <Textarea id="bf-objective" className={fieldTextareaClass} placeholder="Ex: Construir autoridade e gerar 30 leads qualificados/mês via DM" value={values.objective} onChange={(e) => update("objective", e.target.value)} />
       </div>
 
       {/* Pilares + CTAs */}
       <div className="mb-6 grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="bf-pillars" className={labelClass}>Pilares de conteúdo</Label>
+          <LabelWithHint htmlFor="bf-pillars" className={labelClass} hint={'4–6 grandes temas que sustentam o feed. Ex: "Educacional (40%), Bastidores (20%), Cases/prova social (20%), Vendas (15%), Inspiracional (5%)". A IA usa para variar o calendário.'}>Pilares de conteúdo</LabelWithHint>
           <Textarea id="bf-pillars" className={cn(fieldTextareaClass, "min-h-[90px]")} placeholder="Ex: Educacional, Bastidores, Cases, Vendas, Inspiracional" value={values.contentPillars} onChange={(e) => update("contentPillars", e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="bf-ctas" className={labelClass}>CTAs / chamadas preferidas</Label>
+          <LabelWithHint htmlFor="bf-ctas" className={labelClass} hint={'Como você quer que o público responda. Ex: "Comente AGORA para receber por DM", "Salva esse post", "Clica no link da bio", "Me chama no WhatsApp". A IA repete esses padrões.'}>CTAs / chamadas preferidas</LabelWithHint>
           <Textarea id="bf-ctas" className={cn(fieldTextareaClass, "min-h-[90px]")} placeholder='Ex: "Comente AQUI", DM com palavra-chave, link na bio...' value={values.ctaPreferences} onChange={(e) => update("ctaPreferences", e.target.value)} />
         </div>
       </div>
@@ -364,18 +364,18 @@ export function BriefingForm({
       {/* Concorrentes + Referências */}
       <div className="mb-6 grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="bf-competitors" className={labelClass}>Concorrentes diretos</Label>
+          <LabelWithHint htmlFor="bf-competitors" className={labelClass} hint={'3–7 perfis que disputam o MESMO público. Ex: "@marcaA, @marcaB, @empresaC". A IA evita repetir formatos saturados e busca ângulos diferenciadores.'}>Concorrentes diretos</LabelWithHint>
           <Textarea id="bf-competitors" className={cn(fieldTextareaClass, "min-h-[90px]")} placeholder="Ex: @marcaX, @marcaY, @empresaZ..." value={values.competitors} onChange={(e) => update("competitors", e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="bf-refs" className={labelClass}>Perfis de referência (que admira)</Label>
+          <LabelWithHint htmlFor="bf-refs" className={labelClass} hint={'Perfis que você admira (não precisa ser do mesmo nicho) e PORQUÊ. Ex: "@nathfinanças — pelos roteiros didáticos; @bruno.perini — pela edição rápida". A IA imita o que funciona.'}>Perfis de referência (que admira)</LabelWithHint>
           <Textarea id="bf-refs" className={cn(fieldTextareaClass, "min-h-[90px]")} placeholder="Ex: @perfilA, @perfilB — pelo storytelling / edição..." value={values.successReferences} onChange={(e) => update("successReferences", e.target.value)} />
         </div>
       </div>
 
       {/* Redes sociais */}
       <div className="mb-8 space-y-3">
-        <Label className={labelClass}>Redes sociais ativas / prioritárias</Label>
+        <LabelWithHint className={labelClass} hint={'Marque APENAS as redes onde a marca posta de verdade (ou vai começar). Sem ser realista aqui, a IA produz conteúdo para canais inativos.'}>Redes sociais ativas / prioritárias</LabelWithHint>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
           {SOCIAL_NETWORK_OPTIONS.map((opt) => {
             const checked = values.socialNetworks.includes(opt.key);
@@ -401,33 +401,33 @@ export function BriefingForm({
         <div className="mt-5 grid gap-5">
           <div className="grid gap-5 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="bf-tone" className={labelClass}>Tom de voz</Label>
+              <LabelWithHint htmlFor="bf-tone" className={labelClass} hint={'Adjetivos + o que NÃO ser. Ex: "Direto, provocador, com humor leve. Nunca formal, nunca corporativo, nunca usar emoji em excesso."'}>Tom de voz</LabelWithHint>
               <Input id="bf-tone" className={fieldInputClass} placeholder="Ex: Direto, provocador, com humor leve" value={values.toneOfVoice} onChange={(e) => update("toneOfVoice", e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="bf-bv" className={labelClass}>Valores da marca</Label>
+              <LabelWithHint htmlFor="bf-bv" className={labelClass} hint={'3–5 valores inegociáveis da marca. Ex: "Transparência radical, ousadia, foco em resultado mensurável, respeito ao tempo do cliente."'}>Valores da marca</LabelWithHint>
               <Input id="bf-bv" className={fieldInputClass} placeholder="Ex: Transparência, ousadia, resultado" value={values.brandValues} onChange={(e) => update("brandValues", e.target.value)} />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="bf-prod" className={labelClass}>Produtos / Serviços (catálogo)</Label>
+            <LabelWithHint htmlFor="bf-prod" className={labelClass} hint={'Catálogo completo com nome, preço (se relevante) e o que entrega. Ex: "Mentoria 1:1 (R$ 2.997, 8 sessões); Curso X (R$ 497, vitalício); Consultoria pontual (R$ 800/h)."'}>Produtos / Serviços (catálogo)</LabelWithHint>
             <Textarea id="bf-prod" className={fieldTextareaClass} value={values.productsServices} onChange={(e) => update("productsServices", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="bf-diff" className={labelClass}>Diferenciais competitivos</Label>
+            <LabelWithHint htmlFor="bf-diff" className={labelClass} hint={'O que SÓ a sua marca tem/faz. Ex: "Único método com garantia de retorno em 60 dias", "Equipe formada por ex-Meta", "Atendimento humano em até 2h."'}>Diferenciais competitivos</LabelWithHint>
             <Textarea id="bf-diff" className={fieldTextareaClass} value={values.differentials} onChange={(e) => update("differentials", e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="bf-presence" className={labelClass}>Presença atual nas redes (números, status)</Label>
+            <LabelWithHint htmlFor="bf-presence" className={labelClass} hint={'Status atual em números: seguidores, ER médio, formato que mais funciona, gargalos. Ex: "IG 12k, ER 1.2%, reels performam 5x mais que carrossel; TikTok recém-criado, 200 seguidores."'}>Presença atual nas redes (números, status)</LabelWithHint>
             <Textarea id="bf-presence" className={fieldTextareaClass} placeholder="Ex: IG com 12k, ER 1.2%, TikTok recém-criado..." value={values.currentSocialPresence} onChange={(e) => update("currentSocialPresence", e.target.value)} />
           </div>
           <div className="grid gap-5 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="bf-banned" className={labelClass}>Tópicos / palavras proibidas</Label>
+              <LabelWithHint htmlFor="bf-banned" className={labelClass} hint={'Lista do que a IA NUNCA pode citar/usar. Ex: "Política, religião, palavrões, comparação direta com Concorrente X, promessas de cura, claim médico."'}>Tópicos / palavras proibidas</LabelWithHint>
               <Textarea id="bf-banned" className={cn(fieldTextareaClass, "min-h-[90px]")} placeholder="Ex: política, religião, palavrões" value={values.bannedTopics} onChange={(e) => update("bannedTopics", e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="bf-tags" className={labelClass}>Hashtags base da marca</Label>
+              <LabelWithHint htmlFor="bf-tags" className={labelClass} hint={'5–15 hashtags que devem aparecer em todo post. Mistura de marca + nicho + público. Ex: "#suamarca #marketingdigital #empreendedorismo #agenciademarketing"'}>Hashtags base da marca</LabelWithHint>
               <Textarea id="bf-tags" className={cn(fieldTextareaClass, "min-h-[90px]")} placeholder="#suamarca #nichoX #dorY" value={values.hashtagsBase} onChange={(e) => update("hashtagsBase", e.target.value)} />
             </div>
           </div>
