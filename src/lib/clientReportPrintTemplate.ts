@@ -32,11 +32,11 @@ function formatLongDate(dateStr: string) {
 
 function escapeHtml(value: string | null | undefined) {
   return (value ?? "—")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function nl2br(value: string | null | undefined) {
