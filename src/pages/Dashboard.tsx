@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { PostFormat } from "@/data/posts";
 import { PageContainer } from "@/components/PageContainer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FORMAT_CONFIG: Record<PostFormat, { label: string; subtitle: string; icon: typeof Image; color: string }> = {
   static: { label: "Estáticos", subtitle: "posts criados", icon: Image, color: "bg-[hsl(var(--format-static))]" },
