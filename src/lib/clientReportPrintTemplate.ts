@@ -149,11 +149,24 @@ export function createClientReportPrintTemplate({
         <td colspan="6" class="cell-empty">Nenhum post encontrado para este período.</td>
       </tr>`;
 
+  // Pick legend density tier so it always fits in the fixed-height card.
+  // Tiers tuned for ~110mm tall x 110mm wide legend box (≈1 column ~ 38 chars/line).
+  const pickLegendTier = (legend: string | null | undefined) => {
+    const len = (legend ?? "").length;
+    if (len <= 280)   return { fontSize: "10pt",  lineHeight: 1.45, cols: 1 };
+    if (len <= 700)   return { fontSize: "9pt",   lineHeight: 1.4,  cols: 1 };
+    if (len <= 1400)  return { fontSize: "8.5pt", lineHeight: 1.35, cols: 2 };
+    if (len <= 2400)  return { fontSize: "7.5pt", lineHeight: 1.3,  cols: 2 };
+    if (len <= 3600)  return { fontSize: "7pt",   lineHeight: 1.25, cols: 3 };
+    return                  { fontSize: "6.5pt", lineHeight: 1.2,  cols: 3 };
+  };
+
   const detailCards = sortedPosts.length > 0
     ? sortedPosts
         .map(
           (post, index) => {
             const accent = FORMAT_ACCENT[post.format] || COLORS.accent;
+            const legendTier = pickLegendTier(post.legend);
             const arts = artDataUrls?.get(post.id) ?? [];
             const placeholder = `
               <div class="post-card__thumb post-card__thumb--placeholder">
