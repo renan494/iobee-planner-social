@@ -13,6 +13,7 @@ import { HTMLAttributes, forwardRef } from "react";
 const MAX_WIDTHS = {
   default: "max-w-[1400px]",
   "1000": "max-w-[1000px]",
+  "5xl": "max-w-5xl",
   "4xl": "max-w-4xl",
   "3xl": "max-w-3xl",
   "2xl": "max-w-2xl",
