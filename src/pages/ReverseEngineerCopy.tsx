@@ -51,6 +51,8 @@ export default function ReverseEngineerCopy() {
   const [clientId, setClientId] = useState<string>("");
   const [source, setSource] = useState<"manual" | "youtube" | "meta_ad_library" | "instagram">("manual");
   const [sourceUrl, setSourceUrl] = useState<string>("");
+  const [transcriptKind, setTranscriptKind] = useState<"audio" | "written" | null>(null);
+  const [videoWarning, setVideoWarning] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -104,6 +106,8 @@ export default function ReverseEngineerCopy() {
         setTranscript(payload.transcript);
         setSource(payload.source || "manual");
         setSourceUrl(url.trim());
+        setTranscriptKind(payload.transcript_kind === "audio" ? "audio" : payload.transcript_kind === "written" ? "written" : null);
+        setVideoWarning(payload.video_warning || null);
         toast.success("Conteúdo extraído!");
         setTab("manual");
       }
@@ -266,15 +270,38 @@ export default function ReverseEngineerCopy() {
 
           <TabsContent value="manual" className="space-y-4 mt-4">
             <div>
-              <Label className="text-xs font-medium uppercase tracking-wider">Transcrição / Texto do criativo</Label>
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <Label className="text-xs font-medium uppercase tracking-wider">Transcrição / Texto do criativo</Label>
+                {transcriptKind && (
+                  <Badge
+                    variant={transcriptKind === "audio" ? "default" : "secondary"}
+                    className="text-[10px] gap-1"
+                    title={transcriptKind === "audio"
+                      ? "Transcrição literal do áudio falado no vídeo (Gemini)"
+                      : "Texto da legenda escrita do post (vídeo não transcrito)"}
+                  >
+                    {transcriptKind === "audio" ? "🎙️ Áudio falado" : "📝 Legenda escrita"}
+                  </Badge>
+                )}
+              </div>
               <Textarea
                 placeholder="Cole aqui a transcrição completa do vídeo ou texto do post de referência..."
                 value={transcript}
-                onChange={(e) => { setTranscript(e.target.value); if (!sourceUrl) setSource("manual"); }}
+                onChange={(e) => {
+                  setTranscript(e.target.value);
+                  if (!sourceUrl) setSource("manual");
+                  setTranscriptKind(null);
+                  setVideoWarning(null);
+                }}
                 rows={8}
                 className="mt-1.5 font-mono text-xs"
               />
-              <p className="text-[11px] text-muted-foreground mt-1.5">{transcript.length} caracteres • mínimo 30</p>
+              <div className="flex items-center justify-between gap-2 mt-1.5 flex-wrap">
+                <p className="text-[11px] text-muted-foreground">{transcript.length} caracteres • mínimo 30</p>
+                {videoWarning && transcriptKind === "written" && (
+                  <p className="text-[11px] text-muted-foreground italic">⚠️ {videoWarning}</p>
+                )}
+              </div>
             </div>
           </TabsContent>
         </Tabs>
