@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-iobee.svg";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { prefetchRoute } from "@/lib/routePrefetch";
 
 import {
   Sidebar,
@@ -67,6 +68,8 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end
+                      onMouseEnter={() => prefetchRoute(item.url)}
+                      onFocus={() => prefetchRoute(item.url)}
                       className="hover:bg-sidebar-accent/50"
                       activeClassName="bg-sidebar-accent text-sidebar-primary font-semibold"
                     >
@@ -82,6 +85,8 @@ export function AppSidebar() {
                     <NavLink
                       to="/admin/usuarios"
                       end
+                      onMouseEnter={() => prefetchRoute("/admin/usuarios")}
+                      onFocus={() => prefetchRoute("/admin/usuarios")}
                       className="hover:bg-sidebar-accent/50"
                       activeClassName="bg-sidebar-accent text-sidebar-primary font-semibold"
                     >
