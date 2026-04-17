@@ -15,7 +15,6 @@ interface CopyRow {
   produto: string | null;
   publico_alvo: string | null;
   generated_copy: string | null;
-  campaign_type: string | null;
   created_at: string;
 }
 
