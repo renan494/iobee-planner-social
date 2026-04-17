@@ -93,7 +93,7 @@ export default function ReverseEngineerCopy() {
     setExtracting(true); setResult(null); setSavedId(null);
     try {
       const { data, error } = await supabase.functions.invoke("reverse-engineer-copy", {
-        body: { action: "extract", url: url.trim() },
+        body: { action: "extract", url: url.trim(), transcribe_audio: transcribeAudio },
       });
       const payload: any = data ?? {};
       const errMsg = payload?.error || error?.message;
