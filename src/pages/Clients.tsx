@@ -15,7 +15,7 @@ import { BriefingForm, emptyBriefing, type BriefingFormValues } from "@/componen
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Clients() {
-  const { posts, clients, addClient, deleteClient } = usePosts();
+  const { posts, clients, addClient, deleteClient, loading } = usePosts();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState<BriefingFormValues>(emptyBriefing);
