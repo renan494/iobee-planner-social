@@ -117,3 +117,5 @@ function CalendarGridImpl({ currentDate, posts, onPostClick }: CalendarGridProps
     </div>
   );
 }
+
+export const CalendarGrid = memo(CalendarGridImpl);
