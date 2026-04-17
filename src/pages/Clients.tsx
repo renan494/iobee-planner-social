@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, User, Plus, Trash2 } from "lucide-react";
+import { Users, User, Plus, Trash2, Pencil, Folder, Check, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -8,35 +8,63 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { usePosts } from "@/contexts/PostsContext";
 import { FORMAT_LABELS, type PostFormat } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { PageContainer } from "@/components/PageContainer";
+import { cn } from "@/lib/utils";
+
+type PlatformKey = "meta" | "google" | "tiktok";
+const PLATFORM_OPTIONS: { key: PlatformKey; label: string }[] = [
+  { key: "meta", label: "Meta Ads" },
+  { key: "google", label: "Google Ads" },
+  { key: "tiktok", label: "TikTok Ads" },
+];
+
+const initialForm = {
+  name: "",
+  niche: "",
+  websiteUrl: "",
+  ticketMedio: "",
+  verbaMensal: "",
+  targetAudience: "",
+  objective: "",
+  competitors: "",
+  platforms: [] as PlatformKey[],
+  toneOfVoice: "",
+  differentials: "",
+  productsServices: "",
+  brandValues: "",
+  currentSocialPresence: "",
+  instagramHandle: "",
+  facebookUrl: "",
+  linkedinUrl: "",
+  gmbUrl: "",
+};
+
+function formatBRL(value: string) {
+  const onlyDigits = value.replace(/\D/g, "");
+  if (!onlyDigits) return "";
+  const number = parseInt(onlyDigits, 10) / 100;
+  return number.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function parseBRL(value: string): number | undefined {
+  const onlyDigits = value.replace(/\D/g, "");
+  if (!onlyDigits) return undefined;
+  return parseInt(onlyDigits, 10) / 100;
+}
 
 export default function Clients() {
   const { posts, clients, addClient, deleteClient } = usePosts();
   const navigate = useNavigate();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [newClientName, setNewClientName] = useState("");
-  const [newInstagram, setNewInstagram] = useState("");
-  const [newFacebookUrl, setNewFacebookUrl] = useState("");
-  const [newLinkedinUrl, setNewLinkedinUrl] = useState("");
-  const [newGmbUrl, setNewGmbUrl] = useState("");
-  const [newObjective, setNewObjective] = useState("");
-  const [newNiche, setNewNiche] = useState("");
-  const [newTargetAudience, setNewTargetAudience] = useState("");
-  const [newToneOfVoice, setNewToneOfVoice] = useState("");
-  const [newDifferentials, setNewDifferentials] = useState("");
-  const [newProductsServices, setNewProductsServices] = useState("");
-  
-  const [newBrandValues, setNewBrandValues] = useState("");
-  const [newCurrentSocialPresence, setNewCurrentSocialPresence] = useState("");
-  const [newCompetitors, setNewCompetitors] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState(initialForm);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const clientStats = useMemo(() => {
@@ -49,9 +77,7 @@ export default function Clients() {
     });
   }, [posts, clients]);
 
-  // Fetch avatar URLs for each client from storage
   const [avatarUrls, setAvatarUrls] = useState<Record<string, string>>({});
-
   useEffect(() => {
     clients.forEach((name) => {
       const storagePath = `${encodeURIComponent(name)}/avatar`;
@@ -64,19 +90,20 @@ export default function Clients() {
     });
   }, [clients]);
 
-  const [saving, setSaving] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const updateField = <K extends keyof typeof form>(key: K, value: typeof form[K]) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+  const togglePlatform = (key: PlatformKey) => {
+    setForm((prev) => ({
+      ...prev,
+      platforms: prev.platforms.includes(key) ? prev.platforms.filter((p) => p !== key) : [...prev.platforms, key],
+    }));
+  };
 
-  const handleDeleteClient = async () => {
-    if (!deleteTarget) return;
-    try {
-      await deleteClient(deleteTarget);
-      toast({ title: "Cliente removido", description: `"${deleteTarget}" foi excluído.` });
-    } catch {
-      toast({ title: "Erro", description: "Não foi possível excluir o cliente.", variant: "destructive" });
-    } finally {
-      setDeleteTarget(null);
-    }
+  const handleCancel = () => {
+    setCreating(false);
+    setForm(initialForm);
+    setAvatarPreview(null);
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,9 +124,24 @@ export default function Clients() {
     }
   };
 
-  const handleAddClient = async () => {
-    const trimmed = newClientName.trim();
-    if (!trimmed) return;
+  const handleDeleteClient = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteClient(deleteTarget);
+      toast({ title: "Cliente removido", description: `"${deleteTarget}" foi excluído.` });
+    } catch {
+      toast({ title: "Erro", description: "Não foi possível excluir o cliente.", variant: "destructive" });
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleSave = async () => {
+    const trimmed = form.name.trim();
+    if (!trimmed) {
+      toast({ title: "Nome obrigatório", description: "Informe o nome do cliente.", variant: "destructive" });
+      return;
+    }
     if (clients.includes(trimmed)) {
       toast({ title: "Cliente já existe", description: `"${trimmed}" já está cadastrado.`, variant: "destructive" });
       return;
@@ -108,46 +150,38 @@ export default function Clients() {
     try {
       await addClient({
         name: trimmed,
-        instagramHandle: newInstagram.trim() || undefined,
-        facebookUrl: newFacebookUrl.trim() || undefined,
-        linkedinUrl: newLinkedinUrl.trim() || undefined,
-        gmbUrl: newGmbUrl.trim() || undefined,
-        objective: newObjective.trim() || undefined,
+        niche: form.niche.trim() || undefined,
+        websiteUrl: form.websiteUrl.trim() || undefined,
+        ticketMedio: parseBRL(form.ticketMedio),
+        verbaMensal: parseBRL(form.verbaMensal),
+        targetAudience: form.targetAudience.trim() || undefined,
+        objective: form.objective.trim() || undefined,
+        competitors: form.competitors.trim() ? form.competitors.split(",").map((c) => c.trim()).filter(Boolean) : undefined,
+        platforms: form.platforms.length ? form.platforms : undefined,
+        toneOfVoice: form.toneOfVoice.trim() || undefined,
+        differentials: form.differentials.trim() || undefined,
+        productsServices: form.productsServices.trim() || undefined,
+        brandValues: form.brandValues.trim() || undefined,
+        currentSocialPresence: form.currentSocialPresence.trim() || undefined,
+        instagramHandle: form.instagramHandle.trim() || undefined,
+        facebookUrl: form.facebookUrl.trim() || undefined,
+        linkedinUrl: form.linkedinUrl.trim() || undefined,
+        gmbUrl: form.gmbUrl.trim() || undefined,
         avatarUrl: avatarPreview || undefined,
-        niche: newNiche.trim() || undefined,
-        targetAudience: newTargetAudience.trim() || undefined,
-        toneOfVoice: newToneOfVoice.trim() || undefined,
-        differentials: newDifferentials.trim() || undefined,
-        productsServices: newProductsServices.trim() || undefined,
-        
-        brandValues: newBrandValues.trim() || undefined,
-        currentSocialPresence: newCurrentSocialPresence.trim() || undefined,
-        competitors: newCompetitors.trim() ? newCompetitors.split(",").map(c => c.trim()).filter(Boolean) : undefined,
       });
-      toast({ title: "Cliente cadastrado", description: `"${trimmed}" foi adicionado com sucesso.` });
-      setNewClientName("");
-      setNewInstagram("");
-      setNewFacebookUrl("");
-      setNewLinkedinUrl("");
-      setNewGmbUrl("");
-      setNewObjective("");
-      setNewNiche("");
-      setNewTargetAudience("");
-      setNewToneOfVoice("");
-      setNewDifferentials("");
-      setNewProductsServices("");
-      
-      setNewBrandValues("");
-      setNewCurrentSocialPresence("");
-      setNewCompetitors("");
-      setAvatarPreview(null);
-      setDialogOpen(false);
-    } catch (err) {
-      toast({ title: "Erro", description: "Não foi possível cadastrar o cliente.", variant: "destructive" });
+      toast({ title: "Briefing salvo", description: `"${trimmed}" foi cadastrado com sucesso.` });
+      handleCancel();
+    } catch {
+      toast({ title: "Erro", description: "Não foi possível salvar o briefing.", variant: "destructive" });
     } finally {
       setSaving(false);
     }
   };
+
+  // Visual tokens for the briefing card (matches reference image)
+  const fieldInputClass = "h-12 rounded-full border border-foreground/80 bg-background px-5 text-base shadow-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0";
+  const fieldTextareaClass = "min-h-[110px] rounded-2xl border border-foreground/80 bg-background px-5 py-3 text-base shadow-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0";
+  const labelClass = "text-[13px] font-medium text-muted-foreground";
 
   return (
     <PageContainer>
@@ -161,187 +195,268 @@ export default function Clients() {
             <p className="text-sm text-muted-foreground">Gerencie seus clientes e veja a produção de cada um.</p>
           </div>
         </div>
-        <Button onClick={() => setDialogOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Cadastrar Cliente
-        </Button>
+        {!creating && (
+          <Button onClick={() => setCreating(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Cadastrar Cliente
+          </Button>
+        )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {clientStats.map((c) => (
-          <Card key={c.name} className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => navigate(`/clientes/${encodeURIComponent(c.name)}`)}>
-            <CardHeader className="flex flex-row items-center gap-3 pb-3">
-              <Avatar className="h-10 w-10">
-                {avatarUrls[c.name] ? (
-                  <AvatarImage src={avatarUrls[c.name]} alt={c.name} />
-                ) : null}
-                <AvatarFallback className="bg-secondary">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <CardTitle className="text-base">{c.name}</CardTitle>
-                <p className="text-xs text-muted-foreground">{c.total} posts</p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
-                onClick={(e) => { e.stopPropagation(); setDeleteTarget(c.name); }}
-              >
+      {/* Existing clients grid */}
+      {!creating && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {clientStats.map((c) => (
+            <Card key={c.name} className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => navigate(`/clientes/${encodeURIComponent(c.name)}`)}>
+              <CardHeader className="flex flex-row items-center gap-3 pb-3">
+                <Avatar className="h-10 w-10">
+                  {avatarUrls[c.name] ? <AvatarImage src={avatarUrls[c.name]} alt={c.name} /> : null}
+                  <AvatarFallback className="bg-secondary">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-base">{c.name}</CardTitle>
+                  <p className="text-xs text-muted-foreground">{c.total} posts</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+                  onClick={(e) => { e.stopPropagation(); setDeleteTarget(c.name); }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {(Object.entries(c.byFormat) as [PostFormat, number][]).map(([fmt, count]) =>
+                    count > 0 ? (
+                      <Badge key={fmt} variant="secondary" className="text-xs">
+                        {FORMAT_LABELS[fmt]}: {count}
+                      </Badge>
+                    ) : null
+                  )}
+                </div>
+                {c.analysts.length > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
+                    <span>Analistas:</span>
+                    {c.analysts.map((a) => (
+                      <Badge key={a} variant="outline" className="text-xs">{a}</Badge>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Inline expanded briefing editor (matches reference image) */}
+      {creating && (
+        <div className="rounded-3xl border-2 border-primary bg-card p-8 shadow-sm">
+          {/* Header row */}
+          <div className="mb-6 flex items-center justify-between border-b border-border pb-5">
+            <div className="flex items-center gap-3">
+              <Folder className="h-5 w-5 text-foreground" />
+              <span className="text-xl font-bold text-foreground">
+                {form.name.trim() || "Novo cliente"}
+              </span>
+              <span className="rounded-full border border-primary px-3 py-0.5 text-xs font-semibold text-primary">
+                Briefing
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+              <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => fileInputRef.current?.click()} title="Foto de perfil">
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="" className="h-7 w-7 rounded-full object-cover" />
+                ) : (
+                  <Pencil className="h-4 w-4" />
+                )}
+              </Button>
+              <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-destructive" onClick={handleCancel} title="Descartar">
                 <Trash2 className="h-4 w-4" />
               </Button>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex flex-wrap gap-1.5">
-                {(Object.entries(c.byFormat) as [PostFormat, number][]).map(([fmt, count]) =>
-                  count > 0 ? (
-                    <Badge key={fmt} variant="secondary" className="text-xs">
-                      {FORMAT_LABELS[fmt]}: {count}
-                    </Badge>
-                  ) : null
-                )}
-              </div>
-              {c.analysts.length > 0 && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <span>Analistas:</span>
-                  {c.analysts.map((a) => (
-                    <Badge key={a} variant="outline" className="text-xs">{a}</Badge>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </div>
+          </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0">
-          <DialogHeader className="px-8 pt-8 pb-2">
-            <DialogTitle className="text-2xl font-bold tracking-tight">Cadastrar novo cliente</DialogTitle>
-            <p className="text-sm text-muted-foreground">Preencha o briefing para alimentar estratégias e geração de conteúdo com IA.</p>
-          </DialogHeader>
-          <div className="space-y-6 px-8 pb-6 pt-4">
-            {/* Avatar */}
-            <div className="flex items-center gap-5 rounded-2xl border bg-card p-5">
-              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-secondary border-2 border-dashed border-border hover:border-primary/50 transition-colors overflow-hidden"
-              >
-                {avatarPreview ? (
-                  <img src={avatarPreview} alt="Avatar" className="h-full w-full object-cover" />
-                ) : (
-                  <User className="h-7 w-7 text-muted-foreground" />
-                )}
-              </button>
-              <div>
-                <p className="text-base font-semibold text-foreground">Foto de perfil</p>
-                <p className="text-sm text-muted-foreground">{uploading ? "Enviando..." : "Clique no círculo para enviar uma imagem (PNG/JPG)."}</p>
+          <h2 className="mb-6 text-sm font-bold uppercase tracking-wider text-foreground">
+            Briefing do cliente
+          </h2>
+
+          {/* Nome */}
+          <div className="mb-6 space-y-2">
+            <Label htmlFor="client-name" className={labelClass}>Nome do cliente *</Label>
+            <Input
+              id="client-name"
+              className={fieldInputClass}
+              placeholder="Ex: iOBEE"
+              value={form.name}
+              onChange={(e) => updateField("name", e.target.value)}
+              autoFocus
+            />
+          </div>
+
+          {/* Segmento + URL */}
+          <div className="mb-6 grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="niche" className={labelClass}>Segmento / Nicho</Label>
+              <Input id="niche" className={fieldInputClass} placeholder="Ex: Agência de marketing digital" value={form.niche} onChange={(e) => updateField("niche", e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="website" className={labelClass}>URL do site</Label>
+              <Input id="website" className={fieldInputClass} placeholder="https://exemplo.com.br" value={form.websiteUrl} onChange={(e) => updateField("websiteUrl", e.target.value)} />
+            </div>
+          </div>
+
+          {/* Ticket + Verba */}
+          <div className="mb-6 grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="ticket" className={labelClass}>Ticket Médio</Label>
+              <div className="relative">
+                <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-base font-medium text-muted-foreground">R$</span>
+                <Input
+                  id="ticket"
+                  className={cn(fieldInputClass, "pl-12")}
+                  placeholder="0,00"
+                  inputMode="numeric"
+                  value={form.ticketMedio}
+                  onChange={(e) => updateField("ticketMedio", formatBRL(e.target.value))}
+                />
               </div>
             </div>
-
-            {/* Dados Básicos */}
-            <section className="rounded-2xl border bg-card p-6 space-y-5">
-              <header>
-                <h3 className="text-base font-bold text-foreground">Dados básicos</h3>
-                <p className="text-xs text-muted-foreground">Identificação e visão geral do negócio.</p>
-              </header>
-              <div className="space-y-2">
-                <Label htmlFor="client-name" className="text-sm">Nome *</Label>
-                <Input id="client-name" className="h-11 text-base" placeholder="Ex: iOBEE" value={newClientName} onChange={(e) => setNewClientName(e.target.value)} autoFocus />
+            <div className="space-y-2">
+              <Label htmlFor="verba" className={labelClass}>Verba Mensal</Label>
+              <div className="relative">
+                <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-base font-medium text-muted-foreground">R$</span>
+                <Input
+                  id="verba"
+                  className={cn(fieldInputClass, "pl-12")}
+                  placeholder="0,00"
+                  inputMode="numeric"
+                  value={form.verbaMensal}
+                  onChange={(e) => updateField("verbaMensal", formatBRL(e.target.value))}
+                />
               </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="niche" className="text-sm">Nicho / Segmento</Label>
-                  <Input id="niche" className="h-11 text-base" placeholder="Ex: Marketing Digital, Gastronomia..." value={newNiche} onChange={(e) => setNewNiche(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="tone-of-voice" className="text-sm">Tom de voz</Label>
-                  <Input id="tone-of-voice" className="h-11 text-base" placeholder="Ex: Profissional e acolhedor" value={newToneOfVoice} onChange={(e) => setNewToneOfVoice(e.target.value)} />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="objective" className="text-sm">Objetivo</Label>
-                <Textarea id="objective" className="text-base" placeholder="Ex: Aumentar awareness e gerar leads qualificados..." value={newObjective} onChange={(e) => setNewObjective(e.target.value)} rows={3} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="products-services" className="text-sm">Produtos / Serviços</Label>
-                <Textarea id="products-services" className="text-base" placeholder="Descreva os principais produtos ou serviços do cliente..." value={newProductsServices} onChange={(e) => setNewProductsServices(e.target.value)} rows={3} />
-              </div>
-            </section>
-
-            {/* Público e Posicionamento */}
-            <section className="rounded-2xl border bg-card p-6 space-y-5">
-              <header>
-                <h3 className="text-base font-bold text-foreground">Público e posicionamento</h3>
-                <p className="text-xs text-muted-foreground">Para quem falamos e como nos diferenciamos.</p>
-              </header>
-              <div className="space-y-2">
-                <Label htmlFor="target-audience" className="text-sm">Público-alvo</Label>
-                <Textarea id="target-audience" className="text-base" placeholder="Ex: Mulheres 25-45, classe B, interessadas em bem-estar..." value={newTargetAudience} onChange={(e) => setNewTargetAudience(e.target.value)} rows={3} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="brand-values" className="text-sm">Valores da marca</Label>
-                <Input id="brand-values" className="h-11 text-base" placeholder="Ex: Inovação, Transparência, Sustentabilidade..." value={newBrandValues} onChange={(e) => setNewBrandValues(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="differentials" className="text-sm">Diferenciais</Label>
-                <Textarea id="differentials" className="text-base" placeholder="O que diferencia este cliente dos concorrentes..." value={newDifferentials} onChange={(e) => setNewDifferentials(e.target.value)} rows={3} />
-              </div>
-            </section>
-
-            {/* Presença Digital */}
-            <section className="rounded-2xl border bg-card p-6 space-y-5">
-              <header>
-                <h3 className="text-base font-bold text-foreground">Presença digital</h3>
-                <p className="text-xs text-muted-foreground">Cenário atual e referências de mercado.</p>
-              </header>
-              <div className="space-y-2">
-                <Label htmlFor="current-social-presence" className="text-sm">Presença atual nas redes</Label>
-                <Textarea id="current-social-presence" className="text-base" placeholder="Canais atuais, seguidores, frequência..." value={newCurrentSocialPresence} onChange={(e) => setNewCurrentSocialPresence(e.target.value)} rows={3} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="competitors" className="text-sm">Concorrentes (separados por vírgula)</Label>
-                <Input id="competitors" className="h-11 text-base" placeholder="Ex: @concorrente1, @concorrente2, @concorrente3" value={newCompetitors} onChange={(e) => setNewCompetitors(e.target.value)} />
-              </div>
-            </section>
-
-            {/* Links das Redes */}
-            <section className="rounded-2xl border bg-card p-6 space-y-5">
-              <header>
-                <h3 className="text-base font-bold text-foreground">Links das redes</h3>
-                <p className="text-xs text-muted-foreground">URLs públicas para análise e referência.</p>
-              </header>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="instagram" className="text-sm">@ do Instagram</Label>
-                  <Input id="instagram" className="h-11 text-base" placeholder="@iobee.digital" value={newInstagram} onChange={(e) => setNewInstagram(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="facebook-url" className="text-sm">URL do Facebook</Label>
-                  <Input id="facebook-url" className="h-11 text-base" placeholder="https://facebook.com/iobee" value={newFacebookUrl} onChange={(e) => setNewFacebookUrl(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="linkedin-url" className="text-sm">URL do LinkedIn</Label>
-                  <Input id="linkedin-url" className="h-11 text-base" placeholder="https://linkedin.com/company/iobee" value={newLinkedinUrl} onChange={(e) => setNewLinkedinUrl(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="gmb-url" className="text-sm">URL do Google Meu Negócio</Label>
-                  <Input id="gmb-url" className="h-11 text-base" placeholder="https://g.page/iobee" value={newGmbUrl} onChange={(e) => setNewGmbUrl(e.target.value)} />
-                </div>
-              </div>
-            </section>
+            </div>
           </div>
-          <DialogFooter className="px-8 pb-8 pt-2 gap-2">
-            <Button variant="outline" size="lg" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button size="lg" onClick={handleAddClient} disabled={saving || !newClientName.trim()}>
-              {saving ? "Salvando..." : "Cadastrar cliente"}
+
+          {/* Público-alvo */}
+          <div className="mb-6 space-y-2">
+            <Label htmlFor="audience" className={labelClass}>Público-alvo (idade, gênero, localização, interesses, dores)</Label>
+            <Textarea id="audience" className={fieldTextareaClass} placeholder="Descreva o público em detalhes..." value={form.targetAudience} onChange={(e) => updateField("targetAudience", e.target.value)} />
+          </div>
+
+          {/* Objetivos */}
+          <div className="mb-6 space-y-2">
+            <Label htmlFor="objective" className={labelClass}>Objetivos e Metas</Label>
+            <Textarea id="objective" className={fieldTextareaClass} placeholder="Ex: Crescer o faturamento pelo digital em 20%" value={form.objective} onChange={(e) => updateField("objective", e.target.value)} />
+          </div>
+
+          {/* Concorrentes */}
+          <div className="mb-6 space-y-2">
+            <Label htmlFor="competitors" className={labelClass}>Concorrentes</Label>
+            <Textarea id="competitors" className={cn(fieldTextareaClass, "min-h-[80px]")} placeholder="Ex: Marca X, Marca Y, Empresa Z..." value={form.competitors} onChange={(e) => updateField("competitors", e.target.value)} />
+          </div>
+
+          {/* Plataformas */}
+          <div className="mb-8 space-y-3">
+            <Label className={labelClass}>Plataformas</Label>
+            <div className="flex flex-wrap items-center gap-6 pt-1">
+              {PLATFORM_OPTIONS.map((opt) => {
+                const checked = form.platforms.includes(opt.key);
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => togglePlatform(opt.key)}
+                    className="flex items-center gap-2.5 group"
+                  >
+                    <span className={cn(
+                      "flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors",
+                      checked ? "border-foreground bg-foreground text-background" : "border-foreground/70 bg-background"
+                    )}>
+                      {checked && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                    </span>
+                    <span className="text-base font-medium text-foreground">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Optional advanced fields (kept compact, collapsed-look) */}
+          <details className="mb-8 rounded-2xl border border-border bg-background/40 px-5 py-4">
+            <summary className="cursor-pointer text-sm font-semibold text-foreground">
+              Campos avançados (tom de voz, diferenciais, redes sociais...)
+            </summary>
+            <div className="mt-5 grid gap-5">
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="tone" className={labelClass}>Tom de voz</Label>
+                  <Input id="tone" className={fieldInputClass} value={form.toneOfVoice} onChange={(e) => updateField("toneOfVoice", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="brandValues" className={labelClass}>Valores da marca</Label>
+                  <Input id="brandValues" className={fieldInputClass} value={form.brandValues} onChange={(e) => updateField("brandValues", e.target.value)} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="products" className={labelClass}>Produtos / Serviços</Label>
+                <Textarea id="products" className={fieldTextareaClass} value={form.productsServices} onChange={(e) => updateField("productsServices", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="differentials" className={labelClass}>Diferenciais</Label>
+                <Textarea id="differentials" className={fieldTextareaClass} value={form.differentials} onChange={(e) => updateField("differentials", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="presence" className={labelClass}>Presença atual nas redes</Label>
+                <Textarea id="presence" className={fieldTextareaClass} value={form.currentSocialPresence} onChange={(e) => updateField("currentSocialPresence", e.target.value)} />
+              </div>
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="ig" className={labelClass}>@ do Instagram</Label>
+                  <Input id="ig" className={fieldInputClass} value={form.instagramHandle} onChange={(e) => updateField("instagramHandle", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="fb" className={labelClass}>URL do Facebook</Label>
+                  <Input id="fb" className={fieldInputClass} value={form.facebookUrl} onChange={(e) => updateField("facebookUrl", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="li" className={labelClass}>URL do LinkedIn</Label>
+                  <Input id="li" className={fieldInputClass} value={form.linkedinUrl} onChange={(e) => updateField("linkedinUrl", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gmb" className={labelClass}>URL do Google Meu Negócio</Label>
+                  <Input id="gmb" className={fieldInputClass} value={form.gmbUrl} onChange={(e) => updateField("gmbUrl", e.target.value)} />
+                </div>
+              </div>
+            </div>
+          </details>
+
+          {/* Footer actions */}
+          <div className="flex items-center justify-end gap-4 border-t border-border pt-6">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="text-base font-medium text-foreground/70 hover:text-foreground transition-colors"
+            >
+              Cancelar
+            </button>
+            <Button
+              size="lg"
+              onClick={handleSave}
+              disabled={saving || !form.name.trim()}
+              className="h-12 gap-2 rounded-full bg-primary px-7 text-base font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Check className="h-5 w-5" strokeWidth={3} />
+              {saving ? "Salvando..." : "Salvar Briefing"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+          {uploading && <p className="mt-3 text-right text-xs text-muted-foreground">Enviando foto...</p>}
+        </div>
+      )}
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>

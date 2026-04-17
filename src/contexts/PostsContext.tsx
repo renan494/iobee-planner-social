@@ -19,6 +19,10 @@ export interface ClientFormData {
   brandValues?: string;
   currentSocialPresence?: string;
   competitors?: string[];
+  websiteUrl?: string;
+  ticketMedio?: number;
+  verbaMensal?: number;
+  platforms?: string[];
 }
 
 interface PostsContextType {
@@ -211,6 +215,10 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       brand_values: data.brandValues || null,
       current_social_presence: data.currentSocialPresence || null,
       competitors: data.competitors?.length ? data.competitors : null,
+      website_url: data.websiteUrl || null,
+      ticket_medio: data.ticketMedio ?? null,
+      verba_mensal: data.verbaMensal ?? null,
+      platforms: data.platforms?.length ? data.platforms : null,
     } as any);
     if (error) throw error;
     await fetchClients();
