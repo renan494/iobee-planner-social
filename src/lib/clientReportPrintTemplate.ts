@@ -8,14 +8,17 @@ const COLORS = {
   accent: "#FDB600",
   accentSoft: "#FFF1B8",
   accentDeep: "#B07F00",
-  ink: "#0E0A00",
+  ink: "#140F00",
   body: "#3D3729",
   muted: "#8A8472",
   mutedSoft: "#BAB29C",
   line: "#ECE5D2",
   lineSoft: "#F5EFDF",
-  surface: "#FBF7EC",
+  surface: "#F5F3EB",
   white: "#FFFFFF",
+  brandBlue: "#0071CE",
+  brandPink: "#E81F76",
+  brandGreen: "#00CE7C",
 };
 
 export interface ClientReportPrintTemplateOptions {
@@ -31,9 +34,9 @@ const IOBEE_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108
 
 const FORMAT_ACCENT: Record<string, string> = {
   static: "#FDB600",
-  carousel: "#3B82F6",
-  reels: "#EF4444",
-  stories: "#8B5CF6",
+  carousel: "#0071CE",
+  reels: "#E81F76",
+  stories: "#00CE7C",
 };
 
 function formatDate(dateStr: string) {
@@ -86,8 +89,8 @@ export function createClientReportPrintTemplate({
 
   const FUNNEL_COLORS: Record<string, string> = {
     topo: "#FDB600",
-    meio: "#3B82F6",
-    fundo: "#10B981",
+    meio: "#0071CE",
+    fundo: "#00CE7C",
   };
   const funnelOrder: Array<"topo" | "meio" | "fundo"> = ["topo", "meio", "fundo"];
   const funnelCounts = funnelOrder.reduce<Record<string, number>>((acc, stage) => {
