@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Folder, Pencil, Trash2, Check } from "lucide-react";
+import { Folder, Pencil, Trash2, Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -176,7 +176,48 @@ export function BriefingForm({
         </div>
       </div>
 
-      <h2 className="mb-6 text-sm font-bold uppercase tracking-wider text-foreground">Briefing de Social Media</h2>
+      <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-foreground">Briefing de Social Media</h2>
+
+      {/* Disclaimer — por que preencher bem */}
+      <div className="mb-7 rounded-2xl border border-primary/40 bg-primary/10 p-5">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/20">
+            <Sparkles className="h-4 w-4 text-foreground" />
+          </div>
+          <div className="space-y-2 text-sm leading-relaxed text-foreground/85">
+            <p className="font-semibold text-foreground">
+              Quanto mais detalhado este briefing, mais estratégica e personalizada será a I.A.
+            </p>
+            <p>
+              Tudo que você escrever aqui vira <strong>contexto bruto</strong> para a I.A gerar
+              estratégias, copies, ideias de conteúdo e roteiros. Briefing raso = conteúdo
+              genérico. Briefing rico = posts que parecem feitos por alguém de dentro da marca.
+            </p>
+            <ul className="ml-4 list-disc space-y-1 text-foreground/80">
+              <li>
+                <strong>Seja específico</strong>: em vez de “público jovem”, escreva “mulheres 28–40
+                que tentaram emagrecer 3+ vezes e desistiram”.
+              </li>
+              <li>
+                <strong>Fale na voz do cliente</strong>: use frases reais que o público diz
+                (objeções, dores, desejos) — isso vira hook e copy direto.
+              </li>
+              <li>
+                <strong>Dê exemplos concretos</strong>: cite produtos, ofertas, perfis de
+                referência (@), CTAs que costumam funcionar e o que <em>não</em> pode aparecer.
+              </li>
+              <li>
+                <strong>Atualize sempre</strong>: ao mudar oferta, posicionamento ou pilares, edite
+                o briefing — a I.A passa a usar a versão nova imediatamente.
+              </li>
+            </ul>
+            <p className="text-xs text-muted-foreground">
+              Campos com <span className="font-semibold text-foreground">*</span> são obrigatórios.
+              Os demais são opcionais — mas cada campo preenchido aumenta a qualidade do output.
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Nome */}
       <div className="mb-6 space-y-2">
