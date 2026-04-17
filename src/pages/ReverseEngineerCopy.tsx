@@ -299,7 +299,7 @@ export default function ReverseEngineerCopy() {
               <div className="flex items-center justify-between gap-2 mt-1.5 flex-wrap">
                 <p className="text-[11px] text-muted-foreground">{transcript.length} caracteres • mínimo 30</p>
                 {videoWarning && transcriptKind === "written" && (
-                  <p className="text-[11px] text-amber-600 dark:text-amber-500">⚠️ {videoWarning}</p>
+                  <p className="text-[11px] text-muted-foreground italic">⚠️ {videoWarning}</p>
                 )}
               </div>
             </div>
