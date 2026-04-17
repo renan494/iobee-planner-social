@@ -194,13 +194,47 @@ export function createClientReportPrintTemplate({
             border-radius: 999px;
           }
 
-          .cover-brand {
-            margin-top: 18mm;
-            font-size: 13pt;
+          .cover-brand-row {
+            margin-top: 14mm;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6mm;
+          }
+
+          .brand-logo {
+            width: 38mm;
+            height: auto;
+            display: block;
+          }
+
+          .client-identity {
+            display: flex;
+            align-items: center;
+            gap: 5mm;
+            margin-top: 2mm;
+          }
+
+          .client-avatar {
+            width: 22mm;
+            height: 22mm;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5mm solid ${COLORS.accentSoft};
+            background: ${COLORS.surface};
+            display: block;
+            flex-shrink: 0;
+          }
+
+          .client-avatar--fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22pt;
             font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
             color: ${COLORS.dark};
+            background: ${COLORS.accentSoft};
+            text-transform: uppercase;
           }
 
           .cover-content {
