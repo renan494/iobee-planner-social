@@ -199,6 +199,24 @@ export function BriefingForm({
         </div>
       </div>
 
+      {/* Barra de completude */}
+      <div className="mb-6 space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-semibold uppercase tracking-wider text-muted-foreground">
+            Completude do briefing
+          </span>
+          <span className="font-semibold text-foreground">
+            {filledCount} de {totalFields} campos · {completionTone.label}
+          </span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className={cn("h-full rounded-full transition-all duration-500", completionTone.bar)}
+            style={{ width: `${completion}%` }}
+          />
+        </div>
+      </div>
+
       <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-foreground">Briefing de Social Media</h2>
 
       {/* Disclaimer — por que preencher bem */}
