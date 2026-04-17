@@ -51,7 +51,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
         filtersApplied: Boolean(hasFilters),
       });
     } catch {
-      toast.error("Não foi possível gerar o PDF estável.");
+      toast.error("Não foi possível abrir a versão fiel para salvar em PDF.");
     } finally {
       setIsExporting(false);
     }
@@ -87,9 +87,9 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
             <PenTool className="h-4 w-4" />
             Produzir Conteúdo
           </Button>
-          <Button onClick={handleDownloadPDF} className="gap-2" disabled={isExporting}>
+            <Button onClick={handleDownloadPDF} className="gap-2" disabled={isExporting}>
             <Download className="h-4 w-4" />
-            {isExporting ? "Gerando PDF..." : "Baixar PDF estável"}
+              {isExporting ? "Preparando PDF..." : "Salvar PDF fiel"}
           </Button>
         </div>
       </div>
