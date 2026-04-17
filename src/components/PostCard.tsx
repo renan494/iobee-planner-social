@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Post, PostFormat } from "@/data/posts";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +14,7 @@ interface PostCardProps {
   onClick: (post: Post) => void;
 }
 
-export function PostCard({ post, onClick }: PostCardProps) {
+function PostCardImpl({ post, onClick }: PostCardProps) {
   return (
     <button
       onClick={() => onClick(post)}
@@ -28,3 +29,5 @@ export function PostCard({ post, onClick }: PostCardProps) {
     </button>
   );
 }
+
+export const PostCard = memo(PostCardImpl);
