@@ -953,6 +953,18 @@ export function createClientReportPrintTemplate({
               <div class="chip-row">${formatChips}</div>
             </div>
 
+            <div class="funnel-row">
+              <div class="funnel-row__head">
+                <p class="formats-row__label">Distribuição por etapa do funil</p>
+                <span class="funnel-row__total">${funnelTotal} ${funnelTotal === 1 ? "post" : "posts"}</span>
+              </div>
+              ${funnelTotal > 0
+                ? `<div class="funnel-bar">${funnelSegments}</div>
+                   <div class="funnel-legend">${funnelLegend}</div>`
+                : `<div class="funnel-bar funnel-bar--empty"></div>
+                   <p class="funnel-empty">Nenhum post com etapa do funil registrada.</p>`}
+            </div>
+
             <div class="cover-foot">
               <span class="cover-foot__brand">${REPORT_TITLE}</span>
               <span>Gerado em ${escapeHtml(exportedLabel)}</span>
