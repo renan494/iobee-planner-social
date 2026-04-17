@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { decodeEntities, fetchInstagramViaEmbed, getInstagramShortcode } from "../_shared/instagram.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,52 +8,6 @@ const corsHeaders = {
 };
 
 interface Section { key: string; label: string; description: string }
-
-function decodeEntities(s: string): string {
-  return s
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n, 10)))
-    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
-    .trim();
-}
-
-function extractInstagramShortcode(url: string): string | null {
-  const m = url.match(/instagram\.com\/(?:reel|reels|p|tv)\/([A-Za-z0-9_-]+)/i);
-  return m ? m[1] : null;
-}
-
-async function fetchInstagramViaEmbed(shortcode: string): Promise<string | null> {
-  // Mesma técnica usada em reverse-engineer-copy: User-Agent do crawler do Facebook
-  // faz o Instagram devolver meta tags OG sem bloquear (posts/reels públicos).
-  const cleanUrl = `https://www.instagram.com/p/${shortcode}/`;
-  const headers = {
-    "User-Agent": "Mozilla/5.0 (compatible; facebookexternalhit/1.1; +http://www.facebook.com/externalhit_uatext.php)",
-    "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
-  };
-
-  try {
-    const res = await fetch(cleanUrl, { headers });
-    if (!res.ok) return null;
-    const html = await res.text();
-    const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
-    if (ogDesc) {
-      const raw = decodeEntities(ogDesc[1]);
-      const m = raw.match(/:\s*[“”"]([\s\S]+?)[“”"]?\s*$/) || raw.match(/:\s*"([\s\S]+)"\s*$/);
-      const caption = (m ? m[1] : raw).trim();
-      if (caption && caption.length > 20) return caption;
-    }
-    const ogTitle = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
-    if (ogTitle) {
-      const t = decodeEntities(ogTitle[1]);
-      if (t && t.length > 20) return t;
-    }
-    return null;
-  } catch (e) {
-    console.error("instagram embed fetch failed:", e);
-    return null;
-  }
-}
 
 async function scrapeWithFirecrawl(url: string): Promise<string> {
   const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
@@ -78,10 +33,10 @@ async function scrapeWithFirecrawl(url: string): Promise<string> {
 
 async function scrapeContent(url: string): Promise<string> {
   // Para Instagram, tenta primeiro o atalho via facebookexternalhit (gratuito, sem bloqueio)
-  const shortcode = extractInstagramShortcode(url);
+  const shortcode = getInstagramShortcode(url);
   if (shortcode) {
-    const caption = await fetchInstagramViaEmbed(shortcode);
-    if (caption) return caption;
+    const { caption } = await fetchInstagramViaEmbed(shortcode);
+    if (caption && caption.length > 20) return caption;
     // fallback para Firecrawl mesmo em IG, caso o embed falhe
   }
   return await scrapeWithFirecrawl(url);
