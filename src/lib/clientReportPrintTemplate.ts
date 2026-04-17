@@ -857,7 +857,7 @@ export function createClientReportPrintTemplate({
           }
 
           .post-card__col-left {
-            width: 70mm;
+            width: 60mm;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
@@ -869,12 +869,13 @@ export function createClientReportPrintTemplate({
             min-width: 0;
             display: flex;
             flex-direction: column;
+            min-height: 0;
           }
 
           .meta-stack {
             display: flex;
             flex-direction: column;
-            gap: 3mm;
+            gap: 2.5mm;
             border-top: 0.3mm solid ${COLORS.lineSoft};
             padding-top: 3mm;
           }
@@ -885,8 +886,8 @@ export function createClientReportPrintTemplate({
           }
 
           .post-card__thumb {
-            width: 70mm;
-            height: 70mm;
+            width: 60mm;
+            height: 60mm;
             object-fit: cover;
             border-radius: 2mm;
             border: 0.3mm solid ${COLORS.line};
@@ -1151,11 +1152,6 @@ export function createClientReportPrintTemplate({
           </section>
 
           <section class="section details-start">
-            <div class="section-header">
-              <span class="section-eyebrow">02 · Conteúdo</span>
-              <h2>Detalhamento dos posts</h2>
-            </div>
-
             <div class="post-list">${detailCards}</div>
           </section>
         </main>
