@@ -784,6 +784,7 @@ export function createClientReportPrintTemplate({
             page-break-inside: avoid;
             break-after: page;
             page-break-after: always;
+            min-height: 245mm;
           }
 
           .post-card:last-child {
@@ -807,6 +808,7 @@ export function createClientReportPrintTemplate({
             pointer-events: none;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            z-index: 1;
           }
 
           .post-card__index-num {
@@ -827,29 +829,59 @@ export function createClientReportPrintTemplate({
 
           .post-card__body {
             flex: 1;
-            padding: 5mm 6mm;
+            padding: 6mm 7mm;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
           }
 
           .post-card__header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 5mm;
-            margin-bottom: 4mm;
+            margin-bottom: 5mm;
+            padding-right: 32mm;
           }
 
           .post-card__header h3 {
-            font-size: 13pt;
+            font-size: 15pt;
             line-height: 1.2;
             color: ${COLORS.ink};
             font-weight: 700;
-            margin-top: 1mm;
+            margin-top: 1.5mm;
             letter-spacing: -0.005em;
           }
 
-          .post-card__heading {
+          .post-card__columns {
+            display: flex;
+            gap: 7mm;
+            flex: 1;
+            min-height: 0;
+          }
+
+          .post-card__col-left {
+            width: 70mm;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4mm;
+          }
+
+          .post-card__col-right {
             flex: 1;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .meta-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 3mm;
+            border-top: 0.3mm solid ${COLORS.lineSoft};
+            padding-top: 3mm;
+          }
+
+          .meta-stack > div {
+            display: flex;
+            flex-direction: column;
           }
 
           .post-card__thumb {
