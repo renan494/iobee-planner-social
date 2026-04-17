@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
+import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save, Star } from "lucide-react";
 import StrategyContent from "@/components/StrategyContent";
 import StrategyDebateChat from "@/components/StrategyDebateChat";
 import StrategySlideViewer from "@/components/strategy-slides/StrategySlideViewer";
@@ -27,6 +27,7 @@ type ClientData = {
   current_social_presence?: string | null;
   objective?: string | null;
   instagram_handle?: string | null;
+  active_strategy_id?: string | null;
 };
 
 type Strategy = {
@@ -174,8 +175,26 @@ export default function Strategy() {
     } else {
       setStrategies((prev) => prev.filter((s) => s.id !== id));
       if (expandedId === id) setExpandedId(null);
+      if (selectedClient?.active_strategy_id === id) {
+        setClients((prev) => prev.map((c) => c.id === selectedClient.id ? { ...c, active_strategy_id: null } : c));
+      }
       toast.success("Estratégia excluída");
     }
+  }
+
+  async function handleSetActive(strategyId: string) {
+    if (!selectedClient) return;
+    const isAlreadyActive = selectedClient.active_strategy_id === strategyId;
+    const newValue = isAlreadyActive ? null : strategyId;
+    const { error } = await (supabase.from("clients") as any)
+      .update({ active_strategy_id: newValue })
+      .eq("id", selectedClient.id);
+    if (error) {
+      toast.error("Não foi possível definir como ativa");
+      return;
+    }
+    setClients((prev) => prev.map((c) => c.id === selectedClient.id ? { ...c, active_strategy_id: newValue } : c));
+    toast.success(isAlreadyActive ? "Estratégia desativada" : "Estratégia ativa definida — será usada ao gerar posts");
   }
 
   return (
