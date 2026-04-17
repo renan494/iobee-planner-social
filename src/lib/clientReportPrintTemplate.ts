@@ -149,11 +149,24 @@ export function createClientReportPrintTemplate({
         <td colspan="6" class="cell-empty">Nenhum post encontrado para este período.</td>
       </tr>`;
 
+  // Pick legend density tier so it always fits in the fixed-height card.
+  // Tiers tuned for ~110mm tall x 110mm wide legend box (≈1 column ~ 38 chars/line).
+  const pickLegendTier = (legend: string | null | undefined) => {
+    const len = (legend ?? "").length;
+    if (len <= 280)   return { fontSize: "10pt",  lineHeight: 1.45, cols: 1 };
+    if (len <= 700)   return { fontSize: "9pt",   lineHeight: 1.4,  cols: 1 };
+    if (len <= 1400)  return { fontSize: "8.5pt", lineHeight: 1.35, cols: 2 };
+    if (len <= 2400)  return { fontSize: "7.5pt", lineHeight: 1.3,  cols: 2 };
+    if (len <= 3600)  return { fontSize: "7pt",   lineHeight: 1.25, cols: 3 };
+    return                  { fontSize: "6.5pt", lineHeight: 1.2,  cols: 3 };
+  };
+
   const detailCards = sortedPosts.length > 0
     ? sortedPosts
         .map(
           (post, index) => {
             const accent = FORMAT_ACCENT[post.format] || COLORS.accent;
+            const legendTier = pickLegendTier(post.legend);
             const arts = artDataUrls?.get(post.id) ?? [];
             const placeholder = `
               <div class="post-card__thumb post-card__thumb--placeholder">
@@ -212,7 +225,7 @@ export function createClientReportPrintTemplate({
                     ${post.legend ? `
                       <div class="content-block content-block--soft content-block--scroll">
                         <p class="content-label">Legenda</p>
-                        <p class="content-text">${nl2br(post.legend)}</p>
+                        <p class="content-text legend-text" style="font-size:${legendTier.fontSize};line-height:${legendTier.lineHeight};column-count:${legendTier.cols};">${nl2br(post.legend)}</p>
                       </div>` : ""}
 
                     ${post.hashtags.length > 0 ? `
@@ -325,11 +338,13 @@ export function createClientReportPrintTemplate({
           /* ===== COVER ===== */
 
           .page-cover {
-            min-height: calc(297mm - 28mm);
+            height: 269mm;
             display: flex;
             flex-direction: column;
             break-after: page;
+            page-break-after: always;
             position: relative;
+            overflow: hidden;
           }
 
           .cover-top {
@@ -784,12 +799,12 @@ export function createClientReportPrintTemplate({
             page-break-inside: avoid;
             break-after: page;
             page-break-after: always;
-            min-height: 245mm;
+            height: 240mm;
           }
 
           .post-card:last-child {
-            break-after: auto;
-            page-break-after: auto;
+            break-after: avoid;
+            page-break-after: avoid;
           }
 
           .post-card__index {
@@ -1012,15 +1027,18 @@ export function createClientReportPrintTemplate({
           }
 
           .content-block--scroll {
-            flex: 1;
+            flex: 1 1 auto;
             min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
           }
 
-          .content-block--scroll .content-text {
-            font-size: 7.5pt;
-            line-height: 1.3;
-            column-count: 2;
+          .content-block--scroll .content-text.legend-text {
             column-gap: 4mm;
+            flex: 1 1 auto;
+            overflow: hidden;
+            margin: 0;
           }
 
           .content-label {
