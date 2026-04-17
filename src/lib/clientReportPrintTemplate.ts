@@ -761,8 +761,7 @@ export function createClientReportPrintTemplate({
           }
 
           .post-list {
-            display: grid;
-            gap: 7mm;
+            display: block;
           }
 
           .post-card {
@@ -774,6 +773,13 @@ export function createClientReportPrintTemplate({
             background: ${COLORS.white};
             break-inside: avoid;
             page-break-inside: avoid;
+            break-after: page;
+            page-break-after: always;
+          }
+
+          .post-card:last-child {
+            break-after: auto;
+            page-break-after: auto;
           }
 
           .post-card__rail {
@@ -784,7 +790,7 @@ export function createClientReportPrintTemplate({
 
           .post-card__body {
             flex: 1;
-            padding: 6mm 7mm;
+            padding: 5mm 6mm;
           }
 
           .post-card__header {
@@ -792,15 +798,15 @@ export function createClientReportPrintTemplate({
             justify-content: space-between;
             align-items: flex-start;
             gap: 5mm;
-            margin-bottom: 5mm;
+            margin-bottom: 4mm;
           }
 
           .post-card__header h3 {
-            font-size: 14pt;
-            line-height: 1.25;
+            font-size: 13pt;
+            line-height: 1.2;
             color: ${COLORS.ink};
             font-weight: 700;
-            margin-top: 1.5mm;
+            margin-top: 1mm;
             letter-spacing: -0.005em;
           }
 
@@ -810,8 +816,8 @@ export function createClientReportPrintTemplate({
           }
 
           .post-card__thumb {
-            width: 60mm;
-            height: 60mm;
+            width: 70mm;
+            height: 70mm;
             object-fit: cover;
             border-radius: 2mm;
             border: 0.3mm solid ${COLORS.line};
@@ -845,8 +851,8 @@ export function createClientReportPrintTemplate({
           }
 
           .post-card__thumb-grid {
-            width: 60mm;
-            height: 60mm;
+            width: 70mm;
+            height: 70mm;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
@@ -900,59 +906,59 @@ export function createClientReportPrintTemplate({
           .meta-row {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 4mm;
-            padding: 4mm 0;
+            gap: 3mm;
+            padding: 3mm 0;
             border-top: 0.3mm solid ${COLORS.lineSoft};
             border-bottom: 0.3mm solid ${COLORS.lineSoft};
-            margin-bottom: 5mm;
+            margin-bottom: 4mm;
           }
 
           .meta-label {
             display: block;
-            font-size: 7pt;
+            font-size: 6.5pt;
             letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: ${COLORS.muted};
+            margin-bottom: 0.8mm;
+          }
+
+          .meta-value {
+            display: block;
+            font-size: 9pt;
+            color: ${COLORS.ink};
+            font-weight: 600;
+          }
+
+          .content-block + .content-block {
+            margin-top: 3mm;
+          }
+
+          .content-block--soft {
+            background: ${COLORS.surface};
+            border-radius: 2mm;
+            padding: 3mm 3.5mm;
+            border-left: 0.6mm solid ${COLORS.accent};
+          }
+
+          .content-label {
+            font-size: 6.5pt;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
             font-weight: 700;
             color: ${COLORS.muted};
             margin-bottom: 1mm;
           }
 
-          .meta-value {
-            display: block;
-            font-size: 9.5pt;
-            color: ${COLORS.ink};
-            font-weight: 600;
-          }
-
-          .content-block + .content-block {
-            margin-top: 4mm;
-          }
-
-          .content-block--soft {
-            background: ${COLORS.surface};
-            border-radius: 2mm;
-            padding: 4mm 4.5mm;
-            border-left: 0.6mm solid ${COLORS.accent};
-          }
-
-          .content-label {
-            font-size: 7pt;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: ${COLORS.muted};
-            margin-bottom: 1.5mm;
-          }
-
           .content-text {
-            font-size: 10pt;
-            line-height: 1.55;
+            font-size: 9pt;
+            line-height: 1.45;
             color: ${COLORS.body};
           }
 
           .content-text--lead {
-            font-size: 11pt;
-            line-height: 1.45;
+            font-size: 10pt;
+            line-height: 1.4;
             color: ${COLORS.ink};
             font-weight: 500;
           }
@@ -960,12 +966,12 @@ export function createClientReportPrintTemplate({
           .content-text--accent {
             color: ${COLORS.accentDeep};
             font-weight: 600;
-            font-size: 9.5pt;
+            font-size: 8.5pt;
           }
 
           .content-text--mono {
             font-family: "SF Mono", "Menlo", "Consolas", monospace;
-            font-size: 9pt;
+            font-size: 8.5pt;
             color: ${COLORS.muted};
             word-break: break-all;
           }
