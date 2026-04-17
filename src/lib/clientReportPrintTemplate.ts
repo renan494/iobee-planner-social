@@ -84,6 +84,38 @@ export function createClientReportPrintTemplate({
 
   const totalChannels = new Set(sortedPosts.flatMap((p) => p.channels || [])).size;
 
+  const FUNNEL_COLORS: Record<string, string> = {
+    topo: "#FDB600",
+    meio: "#3B82F6",
+    fundo: "#10B981",
+  };
+  const funnelOrder: Array<"topo" | "meio" | "fundo"> = ["topo", "meio", "fundo"];
+  const funnelCounts = funnelOrder.reduce<Record<string, number>>((acc, stage) => {
+    acc[stage] = sortedPosts.filter((p) => p.funnelStage === stage).length;
+    return acc;
+  }, {});
+  const funnelTotal = sortedPosts.length;
+  const funnelSegments = funnelOrder
+    .filter((stage) => (funnelCounts[stage] ?? 0) > 0)
+    .map((stage) => {
+      const count = funnelCounts[stage];
+      const pct = funnelTotal > 0 ? (count / funnelTotal) * 100 : 0;
+      return `<div class="funnel-bar__segment" style="width: ${pct.toFixed(2)}%; background: ${FUNNEL_COLORS[stage]}" title="${FUNNEL_LABELS[stage]} ${count}"></div>`;
+    })
+    .join("");
+  const funnelLegend = funnelOrder
+    .map((stage) => {
+      const count = funnelCounts[stage] ?? 0;
+      const pct = funnelTotal > 0 ? Math.round((count / funnelTotal) * 100) : 0;
+      return `
+        <div class="funnel-legend__item">
+          <span class="funnel-legend__dot" style="background: ${FUNNEL_COLORS[stage]}"></span>
+          <span class="funnel-legend__label">${FUNNEL_LABELS[stage]}</span>
+          <span class="funnel-legend__value">${count} <span class="funnel-legend__pct">· ${pct}%</span></span>
+        </div>`;
+    })
+    .join("");
+
   const formatChips = Object.entries(byFormat)
     .filter(([, count]) => count > 0)
     .map(([fmt, count]) => `
