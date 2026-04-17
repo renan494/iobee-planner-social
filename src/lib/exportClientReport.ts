@@ -64,6 +64,8 @@ export async function exportClientReportPdf({
     throw new Error("Could not open the print document.");
   }
 
+  const avatarDataUrl = avatarUrl ? await toDataUrl(avatarUrl) : null;
+
   printDocument.open();
   printDocument.write(
     createClientReportPrintTemplate({
@@ -71,6 +73,7 @@ export async function exportClientReportPdf({
       posts,
       exportedAt,
       filtersApplied,
+      avatarDataUrl,
     }),
   );
   printDocument.close();
