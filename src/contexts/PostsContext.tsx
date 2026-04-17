@@ -95,6 +95,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     queryKey: POSTS_QUERY_KEY,
     queryFn: fetchPostsFn,
     staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
   const analystsQuery = useQuery({
     queryKey: ANALYSTS_QUERY_KEY,
