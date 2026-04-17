@@ -347,8 +347,10 @@ export default function Strategy() {
             <p className="text-center text-muted-foreground py-8">Nenhuma estratégia salva para este cliente.</p>
           ) : (
             <div className="space-y-3">
-              {strategies.map((s) => (
-                <Card key={s.id} className="overflow-hidden border-border">
+              {strategies.map((s) => {
+                const isActive = selectedClient?.active_strategy_id === s.id;
+                return (
+                <Card key={s.id} className={`overflow-hidden ${isActive ? "border-primary ring-1 ring-primary/40" : "border-border"}`}>
                   <div
                     className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={() => setExpandedId(expandedId === s.id ? null : s.id)}
@@ -356,13 +358,31 @@ export default function Strategy() {
                     <div className="flex items-center gap-3 min-w-0">
                       <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{s.title}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium truncate">{s.title}</p>
+                          {isActive && (
+                            <Badge variant="default" className="gap-1 shrink-0">
+                              <Star className="h-3 w-3 fill-current" />
+                              Ativa
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground">
                           {new Date(s.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
+                      <Button
+                        variant={isActive ? "default" : "ghost"}
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={(e) => { e.stopPropagation(); handleSetActive(s.id); }}
+                        title={isActive ? "Desativar" : "Definir como estratégia ativa (usada ao gerar posts)"}
+                      >
+                        <Star className={`h-3.5 w-3.5 ${isActive ? "fill-current" : ""}`} />
+                        {isActive ? "Ativa" : "Definir ativa"}
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
