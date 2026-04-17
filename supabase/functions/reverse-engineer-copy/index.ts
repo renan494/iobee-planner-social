@@ -40,86 +40,62 @@ function getInstagramShortcode(url: string): string | null {
 }
 
 async function fetchInstagramViaEmbed(shortcode: string): Promise<{ videoUrl: string | null; caption: string | null; error?: string }> {
-  const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+  // Estratégia que funciona: usar o User-Agent do crawler do Facebook (facebookexternalhit),
+  // que o Instagram entrega meta tags OG sem bloquear. Vale para posts/reels públicos.
+  const cleanUrl = `https://www.instagram.com/reel/${shortcode}/`;
+  const headers = {
+    "User-Agent": "Mozilla/5.0 (compatible; facebookexternalhit/1.1; +http://www.facebook.com/externalhit_uatext.php)",
+    "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+  };
 
-  // 1) Try embed page (no login required)
   try {
-    const embedUrl = `https://www.instagram.com/p/${shortcode}/embed/captioned/`;
-    const res = await fetch(embedUrl, {
-      headers: {
-        "User-Agent": UA,
-        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
-        "Accept": "text/html,application/xhtml+xml",
-      },
-    });
-    if (res.ok) {
-      const html = await res.text();
-      let videoUrl: string | null = null;
-      let caption: string | null = null;
-
-      const videoPatterns = [
-        /"video_url":"([^"]+)"/,
-        /"contentUrl":"([^"]+\.mp4[^"]*)"/,
-        /<video[^>]+src=["']([^"']+\.mp4[^"']*)["']/i,
-      ];
-      for (const re of videoPatterns) {
-        const m = html.match(re);
-        if (m && m[1]) {
-          videoUrl = m[1].replace(/\\u0026/g, "&").replace(/\\\//g, "/").replace(/\\"/g, '"');
-          if (videoUrl.startsWith("https://")) break;
-          videoUrl = null;
-        }
-      }
-
-      const capPatterns = [
-        /<div class="Caption">[\s\S]*?<div class="CaptionUsername">[\s\S]*?<\/div>([\s\S]*?)<div class="CaptionComments"/i,
-        /"edge_media_to_caption":\{"edges":\[\{"node":\{"text":"([^"]+)"/,
-        /"caption":"([^"]+)"/,
-      ];
-      for (const re of capPatterns) {
-        const m = html.match(re);
-        if (m && m[1]) {
-          caption = m[1].replace(/<[^>]+>/g, " ").replace(/\\n/g, "\n").replace(/\\"/g, '"').trim();
-          if (caption.length > 10) break;
-          caption = null;
-        }
-      }
-
-      if (videoUrl || caption) return { videoUrl, caption };
+    const res = await fetch(cleanUrl, { headers, redirect: "follow" });
+    if (!res.ok) {
+      console.error("Instagram fetch error:", res.status);
+      if (res.status === 404) return { videoUrl: null, caption: null, error: "Post não encontrado ou privado." };
+      return { videoUrl: null, caption: null, error: `Instagram retornou ${res.status}. O post pode ser privado.` };
     }
-  } catch (e) { console.error("embed fetch error:", e); }
 
-  // 2) Try public GraphQL endpoint (sometimes works)
-  try {
-    const apiUrl = `https://www.instagram.com/p/${shortcode}/?__a=1&__d=dis`;
-    const res = await fetch(apiUrl, {
-      headers: { "User-Agent": UA, "Accept": "application/json" },
-    });
-    if (res.ok) {
-      const data = await res.json().catch(() => null);
-      const media = data?.items?.[0] || data?.graphql?.shortcode_media;
-      if (media) {
-        const videoUrl = media?.video_versions?.[0]?.url || media?.video_url || null;
-        const caption = media?.caption?.text || media?.edge_media_to_caption?.edges?.[0]?.node?.text || null;
-        if (videoUrl || caption) return { videoUrl, caption };
+    const html = await res.text();
+
+    // Caption via og:description (formato: "X likes, Y comments - user on date: \"caption\"")
+    let caption: string | null = null;
+    const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
+    if (ogDesc) {
+      const raw = decodeEntities(ogDesc[1]);
+      const m = raw.match(/:\s*[“”"]([\s\S]+?)[“”"]?\s*$/) || raw.match(/:\s*"([\s\S]+)"\s*$/);
+      caption = (m ? m[1] : raw).trim();
+    }
+
+    // Video URL via og:video (reels)
+    let videoUrl: string | null = null;
+    const videoPatterns = [
+      /<meta[^>]+property=["']og:video:secure_url["'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+property=["']og:video["'][^>]+content=["']([^"']+)["']/i,
+      /"video_url"\s*:\s*"([^"]+\.mp4[^"]*)"/i,
+      /"contentUrl"\s*:\s*"([^"]+\.mp4[^"]*)"/i,
+    ];
+    for (const re of videoPatterns) {
+      const m = html.match(re);
+      if (m && m[1]) {
+        videoUrl = decodeEntities(m[1]).replace(/\\\//g, "/").replace(/\\u0026/g, "&");
+        break;
       }
     }
-  } catch (e) { console.error("graphql fetch error:", e); }
 
-  // 3) Fallback: Firecrawl (handles anti-bot, residential IPs)
-  try {
-    const { markdown, error } = await fetchScrapeRaw(`https://www.instagram.com/reel/${shortcode}/`, 5000);
-    if (markdown) {
-      const videoUrl = extractVideoUrl(markdown);
-      const caption = extractInstagramCaption(markdown);
-      if (videoUrl || (caption && caption.length > 20)) {
-        return { videoUrl, caption: caption || null };
-      }
+    if (!caption && !videoUrl) {
+      return {
+        videoUrl: null,
+        caption: null,
+        error: "Não foi possível extrair conteúdo deste post. O Instagram bloqueia leitura de posts privados ou via login. Cole o texto manualmente.",
+      };
     }
-    if (error) console.error("Firecrawl IG fallback error:", error);
-  } catch (e) { console.error("firecrawl IG exception:", e); }
 
-  return { videoUrl: null, caption: null, error: "Instagram bloqueou o scrape direto e o Firecrawl também não conseguiu extrair. Cole a transcrição manualmente." };
+    return { videoUrl, caption };
+  } catch (e: any) {
+    console.error("Instagram fetch exception:", e);
+    return { videoUrl: null, caption: null, error: e?.message || "Erro ao ler o post do Instagram" };
+  }
 }
 
 async function fetchScrapeRaw(url: string, waitFor = 3500): Promise<{ markdown: string | null; error?: string }> {
