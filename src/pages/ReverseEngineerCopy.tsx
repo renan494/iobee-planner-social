@@ -115,7 +115,15 @@ export default function ReverseEngineerCopy() {
         setTab("manual");
       }
     } catch (e: any) {
-      toast.error(e?.message || "Erro ao extrair");
+      console.error("reverse-engineer-copy extract failed", e);
+      const message = e?.context?.json?.error || e?.context?.json?.message || e?.message || "Erro ao extrair";
+      const code = e?.context?.json?.code;
+      if (["UNSUPPORTED_PLATFORM", "NO_CAPTIONS", "META_SCRAPE_FAILED", "INSTAGRAM_SCRAPE_FAILED"].includes(code)) {
+        toast.warning(message, { description: "Cole a transcrição manualmente abaixo.", duration: 5000 });
+        setTab("manual");
+      } else {
+        toast.error(message);
+      }
     } finally { setExtracting(false); }
   };
 
