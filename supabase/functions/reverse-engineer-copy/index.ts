@@ -270,9 +270,10 @@ async function transcribeVideoWithGemini(videoUrl: string): Promise<{ transcript
 
 function decodeEntities(s: string): string {
   return s
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n, 10)))
     .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#10;/g, " ")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)))
+    .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
     .trim();
 }
 
