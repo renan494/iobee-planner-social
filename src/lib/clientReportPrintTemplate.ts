@@ -225,7 +225,7 @@ export function createClientReportPrintTemplate({
                     ${post.legend ? `
                       <div class="content-block content-block--soft content-block--scroll">
                         <p class="content-label">Legenda</p>
-                        <p class="content-text">${nl2br(post.legend)}</p>
+                        <p class="content-text legend-text" style="font-size:${legendTier.fontSize};line-height:${legendTier.lineHeight};column-count:${legendTier.cols};">${nl2br(post.legend)}</p>
                       </div>` : ""}
 
                     ${post.hashtags.length > 0 ? `
