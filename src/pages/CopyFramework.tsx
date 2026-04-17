@@ -241,16 +241,6 @@ export default function CopyFramework() {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Tipo de Campanha</Label>
-            <Select value={campaignType} onValueChange={setCampaignType}>
-              <SelectTrigger className="bg-card border-border"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ongoing">🔄 Ongoing (contínua)</SelectItem>
-                <SelectItem value="sazonal">📅 Sazonal (campanha específica)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Produto / Serviço</Label>
             <Input value={produto} onChange={(e) => setProduto(e.target.value)} placeholder="Ex: Mentoria de Instagram pra clínicas" className="bg-card border-border" />
           </div>
