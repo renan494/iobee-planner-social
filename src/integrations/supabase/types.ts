@@ -61,76 +61,79 @@ export type Database = {
       }
       clients: {
         Row: {
+          audience_pains: string | null
           avatar_url: string | null
+          banned_topics: string | null
           brand_values: string | null
           competitors: string[] | null
+          content_pillars: string | null
           created_at: string
+          cta_preferences: string | null
           current_social_presence: string | null
           differentials: string | null
-          facebook_url: string | null
-          gmb_url: string | null
+          hashtags_base: string | null
           id: string
           instagram_handle: string | null
-          linkedin_url: string | null
+          main_offer: string | null
           name: string
           niche: string | null
           objective: string | null
-          platforms: string[] | null
           posting_frequency: string | null
           products_services: string | null
+          social_networks: string[] | null
+          success_references: string | null
           target_audience: string | null
-          ticket_medio: number | null
           tone_of_voice: string | null
-          verba_mensal: number | null
-          website_url: string | null
         }
         Insert: {
+          audience_pains?: string | null
           avatar_url?: string | null
+          banned_topics?: string | null
           brand_values?: string | null
           competitors?: string[] | null
+          content_pillars?: string | null
           created_at?: string
+          cta_preferences?: string | null
           current_social_presence?: string | null
           differentials?: string | null
-          facebook_url?: string | null
-          gmb_url?: string | null
+          hashtags_base?: string | null
           id?: string
           instagram_handle?: string | null
-          linkedin_url?: string | null
+          main_offer?: string | null
           name: string
           niche?: string | null
           objective?: string | null
-          platforms?: string[] | null
           posting_frequency?: string | null
           products_services?: string | null
+          social_networks?: string[] | null
+          success_references?: string | null
           target_audience?: string | null
-          ticket_medio?: number | null
           tone_of_voice?: string | null
-          verba_mensal?: number | null
-          website_url?: string | null
         }
         Update: {
+          audience_pains?: string | null
           avatar_url?: string | null
+          banned_topics?: string | null
           brand_values?: string | null
           competitors?: string[] | null
+          content_pillars?: string | null
           created_at?: string
+          cta_preferences?: string | null
           current_social_presence?: string | null
           differentials?: string | null
-          facebook_url?: string | null
-          gmb_url?: string | null
+          hashtags_base?: string | null
           id?: string
           instagram_handle?: string | null
-          linkedin_url?: string | null
+          main_offer?: string | null
           name?: string
           niche?: string | null
           objective?: string | null
-          platforms?: string[] | null
           posting_frequency?: string | null
           products_services?: string | null
+          social_networks?: string[] | null
+          success_references?: string | null
           target_audience?: string | null
-          ticket_medio?: number | null
           tone_of_voice?: string | null
-          verba_mensal?: number | null
-          website_url?: string | null
         }
         Relationships: []
       }
