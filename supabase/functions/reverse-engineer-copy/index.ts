@@ -1,4 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import {
+  decodeEntities,
+  fetchInstagramViaEmbed,
+  getInstagramShortcode,
+  isInstagramUrl,
+} from "../_shared/instagram.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
