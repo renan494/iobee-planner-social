@@ -194,7 +194,7 @@ export function createClientReportPrintTemplate({
               vertical-align: top;
             }
             @bottom-right {
-              content: "Página " counter(page) " de " counter(pages);
+              content: "Página " counter(page) " / " counter(pages);
               font-family: "Helvetica Neue", Arial, sans-serif;
               font-size: 8pt;
               font-weight: 700;
@@ -202,6 +202,7 @@ export function createClientReportPrintTemplate({
               padding-top: 4mm;
               border-top: 0.4mm solid ${COLORS.line};
               vertical-align: top;
+              white-space: nowrap;
             }
           }
 
