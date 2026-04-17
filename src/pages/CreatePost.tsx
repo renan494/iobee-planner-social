@@ -356,7 +356,14 @@ export default function CreatePost() {
                     content: data.legend || entry.content,
                     hashtags: data.hashtags || entry.hashtags,
                   });
-                  toast({ title: "Post gerado!", description: "Campos preenchidos pela IA. Revise antes de publicar." });
+                  const ctx = data._context;
+                  const ctxParts: string[] = [];
+                  if (ctx?.briefingUsed) ctxParts.push("briefing");
+                  if (ctx?.strategyUsed) ctxParts.push("estratégia");
+                  const ctxNote = ctxParts.length
+                    ? ` Usou ${ctxParts.join(" + ")} do cliente.`
+                    : " Cliente sem briefing cadastrado — gerado em modo genérico.";
+                  toast({ title: "Post gerado!", description: `Campos preenchidos pela IA. Revise antes de publicar.${ctxNote}` });
                 }
               } catch (err: any) {
                 toast({ title: "Erro", description: err.message || "Falha ao gerar post com IA.", variant: "destructive" });
