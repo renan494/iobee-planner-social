@@ -15,7 +15,6 @@ interface CopyRow {
   produto: string | null;
   publico_alvo: string | null;
   generated_copy: string | null;
-  campaign_type: string | null;
   created_at: string;
 }
 
@@ -55,7 +54,7 @@ export function ClientCopyHistory({ clientName, mode }: Props) {
       if (mode === "frameworks") {
         const { data } = await supabase
           .from("copies")
-          .select("id, framework, format, produto, publico_alvo, generated_copy, campaign_type, created_at")
+          .select("id, framework, format, produto, publico_alvo, generated_copy, created_at")
           .eq("client_id", clientId)
           .order("created_at", { ascending: false });
         setCopies((data as CopyRow[]) || []);
@@ -144,11 +143,6 @@ export function ClientCopyHistory({ clientName, mode }: Props) {
                     <div className="flex flex-wrap items-center gap-1.5 mb-1">
                       <Badge variant="secondary" className="text-xs">{fwLabel}</Badge>
                       {c.format && <Badge variant="outline" className="text-xs">{c.format}</Badge>}
-                      {c.campaign_type && (
-                        <Badge variant="outline" className="text-xs">
-                          {c.campaign_type === "ongoing" ? "🔄 Ongoing" : "📅 Sazonal"}
-                        </Badge>
-                      )}
                     </div>
                     <p className="font-medium text-sm text-foreground truncate">{c.produto || "Sem produto"}</p>
                     {c.publico_alvo && <p className="text-xs text-muted-foreground truncate">{c.publico_alvo}</p>}

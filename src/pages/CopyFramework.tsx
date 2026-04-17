@@ -32,7 +32,7 @@ export default function CopyFramework() {
   const [manualMode, setManualMode] = useState(false);
   const [manualAdText, setManualAdText] = useState("");
   const [clientName, setClientName] = useState("");
-  const [campaignType, setCampaignType] = useState("ongoing");
+  
   const [guideIA, setGuideIA] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -178,7 +178,6 @@ export default function CopyFramework() {
         publico_alvo: publicoAlvo.trim() || null,
         sections: values,
         generated_copy: finalCopy,
-        campaign_type: campaignType,
       });
       if (error) throw error;
       setSaved(true);
