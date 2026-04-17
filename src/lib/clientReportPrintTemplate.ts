@@ -158,7 +158,59 @@ export function createClientReportPrintTemplate({
         <style>
           @page {
             size: A4;
+            margin: 22mm 14mm 20mm;
+            @top-left {
+              content: "iOBEE Social Lab · Relatório de Conteúdo";
+              font-family: "Helvetica Neue", Arial, sans-serif;
+              font-size: 8pt;
+              font-weight: 700;
+              letter-spacing: 0.08em;
+              text-transform: uppercase;
+              color: ${COLORS.muted};
+              padding-bottom: 4mm;
+              border-bottom: 0.4mm solid ${COLORS.line};
+              width: 100%;
+              vertical-align: bottom;
+            }
+            @top-right {
+              content: "${escapeHtml(clientName).replace(/"/g, '\\"')}";
+              font-family: "Helvetica Neue", Arial, sans-serif;
+              font-size: 8pt;
+              font-weight: 700;
+              letter-spacing: 0.06em;
+              color: ${COLORS.dark};
+              padding-bottom: 4mm;
+              border-bottom: 0.4mm solid ${COLORS.line};
+              vertical-align: bottom;
+            }
+            @bottom-left {
+              content: "iOBEE Social Lab";
+              font-family: "Helvetica Neue", Arial, sans-serif;
+              font-size: 8pt;
+              color: ${COLORS.muted};
+              padding-top: 4mm;
+              border-top: 0.4mm solid ${COLORS.line};
+              width: 100%;
+              vertical-align: top;
+            }
+            @bottom-right {
+              content: "Página " counter(page) " de " counter(pages);
+              font-family: "Helvetica Neue", Arial, sans-serif;
+              font-size: 8pt;
+              font-weight: 700;
+              color: ${COLORS.dark};
+              padding-top: 4mm;
+              border-top: 0.4mm solid ${COLORS.line};
+              vertical-align: top;
+            }
+          }
+
+          @page :first {
             margin: 14mm;
+            @top-left { content: ""; border-bottom: 0; }
+            @top-right { content: ""; border-bottom: 0; }
+            @bottom-left { content: ""; border-top: 0; }
+            @bottom-right { content: ""; border-top: 0; }
           }
 
           * { box-sizing: border-box; }
