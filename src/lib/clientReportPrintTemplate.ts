@@ -877,6 +877,8 @@ export function createClientReportPrintTemplate({
             display: flex;
             flex-direction: column;
             min-width: 0;
+            position: relative;
+            z-index: 1;
           }
 
           .post-card__header {
