@@ -1,18 +1,14 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Camera, FileText, Pencil, Eye, PenTool, X, Sparkles } from "lucide-react";
+import { ArrowLeft, User, Camera, FileText, Pencil, Eye, PenTool, X, FileCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { usePosts } from "@/contexts/PostsContext";
 import { supabase } from "@/integrations/supabase/client";
-import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage, type Post } from "@/data/posts";
+import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type Post } from "@/data/posts";
 import { PostBadge } from "@/components/PostBadge";
 import { toast } from "sonner";
 import { ClientReportPreview } from "@/components/ClientReportPreview";
@@ -20,6 +16,7 @@ import { PostDetailModal } from "@/components/PostDetailModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientCopyHistory } from "@/components/ClientCopyHistory";
 import { PageContainer } from "@/components/PageContainer";
+import { BriefingForm, emptyBriefing, parseBRL, numberToBRL, type BriefingFormValues, type PlatformKey } from "@/components/BriefingForm";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
@@ -29,23 +26,9 @@ export default function ClientDetail() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [previewPost, setPreviewPost] = useState<Post | null>(null);
   const [showReport, setShowReport] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [editName, setEditName] = useState("");
-  const [editInstagram, setEditInstagram] = useState("");
-  const [editFacebookUrl, setEditFacebookUrl] = useState("");
-  const [editLinkedinUrl, setEditLinkedinUrl] = useState("");
-  const [editGmbUrl, setEditGmbUrl] = useState("");
-  const [editObjective, setEditObjective] = useState("");
-  const [editNiche, setEditNiche] = useState("");
-  const [editTargetAudience, setEditTargetAudience] = useState("");
-  const [editToneOfVoice, setEditToneOfVoice] = useState("");
-  const [editCompetitors, setEditCompetitors] = useState("");
-  const [editDifferentials, setEditDifferentials] = useState("");
-  const [editProductsServices, setEditProductsServices] = useState("");
-  
-  const [editBrandValues, setEditBrandValues] = useState("");
-  const [editCurrentSocialPresence, setEditCurrentSocialPresence] = useState("");
-  const [editSaving, setEditSaving] = useState(false);
+  const [editingBriefing, setEditingBriefing] = useState(false);
+  const [briefingForm, setBriefingForm] = useState<BriefingFormValues>(emptyBriefing);
+  const [briefingSaving, setBriefingSaving] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
   const clientPosts = useMemo(() => posts.filter((p) => p.client === clientName), [posts, clientName]);
@@ -88,52 +71,63 @@ export default function ClientDetail() {
     }
   };
 
-  const openEditDialog = async () => {
+  const openBriefingEditor = async () => {
     const { data } = await supabase.from("clients").select("*").eq("name", clientName).maybeSingle();
-    setEditName(clientName);
-    setEditInstagram((data as any)?.instagram_handle || "");
-    setEditFacebookUrl((data as any)?.facebook_url || "");
-    setEditLinkedinUrl((data as any)?.linkedin_url || "");
-    setEditGmbUrl((data as any)?.gmb_url || "");
-    setEditObjective((data as any)?.objective || "");
-    setEditNiche((data as any)?.niche || "");
-    setEditTargetAudience((data as any)?.target_audience || "");
-    setEditToneOfVoice((data as any)?.tone_of_voice || "");
-    setEditCompetitors(((data as any)?.competitors || []).join(", "));
-    setEditDifferentials((data as any)?.differentials || "");
-    setEditProductsServices((data as any)?.products_services || "");
-    
-    setEditBrandValues((data as any)?.brand_values || "");
-    setEditCurrentSocialPresence((data as any)?.current_social_presence || "");
-    setEditOpen(true);
+    const row = (data as any) || {};
+    setBriefingForm({
+      name: clientName,
+      niche: row.niche || "",
+      websiteUrl: row.website_url || "",
+      ticketMedio: numberToBRL(row.ticket_medio),
+      verbaMensal: numberToBRL(row.verba_mensal),
+      targetAudience: row.target_audience || "",
+      objective: row.objective || "",
+      competitors: (row.competitors || []).join(", "),
+      platforms: ((row.platforms || []) as PlatformKey[]).filter((p) => ["meta", "google", "tiktok"].includes(p)),
+      toneOfVoice: row.tone_of_voice || "",
+      differentials: row.differentials || "",
+      productsServices: row.products_services || "",
+      brandValues: row.brand_values || "",
+      currentSocialPresence: row.current_social_presence || "",
+      instagramHandle: row.instagram_handle || "",
+      facebookUrl: row.facebook_url || "",
+      linkedinUrl: row.linkedin_url || "",
+      gmbUrl: row.gmb_url || "",
+    });
+    setEditingBriefing(true);
   };
 
-  const handleSaveEdit = async () => {
-    setEditSaving(true);
+  const handleSaveBriefing = async () => {
+    setBriefingSaving(true);
     try {
       const { error } = await supabase.from("clients").update({
-        instagram_handle: editInstagram.trim() || null,
-        facebook_url: editFacebookUrl.trim() || null,
-        linkedin_url: editLinkedinUrl.trim() || null,
-        gmb_url: editGmbUrl.trim() || null,
-        objective: editObjective.trim() || null,
-        niche: editNiche.trim() || null,
-        target_audience: editTargetAudience.trim() || null,
-        tone_of_voice: editToneOfVoice.trim() || null,
-        competitors: editCompetitors.trim() ? editCompetitors.split(",").map((c: string) => c.trim()).filter(Boolean) : null,
-        differentials: editDifferentials.trim() || null,
-        products_services: editProductsServices.trim() || null,
-        
-        brand_values: editBrandValues.trim() || null,
-        current_social_presence: editCurrentSocialPresence.trim() || null,
+        niche: briefingForm.niche.trim() || null,
+        website_url: briefingForm.websiteUrl.trim() || null,
+        ticket_medio: parseBRL(briefingForm.ticketMedio) ?? null,
+        verba_mensal: parseBRL(briefingForm.verbaMensal) ?? null,
+        target_audience: briefingForm.targetAudience.trim() || null,
+        objective: briefingForm.objective.trim() || null,
+        competitors: briefingForm.competitors.trim()
+          ? briefingForm.competitors.split(",").map((c) => c.trim()).filter(Boolean)
+          : null,
+        platforms: briefingForm.platforms.length ? briefingForm.platforms : null,
+        tone_of_voice: briefingForm.toneOfVoice.trim() || null,
+        differentials: briefingForm.differentials.trim() || null,
+        products_services: briefingForm.productsServices.trim() || null,
+        brand_values: briefingForm.brandValues.trim() || null,
+        current_social_presence: briefingForm.currentSocialPresence.trim() || null,
+        instagram_handle: briefingForm.instagramHandle.trim() || null,
+        facebook_url: briefingForm.facebookUrl.trim() || null,
+        linkedin_url: briefingForm.linkedinUrl.trim() || null,
+        gmb_url: briefingForm.gmbUrl.trim() || null,
       } as any).eq("name", clientName);
       if (error) throw error;
-      toast.success("Dados do cliente atualizados!");
-      setEditOpen(false);
+      toast.success("Briefing atualizado!");
+      setEditingBriefing(false);
     } catch {
-      toast.error("Erro ao salvar dados do cliente.");
+      toast.error("Erro ao salvar briefing.");
     } finally {
-      setEditSaving(false);
+      setBriefingSaving(false);
     }
   };
 
@@ -144,12 +138,17 @@ export default function ClientDetail() {
           <ArrowLeft className="h-4 w-4" /> {showReport ? "Voltar" : "Voltar"}
         </Button>
         <div className="flex gap-2">
-          {!showReport && (
+          {!showReport && !editingBriefing && (
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={openBriefingEditor}>
+              <FileCog className="h-4 w-4" /> Editar Briefing
+            </Button>
+          )}
+          {!showReport && !editingBriefing && (
             <Button variant="outline" size="sm" className="gap-1.5" onClick={() => navigate(`/criar?client=${encodeURIComponent(clientName)}`)}>
               <PenTool className="h-4 w-4" /> Produzir Conteúdo
             </Button>
           )}
-          {!showReport && clientPosts.length > 0 && (
+          {!showReport && !editingBriefing && clientPosts.length > 0 && (
             <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setShowReport(true)}>
               <Eye className="h-4 w-4" /> Ver Posts
             </Button>
@@ -181,14 +180,24 @@ export default function ClientDetail() {
         </div>
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold text-foreground">{clientName}</h1>
-          <button onClick={openEditDialog} className="rounded-full p-1.5 text-muted-foreground/40 hover:text-primary hover:bg-primary/10 transition-colors">
-            <Pencil className="h-4 w-4" />
-          </button>
         </div>
           <p className="text-sm text-muted-foreground">{clientPosts.length} posts · {analysts.length} analista(s)</p>
       </div>
 
-      {showReport ? (
+      {editingBriefing ? (
+        <BriefingForm
+          values={briefingForm}
+          onChange={setBriefingForm}
+          onCancel={() => setEditingBriefing(false)}
+          onSave={handleSaveBriefing}
+          saving={briefingSaving}
+          lockName
+          avatarUrl={avatarUrl}
+          saveLabel="Salvar Briefing"
+        />
+      ) : null}
+
+      {editingBriefing ? null : showReport ? (
         <ClientReportPreview
           clientName={clientName}
           posts={clientPosts}
@@ -379,141 +388,6 @@ export default function ClientDetail() {
         onUpdatePost={async (id, fields) => { await updatePost(id, fields); setSelectedPost((p) => p ? { ...p, ...fields } : null); }}
         onDeletePost={async (id) => { await deletePost(id); setSelectedPost(null); }}
       />
-
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Editar Cliente</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Nome</Label>
-              <Input value={editName} disabled className="opacity-60" />
-            </div>
-
-            {/* Briefing Section */}
-            <div className="border-t pt-4">
-              <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5">
-                <Sparkles className="h-4 w-4 text-primary" />
-                Briefing para IA Estrategista
-              </p>
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-niche">Nicho / Segmento</Label>
-                  <Input id="edit-niche" placeholder="Ex: Gastronomia, Moda feminina, SaaS B2B..." value={editNiche} onChange={(e) => setEditNiche(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-target">Público-alvo</Label>
-                  <Textarea id="edit-target" placeholder="Descreva o público ideal: idade, gênero, interesses, dores..." value={editTargetAudience} onChange={(e) => setEditTargetAudience(e.target.value)} rows={2} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-tone">Tom de voz</Label>
-                  <Input id="edit-tone" placeholder="Ex: Profissional e acolhedor, Jovem e descontraído..." value={editToneOfVoice} onChange={(e) => setEditToneOfVoice(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-products">Produtos / Serviços principais</Label>
-                  <Textarea id="edit-products" placeholder="Descreva os principais produtos ou serviços..." value={editProductsServices} onChange={(e) => setEditProductsServices(e.target.value)} rows={2} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-differentials">Diferenciais</Label>
-                  <Textarea id="edit-differentials" placeholder="O que diferencia este cliente dos concorrentes?" value={editDifferentials} onChange={(e) => setEditDifferentials(e.target.value)} rows={2} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-competitors">Concorrentes (separados por vírgula)</Label>
-                  <Input id="edit-competitors" placeholder="Ex: @marca1, @marca2, empresa X" value={editCompetitors} onChange={(e) => setEditCompetitors(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-brand-values">Valores da marca</Label>
-                  <Input id="edit-brand-values" placeholder="Ex: Inovação, sustentabilidade, qualidade..." value={editBrandValues} onChange={(e) => setEditBrandValues(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-social-presence">Presença atual nas redes</Label>
-                  <Textarea id="edit-social-presence" placeholder="Descreva a situação atual: plataformas ativas, nº de seguidores, frequência..." value={editCurrentSocialPresence} onChange={(e) => setEditCurrentSocialPresence(e.target.value)} rows={2} />
-                </div>
-              </div>
-            </div>
-
-            {/* Social links */}
-            <div className="border-t pt-4">
-              <p className="text-sm font-semibold text-foreground mb-3">Redes sociais</p>
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-instagram">@ do Instagram</Label>
-                  <Input id="edit-instagram" placeholder="@iobee.digital" value={editInstagram} onChange={(e) => setEditInstagram(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-facebook">URL do Facebook</Label>
-                  <Input id="edit-facebook" placeholder="https://facebook.com/iobee" value={editFacebookUrl} onChange={(e) => setEditFacebookUrl(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-linkedin">URL do LinkedIn</Label>
-                  <Input id="edit-linkedin" placeholder="https://linkedin.com/company/iobee" value={editLinkedinUrl} onChange={(e) => setEditLinkedinUrl(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="edit-gmb">URL do Google Meu Negócio</Label>
-                  <Input id="edit-gmb" placeholder="https://g.page/iobee" value={editGmbUrl} onChange={(e) => setEditGmbUrl(e.target.value)} />
-                </div>
-              </div>
-            </div>
-
-            {/* Objective */}
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-objective">Objetivo</Label>
-              <Textarea id="edit-objective" placeholder="Descreva o objetivo..." value={editObjective} onChange={(e) => setEditObjective(e.target.value)} rows={3} />
-            </div>
-
-            {/* Analysts */}
-            <div className="space-y-2">
-              <Label>Analistas</Label>
-              <div className="flex flex-wrap gap-1.5">
-                {analysts.map((a) => (
-                  <span key={a} className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
-                    {a}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (window.confirm(`Remover "${a}" dos posts deste cliente? Isso não exclui os posts, apenas desvincula o analista.`)) {
-                          const analystPosts = clientPosts.filter((p) => p.analyst === a);
-                          analystPosts.forEach((p) => updatePost(p.id, { analyst: "" }));
-                        }
-                      }}
-                      className="ml-0.5 rounded-full p-0.5 hover:bg-destructive/10 hover:text-destructive transition-colors"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-                {analysts.length === 0 && (
-                  <span className="text-xs text-muted-foreground">Nenhum analista vinculado</span>
-                )}
-              </div>
-              {allAnalysts.filter((a) => !analysts.includes(a)).length > 0 && (
-                <select
-                  className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                  value=""
-                  onChange={(e) => {
-                    const analyst = e.target.value;
-                    if (!analyst) return;
-                    navigate(`/criar?client=${encodeURIComponent(clientName)}`);
-                    setEditOpen(false);
-                  }}
-                >
-                  <option value="">+ Adicionar analista...</option>
-                  {allAnalysts.filter((a) => !analysts.includes(a)).map((a) => (
-                    <option key={a} value={a}>{a}</option>
-                  ))}
-                </select>
-              )}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSaveEdit} disabled={editSaving}>
-              {editSaving ? "Salvando..." : "Salvar"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </PageContainer>
   );
 }
