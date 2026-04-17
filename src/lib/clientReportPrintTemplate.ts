@@ -921,8 +921,8 @@ export function createClientReportPrintTemplate({
           }
 
           .post-card__thumb-grid {
-            width: 70mm;
-            height: 70mm;
+            width: 60mm;
+            height: 60mm;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
