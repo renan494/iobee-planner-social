@@ -123,8 +123,17 @@ export function createClientReportPrintTemplate({
           (post, index) => {
             const accent = FORMAT_ACCENT[post.format] || COLORS.accent;
             const arts = artDataUrls?.get(post.id) ?? [];
+            const placeholder = `
+              <div class="post-card__thumb post-card__thumb--placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="9" cy="9" r="2"></circle>
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+                </svg>
+                <span>Sem arte</span>
+              </div>`;
             const thumbBlock = arts.length === 0
-              ? ""
+              ? placeholder
               : arts.length === 1
                 ? `<img class="post-card__thumb" src="${arts[0]}" alt="Arte do post" />`
                 : `<div class="post-card__thumb-grid">${arts
@@ -691,6 +700,30 @@ export function createClientReportPrintTemplate({
             display: block;
           }
 
+          .post-card__thumb--placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5mm;
+            background: ${COLORS.lineSoft};
+            border: 0.3mm dashed ${COLORS.mutedSoft};
+            color: ${COLORS.muted};
+          }
+
+          .post-card__thumb--placeholder svg {
+            width: 16mm;
+            height: 16mm;
+            opacity: 0.55;
+          }
+
+          .post-card__thumb--placeholder span {
+            font-size: 7.5pt;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-weight: 700;
+          }
+
           .post-card__thumb-grid {
             width: 60mm;
             height: 60mm;
@@ -712,6 +745,9 @@ export function createClientReportPrintTemplate({
             border-radius: 1.2mm;
             display: block;
           }
+
+          .eyebrow {
+            font-size: 7pt;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             font-weight: 700;
