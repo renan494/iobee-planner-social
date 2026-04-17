@@ -54,7 +54,7 @@ export default function Dashboard() {
   }, [filteredPosts, analysts]);
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6">
+    <PageContainer>
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
           <TrendingUp className="h-5 w-5 text-primary" />
