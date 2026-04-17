@@ -179,6 +179,10 @@ export function createClientReportPrintTemplate({
                   })();
             return `
             <article class="post-card" style="--accent: ${accent}">
+              <div class="post-card__index" aria-hidden="true">
+                <span class="post-card__index-num">${String(index + 1).padStart(2, "0")}</span>
+                <span class="post-card__index-total">/${String(sortedPosts.length).padStart(2, "0")}</span>
+              </div>
               <div class="post-card__rail"></div>
               <div class="post-card__body">
                 <header class="post-card__header">
