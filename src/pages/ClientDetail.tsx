@@ -71,52 +71,63 @@ export default function ClientDetail() {
     }
   };
 
-  const openEditDialog = async () => {
+  const openBriefingEditor = async () => {
     const { data } = await supabase.from("clients").select("*").eq("name", clientName).maybeSingle();
-    setEditName(clientName);
-    setEditInstagram((data as any)?.instagram_handle || "");
-    setEditFacebookUrl((data as any)?.facebook_url || "");
-    setEditLinkedinUrl((data as any)?.linkedin_url || "");
-    setEditGmbUrl((data as any)?.gmb_url || "");
-    setEditObjective((data as any)?.objective || "");
-    setEditNiche((data as any)?.niche || "");
-    setEditTargetAudience((data as any)?.target_audience || "");
-    setEditToneOfVoice((data as any)?.tone_of_voice || "");
-    setEditCompetitors(((data as any)?.competitors || []).join(", "));
-    setEditDifferentials((data as any)?.differentials || "");
-    setEditProductsServices((data as any)?.products_services || "");
-    
-    setEditBrandValues((data as any)?.brand_values || "");
-    setEditCurrentSocialPresence((data as any)?.current_social_presence || "");
-    setEditOpen(true);
+    const row = (data as any) || {};
+    setBriefingForm({
+      name: clientName,
+      niche: row.niche || "",
+      websiteUrl: row.website_url || "",
+      ticketMedio: numberToBRL(row.ticket_medio),
+      verbaMensal: numberToBRL(row.verba_mensal),
+      targetAudience: row.target_audience || "",
+      objective: row.objective || "",
+      competitors: (row.competitors || []).join(", "),
+      platforms: ((row.platforms || []) as PlatformKey[]).filter((p) => ["meta", "google", "tiktok"].includes(p)),
+      toneOfVoice: row.tone_of_voice || "",
+      differentials: row.differentials || "",
+      productsServices: row.products_services || "",
+      brandValues: row.brand_values || "",
+      currentSocialPresence: row.current_social_presence || "",
+      instagramHandle: row.instagram_handle || "",
+      facebookUrl: row.facebook_url || "",
+      linkedinUrl: row.linkedin_url || "",
+      gmbUrl: row.gmb_url || "",
+    });
+    setEditingBriefing(true);
   };
 
-  const handleSaveEdit = async () => {
-    setEditSaving(true);
+  const handleSaveBriefing = async () => {
+    setBriefingSaving(true);
     try {
       const { error } = await supabase.from("clients").update({
-        instagram_handle: editInstagram.trim() || null,
-        facebook_url: editFacebookUrl.trim() || null,
-        linkedin_url: editLinkedinUrl.trim() || null,
-        gmb_url: editGmbUrl.trim() || null,
-        objective: editObjective.trim() || null,
-        niche: editNiche.trim() || null,
-        target_audience: editTargetAudience.trim() || null,
-        tone_of_voice: editToneOfVoice.trim() || null,
-        competitors: editCompetitors.trim() ? editCompetitors.split(",").map((c: string) => c.trim()).filter(Boolean) : null,
-        differentials: editDifferentials.trim() || null,
-        products_services: editProductsServices.trim() || null,
-        
-        brand_values: editBrandValues.trim() || null,
-        current_social_presence: editCurrentSocialPresence.trim() || null,
+        niche: briefingForm.niche.trim() || null,
+        website_url: briefingForm.websiteUrl.trim() || null,
+        ticket_medio: parseBRL(briefingForm.ticketMedio) ?? null,
+        verba_mensal: parseBRL(briefingForm.verbaMensal) ?? null,
+        target_audience: briefingForm.targetAudience.trim() || null,
+        objective: briefingForm.objective.trim() || null,
+        competitors: briefingForm.competitors.trim()
+          ? briefingForm.competitors.split(",").map((c) => c.trim()).filter(Boolean)
+          : null,
+        platforms: briefingForm.platforms.length ? briefingForm.platforms : null,
+        tone_of_voice: briefingForm.toneOfVoice.trim() || null,
+        differentials: briefingForm.differentials.trim() || null,
+        products_services: briefingForm.productsServices.trim() || null,
+        brand_values: briefingForm.brandValues.trim() || null,
+        current_social_presence: briefingForm.currentSocialPresence.trim() || null,
+        instagram_handle: briefingForm.instagramHandle.trim() || null,
+        facebook_url: briefingForm.facebookUrl.trim() || null,
+        linkedin_url: briefingForm.linkedinUrl.trim() || null,
+        gmb_url: briefingForm.gmbUrl.trim() || null,
       } as any).eq("name", clientName);
       if (error) throw error;
-      toast.success("Dados do cliente atualizados!");
-      setEditOpen(false);
+      toast.success("Briefing atualizado!");
+      setEditingBriefing(false);
     } catch {
-      toast.error("Erro ao salvar dados do cliente.");
+      toast.error("Erro ao salvar briefing.");
     } finally {
-      setEditSaving(false);
+      setBriefingSaving(false);
     }
   };
 
