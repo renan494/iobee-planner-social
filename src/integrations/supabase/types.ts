@@ -61,6 +61,7 @@ export type Database = {
       }
       clients: {
         Row: {
+          active_strategy_id: string | null
           audience_pains: string | null
           avatar_url: string | null
           banned_topics: string | null
@@ -86,6 +87,7 @@ export type Database = {
           tone_of_voice: string | null
         }
         Insert: {
+          active_strategy_id?: string | null
           audience_pains?: string | null
           avatar_url?: string | null
           banned_topics?: string | null
@@ -111,6 +113,7 @@ export type Database = {
           tone_of_voice?: string | null
         }
         Update: {
+          active_strategy_id?: string | null
           audience_pains?: string | null
           avatar_url?: string | null
           banned_topics?: string | null
@@ -135,7 +138,15 @@ export type Database = {
           target_audience?: string | null
           tone_of_voice?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "clients_active_strategy_id_fkey"
+            columns: ["active_strategy_id"]
+            isOneToOne: false
+            referencedRelation: "strategies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       copies: {
         Row: {

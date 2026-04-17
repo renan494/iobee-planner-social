@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save } from "lucide-react";
+import { Loader2, Sparkles, FileText, Clock, Trash2, ChevronDown, ChevronUp, AlertCircle, Save, Star } from "lucide-react";
 import StrategyContent from "@/components/StrategyContent";
 import StrategyDebateChat from "@/components/StrategyDebateChat";
 import StrategySlideViewer from "@/components/strategy-slides/StrategySlideViewer";
@@ -27,6 +27,7 @@ type ClientData = {
   current_social_presence?: string | null;
   objective?: string | null;
   instagram_handle?: string | null;
+  active_strategy_id?: string | null;
 };
 
 type Strategy = {
@@ -174,8 +175,26 @@ export default function Strategy() {
     } else {
       setStrategies((prev) => prev.filter((s) => s.id !== id));
       if (expandedId === id) setExpandedId(null);
+      if (selectedClient?.active_strategy_id === id) {
+        setClients((prev) => prev.map((c) => c.id === selectedClient.id ? { ...c, active_strategy_id: null } : c));
+      }
       toast.success("Estratégia excluída");
     }
+  }
+
+  async function handleSetActive(strategyId: string) {
+    if (!selectedClient) return;
+    const isAlreadyActive = selectedClient.active_strategy_id === strategyId;
+    const newValue = isAlreadyActive ? null : strategyId;
+    const { error } = await (supabase.from("clients") as any)
+      .update({ active_strategy_id: newValue })
+      .eq("id", selectedClient.id);
+    if (error) {
+      toast.error("Não foi possível definir como ativa");
+      return;
+    }
+    setClients((prev) => prev.map((c) => c.id === selectedClient.id ? { ...c, active_strategy_id: newValue } : c));
+    toast.success(isAlreadyActive ? "Estratégia desativada" : "Estratégia ativa definida — será usada ao gerar posts");
   }
 
   return (
@@ -328,8 +347,10 @@ export default function Strategy() {
             <p className="text-center text-muted-foreground py-8">Nenhuma estratégia salva para este cliente.</p>
           ) : (
             <div className="space-y-3">
-              {strategies.map((s) => (
-                <Card key={s.id} className="overflow-hidden border-border">
+              {strategies.map((s) => {
+                const isActive = selectedClient?.active_strategy_id === s.id;
+                return (
+                <Card key={s.id} className={`overflow-hidden ${isActive ? "border-primary ring-1 ring-primary/40" : "border-border"}`}>
                   <div
                     className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={() => setExpandedId(expandedId === s.id ? null : s.id)}
@@ -337,13 +358,31 @@ export default function Strategy() {
                     <div className="flex items-center gap-3 min-w-0">
                       <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{s.title}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium truncate">{s.title}</p>
+                          {isActive && (
+                            <Badge variant="default" className="gap-1 shrink-0">
+                              <Star className="h-3 w-3 fill-current" />
+                              Ativa
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground">
                           {new Date(s.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
+                      <Button
+                        variant={isActive ? "default" : "ghost"}
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={(e) => { e.stopPropagation(); handleSetActive(s.id); }}
+                        title={isActive ? "Desativar" : "Definir como estratégia ativa (usada ao gerar posts)"}
+                      >
+                        <Star className={`h-3.5 w-3.5 ${isActive ? "fill-current" : ""}`} />
+                        {isActive ? "Ativa" : "Definir ativa"}
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -366,7 +405,8 @@ export default function Strategy() {
                     </CardContent>
                   )}
                 </Card>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
