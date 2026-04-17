@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useNavigate, type NavigateFunction } from "react-router-dom";
 import { FileEdit, Trash2, Send, Clock } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { List, type RowComponentProps } from "react-window";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,7 +82,29 @@ export default function Drafts() {
     toast({ title: "Post publicado!", description: `"${draft.title}" adicionado ao calendário.` });
   };
 
-  const isComplete = (d: Draft) => !!(d.client && d.analyst && d.date && d.title);
+  const isComplete = useCallback(
+    (d: Draft) => !!(d.client && d.analyst && d.date && d.title),
+    []
+  );
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [listHeight, setListHeight] = useState(600);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      const top = el.getBoundingClientRect().top;
+      setListHeight(Math.max(320, window.innerHeight - top - 40));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [drafts.length]);
+
+  const rowProps = useMemo(
+    () => ({ items: drafts, navigate, publishDraft, deleteDraft, isComplete }),
+    [drafts, navigate, publishDraft, deleteDraft, isComplete]
+  );
 
   return (
     <PageContainer maxWidth="4xl">
@@ -106,46 +129,68 @@ export default function Drafts() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {drafts.map((draft) => (
-            <Card key={draft.id} className="overflow-hidden">
-              <CardContent className="flex items-center gap-4 p-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-foreground truncate">
-                      {draft.title || <span className="italic text-muted-foreground">Sem título</span>}
-                    </p>
-                    {!isComplete(draft) && (
-                      <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">Incompleto</span>
-                    )}
-                  </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                    {draft.client && <span>{draft.client}</span>}
-                    {draft.analyst && <span>• {draft.analyst}</span>}
-                    <span>• {FORMAT_LABELS[draft.format as PostFormat] || draft.format}</span>
-                    {draft.date && <span>• {format(new Date(draft.date + "T12:00:00"), "dd/MM/yyyy")}</span>}
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {formatDistanceToNow(new Date(draft.updated_at), { addSuffix: true, locale: ptBR })}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <Button size="sm" variant="outline" onClick={() => navigate(`/criar?draft=${draft.id}`)}>
-                    <FileEdit className="mr-1 h-3.5 w-3.5" /> Editar
-                  </Button>
-                  <Button size="sm" variant="default" onClick={() => publishDraft(draft)} disabled={!isComplete(draft)}>
-                    <Send className="mr-1 h-3.5 w-3.5" /> Publicar
-                  </Button>
-                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => { if (confirm("Excluir este rascunho?")) deleteDraft(draft.id); }}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div ref={containerRef}>
+          <List
+            style={{ height: listHeight, width: "100%" }}
+            rowCount={drafts.length}
+            rowHeight={108}
+            rowComponent={DraftRow}
+            rowProps={rowProps}
+            overscanCount={4}
+          />
         </div>
       )}
     </PageContainer>
+  );
+}
+
+type DraftRowProps = {
+  items: Draft[];
+  navigate: NavigateFunction;
+  publishDraft: (d: Draft) => void;
+  deleteDraft: (id: string) => void;
+  isComplete: (d: Draft) => boolean;
+};
+
+function DraftRow({ index, style, items, navigate, publishDraft, deleteDraft, isComplete }: RowComponentProps<DraftRowProps>) {
+  const draft = items[index];
+  return (
+    <div style={style} className="pb-3">
+      <Card className="overflow-hidden">
+        <CardContent className="flex items-center gap-4 p-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="font-medium text-foreground truncate">
+                {draft.title || <span className="italic text-muted-foreground">Sem título</span>}
+              </p>
+              {!isComplete(draft) && (
+                <span className="shrink-0 rounded bg-warning/15 px-1.5 py-0.5 text-[10px] font-medium text-warning-foreground">Incompleto</span>
+              )}
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              {draft.client && <span>{draft.client}</span>}
+              {draft.analyst && <span>• {draft.analyst}</span>}
+              <span>• {FORMAT_LABELS[draft.format as PostFormat] || draft.format}</span>
+              {draft.date && <span>• {format(new Date(draft.date + "T12:00:00"), "dd/MM/yyyy")}</span>}
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatDistanceToNow(new Date(draft.updated_at), { addSuffix: true, locale: ptBR })}
+              </span>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => navigate(`/criar?draft=${draft.id}`)}>
+              <FileEdit className="mr-1 h-3.5 w-3.5" /> Editar
+            </Button>
+            <Button size="sm" variant="default" onClick={() => publishDraft(draft)} disabled={!isComplete(draft)}>
+              <Send className="mr-1 h-3.5 w-3.5" /> Publicar
+            </Button>
+            <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => { if (confirm("Excluir este rascunho?")) deleteDraft(draft.id); }}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
