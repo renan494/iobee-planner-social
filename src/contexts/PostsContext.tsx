@@ -5,13 +5,11 @@ import { getClients, type Post, type PostFormat, type FunnelStage } from "@/data
 export interface ClientFormData {
   name: string;
   instagramHandle?: string;
-  facebookUrl?: string;
-  linkedinUrl?: string;
-  gmbUrl?: string;
   objective?: string;
   avatarUrl?: string;
   niche?: string;
   targetAudience?: string;
+  audiencePains?: string;
   toneOfVoice?: string;
   differentials?: string;
   productsServices?: string;
@@ -19,10 +17,13 @@ export interface ClientFormData {
   brandValues?: string;
   currentSocialPresence?: string;
   competitors?: string[];
-  websiteUrl?: string;
-  ticketMedio?: number;
-  verbaMensal?: number;
-  platforms?: string[];
+  socialNetworks?: string[];
+  contentPillars?: string;
+  mainOffer?: string;
+  ctaPreferences?: string;
+  bannedTopics?: string;
+  successReferences?: string;
+  hashtagsBase?: string;
 }
 
 interface PostsContextType {
@@ -201,13 +202,11 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.from("clients").insert({
       name: data.name,
       instagram_handle: data.instagramHandle || null,
-      facebook_url: data.facebookUrl || null,
-      linkedin_url: data.linkedinUrl || null,
-      gmb_url: data.gmbUrl || null,
       objective: data.objective || null,
       avatar_url: data.avatarUrl || null,
       niche: data.niche || null,
       target_audience: data.targetAudience || null,
+      audience_pains: data.audiencePains || null,
       tone_of_voice: data.toneOfVoice || null,
       differentials: data.differentials || null,
       products_services: data.productsServices || null,
@@ -215,10 +214,13 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       brand_values: data.brandValues || null,
       current_social_presence: data.currentSocialPresence || null,
       competitors: data.competitors?.length ? data.competitors : null,
-      website_url: data.websiteUrl || null,
-      ticket_medio: data.ticketMedio ?? null,
-      verba_mensal: data.verbaMensal ?? null,
-      platforms: data.platforms?.length ? data.platforms : null,
+      social_networks: data.socialNetworks?.length ? data.socialNetworks : null,
+      content_pillars: data.contentPillars || null,
+      main_offer: data.mainOffer || null,
+      cta_preferences: data.ctaPreferences || null,
+      banned_topics: data.bannedTopics || null,
+      success_references: data.successReferences || null,
+      hashtags_base: data.hashtagsBase || null,
     } as any);
     if (error) throw error;
     await fetchClients();

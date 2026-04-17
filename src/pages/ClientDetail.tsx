@@ -16,7 +16,7 @@ import { PostDetailModal } from "@/components/PostDetailModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientCopyHistory } from "@/components/ClientCopyHistory";
 import { PageContainer } from "@/components/PageContainer";
-import { BriefingForm, emptyBriefing, parseBRL, numberToBRL, type BriefingFormValues, type PlatformKey } from "@/components/BriefingForm";
+import { BriefingForm, emptyBriefing, type BriefingFormValues, type SocialNetworkKey } from "@/components/BriefingForm";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
@@ -74,25 +74,28 @@ export default function ClientDetail() {
   const openBriefingEditor = async () => {
     const { data } = await supabase.from("clients").select("*").eq("name", clientName).maybeSingle();
     const row = (data as any) || {};
+    const validNetworks: SocialNetworkKey[] = ["instagram", "tiktok", "youtube", "linkedin", "facebook", "pinterest", "threads"];
     setBriefingForm({
       name: clientName,
       niche: row.niche || "",
-      websiteUrl: row.website_url || "",
-      ticketMedio: numberToBRL(row.ticket_medio),
-      verbaMensal: numberToBRL(row.verba_mensal),
+      postingFrequency: row.posting_frequency || "",
+      socialNetworks: ((row.social_networks || []) as SocialNetworkKey[]).filter((p) => validNetworks.includes(p)),
       targetAudience: row.target_audience || "",
+      audiencePains: row.audience_pains || "",
       objective: row.objective || "",
+      mainOffer: row.main_offer || "",
       competitors: (row.competitors || []).join(", "),
-      platforms: ((row.platforms || []) as PlatformKey[]).filter((p) => ["meta", "google", "tiktok"].includes(p)),
+      successReferences: row.success_references || "",
       toneOfVoice: row.tone_of_voice || "",
+      contentPillars: row.content_pillars || "",
+      ctaPreferences: row.cta_preferences || "",
       differentials: row.differentials || "",
       productsServices: row.products_services || "",
       brandValues: row.brand_values || "",
       currentSocialPresence: row.current_social_presence || "",
+      bannedTopics: row.banned_topics || "",
+      hashtagsBase: row.hashtags_base || "",
       instagramHandle: row.instagram_handle || "",
-      facebookUrl: row.facebook_url || "",
-      linkedinUrl: row.linkedin_url || "",
-      gmbUrl: row.gmb_url || "",
     });
     setEditingBriefing(true);
   };
@@ -102,24 +105,26 @@ export default function ClientDetail() {
     try {
       const { error } = await supabase.from("clients").update({
         niche: briefingForm.niche.trim() || null,
-        website_url: briefingForm.websiteUrl.trim() || null,
-        ticket_medio: parseBRL(briefingForm.ticketMedio) ?? null,
-        verba_mensal: parseBRL(briefingForm.verbaMensal) ?? null,
+        posting_frequency: briefingForm.postingFrequency.trim() || null,
+        social_networks: briefingForm.socialNetworks.length ? briefingForm.socialNetworks : null,
         target_audience: briefingForm.targetAudience.trim() || null,
+        audience_pains: briefingForm.audiencePains.trim() || null,
         objective: briefingForm.objective.trim() || null,
+        main_offer: briefingForm.mainOffer.trim() || null,
         competitors: briefingForm.competitors.trim()
           ? briefingForm.competitors.split(",").map((c) => c.trim()).filter(Boolean)
           : null,
-        platforms: briefingForm.platforms.length ? briefingForm.platforms : null,
+        success_references: briefingForm.successReferences.trim() || null,
         tone_of_voice: briefingForm.toneOfVoice.trim() || null,
+        content_pillars: briefingForm.contentPillars.trim() || null,
+        cta_preferences: briefingForm.ctaPreferences.trim() || null,
         differentials: briefingForm.differentials.trim() || null,
         products_services: briefingForm.productsServices.trim() || null,
         brand_values: briefingForm.brandValues.trim() || null,
         current_social_presence: briefingForm.currentSocialPresence.trim() || null,
+        banned_topics: briefingForm.bannedTopics.trim() || null,
+        hashtags_base: briefingForm.hashtagsBase.trim() || null,
         instagram_handle: briefingForm.instagramHandle.trim() || null,
-        facebook_url: briefingForm.facebookUrl.trim() || null,
-        linkedin_url: briefingForm.linkedinUrl.trim() || null,
-        gmb_url: briefingForm.gmbUrl.trim() || null,
       } as any).eq("name", clientName);
       if (error) throw error;
       toast.success("Briefing atualizado!");

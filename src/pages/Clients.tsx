@@ -11,7 +11,7 @@ import { FORMAT_LABELS, type PostFormat } from "@/data/posts";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { PageContainer } from "@/components/PageContainer";
-import { BriefingForm, emptyBriefing, parseBRL, type BriefingFormValues } from "@/components/BriefingForm";
+import { BriefingForm, emptyBriefing, type BriefingFormValues } from "@/components/BriefingForm";
 
 export default function Clients() {
   const { posts, clients, addClient, deleteClient } = usePosts();
@@ -78,22 +78,24 @@ export default function Clients() {
       await addClient({
         name: trimmed,
         niche: form.niche.trim() || undefined,
-        websiteUrl: form.websiteUrl.trim() || undefined,
-        ticketMedio: parseBRL(form.ticketMedio),
-        verbaMensal: parseBRL(form.verbaMensal),
+        postingFrequency: form.postingFrequency.trim() || undefined,
+        socialNetworks: form.socialNetworks.length ? form.socialNetworks : undefined,
         targetAudience: form.targetAudience.trim() || undefined,
+        audiencePains: form.audiencePains.trim() || undefined,
         objective: form.objective.trim() || undefined,
+        mainOffer: form.mainOffer.trim() || undefined,
         competitors: form.competitors.trim() ? form.competitors.split(",").map((c) => c.trim()).filter(Boolean) : undefined,
-        platforms: form.platforms.length ? form.platforms : undefined,
+        successReferences: form.successReferences.trim() || undefined,
         toneOfVoice: form.toneOfVoice.trim() || undefined,
+        contentPillars: form.contentPillars.trim() || undefined,
+        ctaPreferences: form.ctaPreferences.trim() || undefined,
         differentials: form.differentials.trim() || undefined,
         productsServices: form.productsServices.trim() || undefined,
         brandValues: form.brandValues.trim() || undefined,
         currentSocialPresence: form.currentSocialPresence.trim() || undefined,
+        bannedTopics: form.bannedTopics.trim() || undefined,
+        hashtagsBase: form.hashtagsBase.trim() || undefined,
         instagramHandle: form.instagramHandle.trim() || undefined,
-        facebookUrl: form.facebookUrl.trim() || undefined,
-        linkedinUrl: form.linkedinUrl.trim() || undefined,
-        gmbUrl: form.gmbUrl.trim() || undefined,
         avatarUrl: avatarPreview || undefined,
       });
       toast({ title: "Briefing salvo", description: `"${trimmed}" foi cadastrado com sucesso.` });
