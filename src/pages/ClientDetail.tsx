@@ -197,7 +197,7 @@ export default function ClientDetail() {
         />
       ) : null}
 
-      {showReport ? (
+      {editingBriefing ? null : showReport ? (
         <ClientReportPreview
           clientName={clientName}
           posts={clientPosts}
