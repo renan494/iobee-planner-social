@@ -691,8 +691,27 @@ export function createClientReportPrintTemplate({
             display: block;
           }
 
-          .eyebrow {
-            font-size: 7pt;
+          .post-card__thumb-grid {
+            width: 60mm;
+            height: 60mm;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1mm;
+            flex-shrink: 0;
+            border-radius: 2mm;
+            overflow: hidden;
+            background: ${COLORS.surface};
+          }
+
+          .post-card__thumb-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 0.3mm solid ${COLORS.line};
+            border-radius: 1.2mm;
+            display: block;
+          }
             letter-spacing: 0.18em;
             text-transform: uppercase;
             font-weight: 700;
