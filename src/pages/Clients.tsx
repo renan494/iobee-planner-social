@@ -133,7 +133,7 @@ export default function Clients() {
             <Card key={c.name} className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => navigate(`/clientes/${encodeURIComponent(c.name)}`)}>
               <CardHeader className="flex flex-row items-center gap-3 pb-3">
                 <Avatar className="h-10 w-10">
-                  {avatarUrls[c.name] ? <AvatarImage src={avatarUrls[c.name]} alt={c.name} /> : null}
+                  {avatarUrls[c.name] ? <AvatarImage src={avatarUrls[c.name]} alt={c.name} loading="lazy" decoding="async" /> : null}
                   <AvatarFallback className="bg-secondary">
                     <User className="h-5 w-5 text-muted-foreground" />
                   </AvatarFallback>

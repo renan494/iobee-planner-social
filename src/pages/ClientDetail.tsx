@@ -165,7 +165,7 @@ export default function ClientDetail() {
         <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
           <Avatar className="h-12 w-12">
             {avatarUrl ? (
-              <AvatarImage src={avatarUrl} alt={clientName} />
+              <AvatarImage src={avatarUrl} alt={clientName} loading="lazy" decoding="async" />
             ) : null}
             <AvatarFallback className="bg-secondary">
               <User className="h-6 w-6 text-muted-foreground" />
@@ -314,9 +314,9 @@ export default function ClientDetail() {
                                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-foreground/80 rounded-b-lg z-10" />
                                         <div className="aspect-[9/16] bg-muted flex items-center justify-center overflow-hidden">
                                           {(post.format === "carousel" && post.artUrls && post.artUrls.length > 0) ? (
-                                            <img src={post.artUrls[0]} alt={post.title} className="w-full h-full object-cover" />
+                                            <img src={post.artUrls[0]} alt={post.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                           ) : post.artUrl ? (
-                                            <img src={post.artUrl} alt={post.title} className="w-full h-full object-cover" />
+                                            <img src={post.artUrl} alt={post.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                           ) : (
                                             <div className="flex flex-col items-center gap-1 text-muted-foreground">
                                               <FileText className="h-6 w-6" />

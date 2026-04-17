@@ -48,7 +48,7 @@ function PhoneMockup({
         {/* Screen */}
         <div className="aspect-[9/16] bg-muted flex items-center justify-center overflow-hidden relative">
           {total > 0 ? (
-            <img src={images[currentSlide]} alt={`${title} - slide ${currentSlide + 1}`} className="w-full h-full object-cover" />
+            <img src={images[currentSlide]} alt={`${title} - slide ${currentSlide + 1}`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <ImageOff className="h-8 w-8" />
