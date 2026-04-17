@@ -387,6 +387,7 @@ export default function CreatePost() {
             idx={idx}
             total={entries.length}
             clients={clients}
+            briefings={briefings}
             analysts={analysts}
             onUpdate={(patch) => updateEntry(idx, patch)}
             onRemove={() => removeEntry(idx)}
@@ -456,12 +457,13 @@ export default function CreatePost() {
 }
 
 function PostEntryForm({
-  entry, idx, total, clients, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag, onGenerateAI,
+  entry, idx, total, clients, briefings, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag, onGenerateAI,
 }: {
   entry: PostEntry;
   idx: number;
   total: number;
   clients: string[];
+  briefings: Record<string, BriefingStatus>;
   analysts: string[];
   onUpdate: (patch: Partial<PostEntry>) => void;
   onRemove: () => void;
@@ -470,6 +472,7 @@ function PostEntryForm({
   onGenerateAI: () => void;
 }) {
   const effectiveClient = entry.client === "__new__" ? entry.newClient.trim() : entry.client;
+  const briefing = effectiveClient ? briefings[effectiveClient] : undefined;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm">
