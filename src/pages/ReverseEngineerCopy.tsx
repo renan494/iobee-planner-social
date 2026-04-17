@@ -269,6 +269,28 @@ export default function ReverseEngineerCopy() {
                 ✅ Instagram (Post / Reel) · ✅ Meta Ad Library · ✅ YouTube / Shorts · TikTok use a aba "Transcrição manual".
               </p>
             </div>
+
+            <div className="flex items-start justify-between gap-4 p-3 rounded-md border border-border bg-muted/30">
+              <div className="flex items-start gap-2.5 min-w-0">
+                <Mic className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <Label htmlFor="transcribe-audio-toggle" className="text-sm font-medium text-foreground cursor-pointer">
+                    Transcrever áudio do vídeo
+                  </Label>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {transcribeAudio
+                      ? "Gemini transcreve o áudio falado no vídeo (mais fiel, leva ~15–30s a mais)."
+                      : "Pula a transcrição e usa só a legenda escrita do post (mais rápido)."}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="transcribe-audio-toggle"
+                checked={transcribeAudio}
+                onCheckedChange={setTranscribeAudio}
+                disabled={extracting}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="manual" className="space-y-4 mt-4">
