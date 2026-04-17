@@ -55,6 +55,8 @@ export default function ReverseEngineerCopy() {
   const [transcriptKind, setTranscriptKind] = useState<"audio" | "written" | null>(null);
   const [videoWarning, setVideoWarning] = useState<string | null>(null);
 
+  const [transcribeAudio, setTranscribeAudio] = useState(true);
+
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryRow[]>([]);
