@@ -51,6 +51,8 @@ export default function ReverseEngineerCopy() {
   const [clientId, setClientId] = useState<string>("");
   const [source, setSource] = useState<"manual" | "youtube" | "meta_ad_library" | "instagram">("manual");
   const [sourceUrl, setSourceUrl] = useState<string>("");
+  const [transcriptKind, setTranscriptKind] = useState<"audio" | "written" | null>(null);
+  const [videoWarning, setVideoWarning] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
