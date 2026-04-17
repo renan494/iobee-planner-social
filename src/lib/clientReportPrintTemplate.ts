@@ -63,6 +63,7 @@ export function createClientReportPrintTemplate({
   exportedAt,
   filtersApplied,
   avatarDataUrl,
+  artDataUrls,
 }: ClientReportPrintTemplateOptions) {
   const sortedPosts = [...posts].sort((a, b) => a.date.localeCompare(b.date));
   const analysts = [...new Set(sortedPosts.map((post) => post.analyst.trim()).filter(Boolean))];
