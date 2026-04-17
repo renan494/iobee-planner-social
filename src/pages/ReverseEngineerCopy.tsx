@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
   Loader2, Link2, FileText, Sparkles, Copy, Check, Wand2, AlertCircle,
-  Save, History, Trash2, ChevronDown, ChevronUp, Eye, FlaskConical, ArrowUp, ArrowLeft,
+  Save, History, Trash2, ChevronDown, ChevronUp, Eye, FlaskConical, ArrowUp, ArrowLeft, Mic,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
