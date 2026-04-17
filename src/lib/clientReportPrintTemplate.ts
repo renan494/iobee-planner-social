@@ -179,6 +179,10 @@ export function createClientReportPrintTemplate({
                   })();
             return `
             <article class="post-card" style="--accent: ${accent}">
+              <div class="post-card__index" aria-hidden="true">
+                <span class="post-card__index-num">${String(index + 1).padStart(2, "0")}</span>
+                <span class="post-card__index-total">/${String(sortedPosts.length).padStart(2, "0")}</span>
+              </div>
               <div class="post-card__rail"></div>
               <div class="post-card__body">
                 <header class="post-card__header">
@@ -765,6 +769,7 @@ export function createClientReportPrintTemplate({
           }
 
           .post-card {
+            position: relative;
             display: flex;
             gap: 0;
             border: 0.3mm solid ${COLORS.line};
@@ -780,6 +785,34 @@ export function createClientReportPrintTemplate({
           .post-card:last-child {
             break-after: auto;
             page-break-after: auto;
+          }
+
+          .post-card__index {
+            position: absolute;
+            top: 4mm;
+            right: 6mm;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5mm;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            color: var(--accent, ${COLORS.accent});
+            opacity: 0.18;
+            pointer-events: none;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .post-card__index-num {
+            font-size: 56pt;
+          }
+
+          .post-card__index-total {
+            font-size: 22pt;
+            color: ${COLORS.muted};
+            opacity: 0.9;
           }
 
           .post-card__rail {
