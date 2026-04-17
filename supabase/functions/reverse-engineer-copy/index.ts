@@ -1,4 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import {
+  decodeEntities,
+  fetchInstagramViaEmbed,
+  getInstagramShortcode,
+  isInstagramUrl,
+} from "../_shared/instagram.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,73 +36,6 @@ function isMetaAdLibrary(url: string): boolean {
   return /(?:facebook|fb)\.com\/ads\/library/i.test(url);
 }
 
-function isInstagramUrl(url: string): boolean {
-  return /(?:instagram\.com|instagr\.am)\/(p|reel|reels|tv)\//i.test(url);
-}
-
-function getInstagramShortcode(url: string): string | null {
-  const m = url.match(/(?:instagram\.com|instagr\.am)\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/i);
-  return m ? m[1] : null;
-}
-
-async function fetchInstagramViaEmbed(shortcode: string): Promise<{ videoUrl: string | null; caption: string | null; error?: string }> {
-  // Estratégia que funciona: usar o User-Agent do crawler do Facebook (facebookexternalhit),
-  // que o Instagram entrega meta tags OG sem bloquear. Vale para posts/reels públicos.
-  const cleanUrl = `https://www.instagram.com/reel/${shortcode}/`;
-  const headers = {
-    "User-Agent": "Mozilla/5.0 (compatible; facebookexternalhit/1.1; +http://www.facebook.com/externalhit_uatext.php)",
-    "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
-  };
-
-  try {
-    const res = await fetch(cleanUrl, { headers, redirect: "follow" });
-    if (!res.ok) {
-      console.error("Instagram fetch error:", res.status);
-      if (res.status === 404) return { videoUrl: null, caption: null, error: "Post não encontrado ou privado." };
-      return { videoUrl: null, caption: null, error: `Instagram retornou ${res.status}. O post pode ser privado.` };
-    }
-
-    const html = await res.text();
-
-    // Caption via og:description (formato: "X likes, Y comments - user on date: \"caption\"")
-    let caption: string | null = null;
-    const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
-    if (ogDesc) {
-      const raw = decodeEntities(ogDesc[1]);
-      const m = raw.match(/:\s*[“”"]([\s\S]+?)[“”"]?\s*$/) || raw.match(/:\s*"([\s\S]+)"\s*$/);
-      caption = (m ? m[1] : raw).trim();
-    }
-
-    // Video URL via og:video (reels)
-    let videoUrl: string | null = null;
-    const videoPatterns = [
-      /<meta[^>]+property=["']og:video:secure_url["'][^>]+content=["']([^"']+)["']/i,
-      /<meta[^>]+property=["']og:video["'][^>]+content=["']([^"']+)["']/i,
-      /"video_url"\s*:\s*"([^"]+\.mp4[^"]*)"/i,
-      /"contentUrl"\s*:\s*"([^"]+\.mp4[^"]*)"/i,
-    ];
-    for (const re of videoPatterns) {
-      const m = html.match(re);
-      if (m && m[1]) {
-        videoUrl = decodeEntities(m[1]).replace(/\\\//g, "/").replace(/\\u0026/g, "&");
-        break;
-      }
-    }
-
-    if (!caption && !videoUrl) {
-      return {
-        videoUrl: null,
-        caption: null,
-        error: "Não foi possível extrair conteúdo deste post. O Instagram bloqueia leitura de posts privados ou via login. Cole o texto manualmente.",
-      };
-    }
-
-    return { videoUrl, caption };
-  } catch (e: any) {
-    console.error("Instagram fetch exception:", e);
-    return { videoUrl: null, caption: null, error: e?.message || "Erro ao ler o post do Instagram" };
-  }
-}
 
 async function fetchScrapeRaw(url: string, waitFor = 3500): Promise<{ markdown: string | null; error?: string }> {
   const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
@@ -268,14 +207,6 @@ async function transcribeVideoWithGemini(videoUrl: string): Promise<{ transcript
   }
 }
 
-function decodeEntities(s: string): string {
-  return s
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n, 10)))
-    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
-    .trim();
-}
 
 function parseTimedTextXML(xml: string): string {
   const matches = xml.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g);
