@@ -440,12 +440,19 @@ export function createClientReportPrintTemplate({
           <section class="page-cover">
             <div>
               <div class="top-bar"></div>
-              <p class="cover-brand">iOBEE Social Lab</p>
+              <div class="cover-brand-row">
+                <div class="brand-logo">${IOBEE_LOGO_SVG}</div>
+              </div>
             </div>
 
             <div class="cover-content">
               <p class="cover-kicker">Relatório de Conteúdo</p>
-              <h1>${escapeHtml(clientName)}</h1>
+              <div class="client-identity">
+                ${avatarDataUrl
+                  ? `<img class="client-avatar" src="${avatarDataUrl}" alt="${escapeHtml(clientName)}" />`
+                  : `<div class="client-avatar client-avatar--fallback">${escapeHtml(clientName.trim().charAt(0) || "?")}</div>`}
+                <h1>${escapeHtml(clientName)}</h1>
+              </div>
               <p class="cover-note">
                 Versão simplificada e fiel para exportação em PDF, priorizando consistência visual e abertura sem falhas.
                 ${filtersApplied ? " Relatório gerado com filtros de período aplicados." : ""}
