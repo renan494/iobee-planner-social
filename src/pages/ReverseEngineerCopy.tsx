@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
   Loader2, Link2, FileText, Sparkles, Copy, Check, Wand2, AlertCircle,
-  Save, History, Trash2, ChevronDown, ChevronUp, Eye, FlaskConical, ArrowUp, ArrowLeft,
+  Save, History, Trash2, ChevronDown, ChevronUp, Eye, FlaskConical, ArrowUp, ArrowLeft, Mic,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +55,8 @@ export default function ReverseEngineerCopy() {
   const [transcriptKind, setTranscriptKind] = useState<"audio" | "written" | null>(null);
   const [videoWarning, setVideoWarning] = useState<string | null>(null);
 
+  const [transcribeAudio, setTranscribeAudio] = useState(true);
+
   const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryRow[]>([]);
@@ -90,7 +93,7 @@ export default function ReverseEngineerCopy() {
     setExtracting(true); setResult(null); setSavedId(null);
     try {
       const { data, error } = await supabase.functions.invoke("reverse-engineer-copy", {
-        body: { action: "extract", url: url.trim() },
+        body: { action: "extract", url: url.trim(), transcribe_audio: transcribeAudio },
       });
       const payload: any = data ?? {};
       const errMsg = payload?.error || error?.message;
@@ -265,6 +268,28 @@ export default function ReverseEngineerCopy() {
               <p className="text-[11px] text-muted-foreground mt-1.5">
                 ✅ Instagram (Post / Reel) · ✅ Meta Ad Library · ✅ YouTube / Shorts · TikTok use a aba "Transcrição manual".
               </p>
+            </div>
+
+            <div className="flex items-start justify-between gap-4 p-3 rounded-md border border-border bg-muted/30">
+              <div className="flex items-start gap-2.5 min-w-0">
+                <Mic className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <Label htmlFor="transcribe-audio-toggle" className="text-sm font-medium text-foreground cursor-pointer">
+                    Transcrever áudio do vídeo
+                  </Label>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {transcribeAudio
+                      ? "Gemini transcreve o áudio falado no vídeo (mais fiel, leva ~15–30s a mais)."
+                      : "Pula a transcrição e usa só a legenda escrita do post (mais rápido)."}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="transcribe-audio-toggle"
+                checked={transcribeAudio}
+                onCheckedChange={setTranscribeAudio}
+                disabled={extracting}
+              />
             </div>
           </TabsContent>
 
