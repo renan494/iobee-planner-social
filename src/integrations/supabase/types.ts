@@ -75,10 +75,14 @@ export type Database = {
           name: string
           niche: string | null
           objective: string | null
+          platforms: string[] | null
           posting_frequency: string | null
           products_services: string | null
           target_audience: string | null
+          ticket_medio: number | null
           tone_of_voice: string | null
+          verba_mensal: number | null
+          website_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -95,10 +99,14 @@ export type Database = {
           name: string
           niche?: string | null
           objective?: string | null
+          platforms?: string[] | null
           posting_frequency?: string | null
           products_services?: string | null
           target_audience?: string | null
+          ticket_medio?: number | null
           tone_of_voice?: string | null
+          verba_mensal?: number | null
+          website_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -115,10 +123,14 @@ export type Database = {
           name?: string
           niche?: string | null
           objective?: string | null
+          platforms?: string[] | null
           posting_frequency?: string | null
           products_services?: string | null
           target_audience?: string | null
+          ticket_medio?: number | null
           tone_of_voice?: string | null
+          verba_mensal?: number | null
+          website_url?: string | null
         }
         Relationships: []
       }

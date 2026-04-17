@@ -1,0 +1,5 @@
+ALTER TABLE public.clients
+  ADD COLUMN IF NOT EXISTS website_url TEXT,
+  ADD COLUMN IF NOT EXISTS ticket_medio NUMERIC,
+  ADD COLUMN IF NOT EXISTS verba_mensal NUMERIC,
+  ADD COLUMN IF NOT EXISTS platforms TEXT[];
