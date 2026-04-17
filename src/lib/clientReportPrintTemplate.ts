@@ -1025,15 +1025,18 @@ export function createClientReportPrintTemplate({
           }
 
           .content-block--scroll {
-            flex: 1;
+            flex: 1 1 auto;
             min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
           }
 
-          .content-block--scroll .content-text {
-            font-size: 7.5pt;
-            line-height: 1.3;
-            column-count: 2;
+          .content-block--scroll .content-text.legend-text {
             column-gap: 4mm;
+            flex: 1 1 auto;
+            overflow: hidden;
+            margin: 0;
           }
 
           .content-label {
