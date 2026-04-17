@@ -6,11 +6,19 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-function errorResponse(message: string, status = 500, code?: string) {
-  return new Response(JSON.stringify({ error: message, code }), {
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+function errorResponse(message: string, status = 500, code?: string) {
+  return jsonResponse({ error: message, code }, status);
+}
+
+function extractFailureResponse(message: string, code: string) {
+  return jsonResponse({ error: message, code, fallback: true }, 200);
 }
 
 function getYouTubeId(url: string): string | null {
@@ -458,7 +466,7 @@ serve(async (req) => {
       // Meta Ad Library — scrape + transcrever áudio do MP4
       if (isMetaAdLibrary(url)) {
         const { markdown, error } = await fetchScrapeRaw(url);
-        if (!markdown) return errorResponse(error || "Não foi possível ler este anúncio.", 422, "META_SCRAPE_FAILED");
+        if (!markdown) return extractFailureResponse(error || "Não foi possível ler este anúncio.", "META_SCRAPE_FAILED");
 
         const writtenCopy = extractMetaAdCopy(markdown);
         let videoTranscript: string | null = null;
@@ -477,19 +485,19 @@ serve(async (req) => {
 
         const finalTranscript = videoTranscript || writtenCopy;
         if (!finalTranscript || finalTranscript.length < 30) {
-          return errorResponse(videoError || "Anúncio sem texto suficiente. Cole manualmente.", 422, "META_SCRAPE_FAILED");
+          return extractFailureResponse(videoError || "Anúncio sem texto suficiente. Cole manualmente.", "META_SCRAPE_FAILED");
         }
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
           transcript: finalTranscript,
           source: "meta_ad_library",
           transcript_kind: videoTranscript ? "audio" : "written",
           written_copy: writtenCopy || null,
           video_warning: videoTranscript ? null : videoError,
-        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        });
       }
 
-      // Instagram — embed scrape (sem Firecrawl) + transcrever áudio
+      // Instagram — embed scrape + fallback + transcrever áudio
       if (isInstagramUrl(url)) {
         const shortcode = getInstagramShortcode(url);
         if (!shortcode) return errorResponse("URL do Instagram inválida.", 400, "INSTAGRAM_INVALID_URL");
@@ -510,30 +518,29 @@ serve(async (req) => {
 
         const finalTranscript = videoTranscript || writtenCopy;
         if (!finalTranscript || finalTranscript.length < 30) {
-          return errorResponse(
+          return extractFailureResponse(
             videoError || "Não foi possível extrair conteúdo deste post. Cole a transcrição manualmente na aba 'Transcrição manual'.",
-            422,
             "INSTAGRAM_SCRAPE_FAILED"
           );
         }
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
           transcript: finalTranscript,
           source: "instagram",
           transcript_kind: videoTranscript ? "audio" : "written",
           written_copy: writtenCopy || null,
           video_warning: videoTranscript ? null : videoError,
-        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        });
       }
 
       // YouTube — captions
       const ytId = getYouTubeId(url);
-      if (!ytId) return errorResponse("URL não suportada. Use Meta Ad Library, Instagram (post/reel) ou YouTube — ou cole o texto manualmente.", 422, "UNSUPPORTED_PLATFORM");
+      if (!ytId) return extractFailureResponse("URL não suportada. Use Meta Ad Library, Instagram (post/reel) ou YouTube — ou cole o texto manualmente.", "UNSUPPORTED_PLATFORM");
 
       const transcriptText = await fetchYouTubeTranscript(ytId);
-      if (!transcriptText) return errorResponse("Não foi possível extrair a legenda deste vídeo. Cole a transcrição manualmente.", 422, "NO_CAPTIONS");
+      if (!transcriptText) return extractFailureResponse("Não foi possível extrair a legenda deste vídeo. Cole a transcrição manualmente.", "NO_CAPTIONS");
 
-      return new Response(JSON.stringify({ transcript: transcriptText, source: "youtube" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ transcript: transcriptText, source: "youtube" });
     }
 
     if (action === "generate") {
