@@ -202,7 +202,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
                         </div>
                       )}
                       {post.artUrl && (
-                        <img src={post.artUrl} alt={post.title} className="h-20 w-20 rounded-lg object-cover" />
+                        <img src={post.artUrl} alt={post.title} loading="lazy" decoding="async" className="h-20 w-20 rounded-lg object-cover" />
                       )}
                     </div>
                   </div>
