@@ -742,13 +742,36 @@ export function createClientReportPrintTemplate({
             background: ${COLORS.surface};
           }
 
-          .post-card__thumb-grid img {
+          .post-card__thumb-grid__cell {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 1.2mm;
+            border: 0.3mm solid ${COLORS.line};
+          }
+
+          .post-card__thumb-grid__cell img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border: 0.3mm solid ${COLORS.line};
-            border-radius: 1.2mm;
             display: block;
+          }
+
+          .post-card__thumb-grid__counter {
+            position: absolute;
+            top: 1.2mm;
+            right: 1.2mm;
+            background: rgba(14, 10, 0, 0.72);
+            color: ${COLORS.white};
+            font-size: 6.5pt;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            padding: 0.6mm 1.6mm;
+            border-radius: 999px;
+            line-height: 1;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
 
           .eyebrow {
