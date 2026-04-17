@@ -148,6 +148,26 @@ export function BriefingForm({
   const fieldTextareaClass = "min-h-[110px] rounded-2xl border border-foreground/80 bg-background px-5 py-3 text-base shadow-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0";
   const labelClass = "text-[13px] font-medium text-muted-foreground";
 
+  // Completude: conta quantos campos estratégicos estão preenchidos
+  const trackedFields: Array<keyof BriefingFormValues> = [
+    "name", "niche", "instagramHandle", "postingFrequency", "mainOffer",
+    "targetAudience", "audiencePains", "objective", "contentPillars",
+    "ctaPreferences", "competitors", "successReferences", "toneOfVoice",
+    "brandValues", "productsServices", "differentials", "currentSocialPresence",
+    "bannedTopics", "hashtagsBase",
+  ];
+  const filledCount = trackedFields.filter((k) => {
+    const v = values[k];
+    return typeof v === "string" && v.trim().length > 0;
+  }).length + (values.socialNetworks.length > 0 ? 1 : 0);
+  const totalFields = trackedFields.length + 1; // +1 = redes sociais
+  const completion = Math.round((filledCount / totalFields) * 100);
+  const completionTone =
+    completion >= 80 ? { label: "Excelente — IA com contexto rico", bar: "bg-foreground", chip: "bg-foreground text-background" }
+    : completion >= 50 ? { label: "Bom — pode melhorar", bar: "bg-primary", chip: "bg-primary text-primary-foreground" }
+    : completion >= 25 ? { label: "Raso — IA terá pouco contexto", bar: "bg-orange-500", chip: "bg-orange-500 text-white" }
+    : { label: "Quase vazio — output será genérico", bar: "bg-destructive", chip: "bg-destructive text-destructive-foreground" };
+
   return (
     <div className="rounded-3xl border-2 border-primary bg-card p-8 shadow-sm">
       {/* Header */}
@@ -159,6 +179,9 @@ export function BriefingForm({
           </span>
           <span className="rounded-full border border-primary px-3 py-0.5 text-xs font-semibold text-primary">
             Briefing
+          </span>
+          <span className={cn("rounded-full px-3 py-0.5 text-xs font-semibold", completionTone.chip)}>
+            {completion}% preenchido
           </span>
         </div>
         <div className="flex items-center gap-1">
@@ -173,6 +196,24 @@ export function BriefingForm({
           <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-destructive" onClick={onCancel} title="Descartar">
             <Trash2 className="h-4 w-4" />
           </Button>
+        </div>
+      </div>
+
+      {/* Barra de completude */}
+      <div className="mb-6 space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-semibold uppercase tracking-wider text-muted-foreground">
+            Completude do briefing
+          </span>
+          <span className="font-semibold text-foreground">
+            {filledCount} de {totalFields} campos · {completionTone.label}
+          </span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className={cn("h-full rounded-full transition-all duration-500", completionTone.bar)}
+            style={{ width: `${completion}%` }}
+          />
         </div>
       </div>
 
