@@ -19,6 +19,10 @@ export interface ClientFormData {
   brandValues?: string;
   currentSocialPresence?: string;
   competitors?: string[];
+  websiteUrl?: string;
+  ticketMedio?: number;
+  verbaMensal?: number;
+  platforms?: string[];
 }
 
 interface PostsContextType {
