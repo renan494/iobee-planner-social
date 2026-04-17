@@ -26,23 +26,9 @@ export default function ClientDetail() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [previewPost, setPreviewPost] = useState<Post | null>(null);
   const [showReport, setShowReport] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [editName, setEditName] = useState("");
-  const [editInstagram, setEditInstagram] = useState("");
-  const [editFacebookUrl, setEditFacebookUrl] = useState("");
-  const [editLinkedinUrl, setEditLinkedinUrl] = useState("");
-  const [editGmbUrl, setEditGmbUrl] = useState("");
-  const [editObjective, setEditObjective] = useState("");
-  const [editNiche, setEditNiche] = useState("");
-  const [editTargetAudience, setEditTargetAudience] = useState("");
-  const [editToneOfVoice, setEditToneOfVoice] = useState("");
-  const [editCompetitors, setEditCompetitors] = useState("");
-  const [editDifferentials, setEditDifferentials] = useState("");
-  const [editProductsServices, setEditProductsServices] = useState("");
-  
-  const [editBrandValues, setEditBrandValues] = useState("");
-  const [editCurrentSocialPresence, setEditCurrentSocialPresence] = useState("");
-  const [editSaving, setEditSaving] = useState(false);
+  const [editingBriefing, setEditingBriefing] = useState(false);
+  const [briefingForm, setBriefingForm] = useState<BriefingFormValues>(emptyBriefing);
+  const [briefingSaving, setBriefingSaving] = useState(false);
 
   const clientName = decodeURIComponent(name || "");
   const clientPosts = useMemo(() => posts.filter((p) => p.client === clientName), [posts, clientName]);
