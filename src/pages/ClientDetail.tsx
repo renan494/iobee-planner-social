@@ -1,18 +1,14 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Camera, FileText, Pencil, Eye, PenTool, X, Sparkles } from "lucide-react";
+import { ArrowLeft, User, Camera, FileText, Pencil, Eye, PenTool, X, FileCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { usePosts } from "@/contexts/PostsContext";
 import { supabase } from "@/integrations/supabase/client";
-import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type FunnelStage, type Post } from "@/data/posts";
+import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type Post } from "@/data/posts";
 import { PostBadge } from "@/components/PostBadge";
 import { toast } from "sonner";
 import { ClientReportPreview } from "@/components/ClientReportPreview";
@@ -20,6 +16,7 @@ import { PostDetailModal } from "@/components/PostDetailModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientCopyHistory } from "@/components/ClientCopyHistory";
 import { PageContainer } from "@/components/PageContainer";
+import { BriefingForm, emptyBriefing, parseBRL, numberToBRL, type BriefingFormValues, type PlatformKey } from "@/components/BriefingForm";
 
 export default function ClientDetail() {
   const { name } = useParams<{ name: string }>();
