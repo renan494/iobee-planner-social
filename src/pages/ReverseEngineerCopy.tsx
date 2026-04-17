@@ -212,7 +212,7 @@ export default function ReverseEngineerCopy() {
     s === "instagram" ? "Instagram" : "Manual";
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 space-y-6">
       <Link to="/copy" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" /> Voltar pra Copy
       </Link>
