@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { PostFormat } from "@/data/posts";
 import { PageContainer } from "@/components/PageContainer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FORMAT_CONFIG: Record<PostFormat, { label: string; subtitle: string; icon: typeof Image; color: string }> = {
   static: { label: "Estáticos", subtitle: "posts criados", icon: Image, color: "bg-[hsl(var(--format-static))]" },
@@ -21,7 +22,7 @@ const FORMAT_CONFIG: Record<PostFormat, { label: string; subtitle: string; icon:
 };
 
 export default function Dashboard() {
-  const { posts, analysts } = usePosts();
+  const { posts, analysts, loading } = usePosts();
   const { activities, clearActivities } = useActivity();
   
   const navigate = useNavigate();
@@ -74,23 +75,36 @@ export default function Dashboard() {
 
       {/* Format cards */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {(Object.entries(FORMAT_CONFIG) as [PostFormat, typeof FORMAT_CONFIG["static"]][]).map(([key, cfg]) => {
-          const Icon = cfg.icon;
-          return (
-            <Card key={key} className="overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{cfg.label}</CardTitle>
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${cfg.color} text-white`}>
-                  <Icon className="h-4 w-4" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-foreground">{formatCounts[key]}</div>
-                <p className="mt-1 text-xs text-muted-foreground">{cfg.subtitle}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {loading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} className="overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-9 w-12" />
+                  <Skeleton className="mt-2 h-3 w-24" />
+                </CardContent>
+              </Card>
+            ))
+          : (Object.entries(FORMAT_CONFIG) as [PostFormat, typeof FORMAT_CONFIG["static"]][]).map(([key, cfg]) => {
+              const Icon = cfg.icon;
+              return (
+                <Card key={key} className="overflow-hidden">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{cfg.label}</CardTitle>
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${cfg.color} text-white`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{formatCounts[key]}</div>
+                    <p className="mt-1 text-xs text-muted-foreground">{cfg.subtitle}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
       </div>
 
       {/* Analyst table */}
@@ -112,17 +126,27 @@ export default function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {analystStats.map((a) => (
-                <TableRow key={a.name}>
-                  <TableCell className="font-medium">{a.name}</TableCell>
-                  <TableCell className="text-center">{a.accounts}</TableCell>
-                  <TableCell className="text-center">{a.static}</TableCell>
-                  <TableCell className="text-center">{a.carousel}</TableCell>
-                  <TableCell className="text-center">{a.reels}</TableCell>
-                  <TableCell className="text-center">{a.stories}</TableCell>
-                  <TableCell className="text-center font-bold">{a.total}</TableCell>
-                </TableRow>
-              ))}
+              {loading
+                ? Array.from({ length: 4 }).map((_, i) => (
+                    <TableRow key={i}>
+                      {Array.from({ length: 7 }).map((__, j) => (
+                        <TableCell key={j} className={j === 0 ? "" : "text-center"}>
+                          <Skeleton className={j === 0 ? "h-4 w-32" : "mx-auto h-4 w-8"} />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                : analystStats.map((a) => (
+                    <TableRow key={a.name}>
+                      <TableCell className="font-medium">{a.name}</TableCell>
+                      <TableCell className="text-center">{a.accounts}</TableCell>
+                      <TableCell className="text-center">{a.static}</TableCell>
+                      <TableCell className="text-center">{a.carousel}</TableCell>
+                      <TableCell className="text-center">{a.reels}</TableCell>
+                      <TableCell className="text-center">{a.stories}</TableCell>
+                      <TableCell className="text-center font-bold">{a.total}</TableCell>
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
         </CardContent>
