@@ -98,7 +98,20 @@ async function fetchInstagramViaEmbed(shortcode: string): Promise<{ videoUrl: st
     }
   } catch (e) { console.error("graphql fetch error:", e); }
 
-  return { videoUrl: null, caption: null, error: "Instagram bloqueou todas as tentativas de scrape (login obrigatório)." };
+  // 3) Fallback: Firecrawl (handles anti-bot, residential IPs)
+  try {
+    const { markdown, error } = await fetchScrapeRaw(`https://www.instagram.com/reel/${shortcode}/`, 5000);
+    if (markdown) {
+      const videoUrl = extractVideoUrl(markdown);
+      const caption = extractInstagramCaption(markdown);
+      if (videoUrl || (caption && caption.length > 20)) {
+        return { videoUrl, caption: caption || null };
+      }
+    }
+    if (error) console.error("Firecrawl IG fallback error:", error);
+  } catch (e) { console.error("firecrawl IG exception:", e); }
+
+  return { videoUrl: null, caption: null, error: "Instagram bloqueou o scrape direto e o Firecrawl também não conseguiu extrair. Cole a transcrição manualmente." };
 }
 
 async function fetchScrapeRaw(url: string, waitFor = 3500): Promise<{ markdown: string | null; error?: string }> {
