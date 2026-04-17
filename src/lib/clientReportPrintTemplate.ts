@@ -1011,6 +1011,25 @@ export function createClientReportPrintTemplate({
             border-left: 0.6mm solid ${COLORS.accent};
           }
 
+          .content-block--scroll {
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .content-block--scroll .content-text {
+            font-size: 8.5pt;
+            line-height: 1.35;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            column-count: 2;
+            column-gap: 5mm;
+            column-fill: auto;
+          }
+
           .content-label {
             font-size: 6.5pt;
             letter-spacing: 0.18em;
