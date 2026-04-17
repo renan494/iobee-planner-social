@@ -126,17 +126,27 @@ export default function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {analystStats.map((a) => (
-                <TableRow key={a.name}>
-                  <TableCell className="font-medium">{a.name}</TableCell>
-                  <TableCell className="text-center">{a.accounts}</TableCell>
-                  <TableCell className="text-center">{a.static}</TableCell>
-                  <TableCell className="text-center">{a.carousel}</TableCell>
-                  <TableCell className="text-center">{a.reels}</TableCell>
-                  <TableCell className="text-center">{a.stories}</TableCell>
-                  <TableCell className="text-center font-bold">{a.total}</TableCell>
-                </TableRow>
-              ))}
+              {loading
+                ? Array.from({ length: 4 }).map((_, i) => (
+                    <TableRow key={i}>
+                      {Array.from({ length: 7 }).map((__, j) => (
+                        <TableCell key={j} className={j === 0 ? "" : "text-center"}>
+                          <Skeleton className={j === 0 ? "h-4 w-32" : "mx-auto h-4 w-8"} />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                : analystStats.map((a) => (
+                    <TableRow key={a.name}>
+                      <TableCell className="font-medium">{a.name}</TableCell>
+                      <TableCell className="text-center">{a.accounts}</TableCell>
+                      <TableCell className="text-center">{a.static}</TableCell>
+                      <TableCell className="text-center">{a.carousel}</TableCell>
+                      <TableCell className="text-center">{a.reels}</TableCell>
+                      <TableCell className="text-center">{a.stories}</TableCell>
+                      <TableCell className="text-center font-bold">{a.total}</TableCell>
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
         </CardContent>
