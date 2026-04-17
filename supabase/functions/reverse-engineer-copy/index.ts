@@ -26,6 +26,81 @@ function isInstagramUrl(url: string): boolean {
   return /(?:instagram\.com|instagr\.am)\/(p|reel|reels|tv)\//i.test(url);
 }
 
+function getInstagramShortcode(url: string): string | null {
+  const m = url.match(/(?:instagram\.com|instagr\.am)\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/i);
+  return m ? m[1] : null;
+}
+
+async function fetchInstagramViaEmbed(shortcode: string): Promise<{ videoUrl: string | null; caption: string | null; error?: string }> {
+  const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
+  // 1) Try embed page (no login required)
+  try {
+    const embedUrl = `https://www.instagram.com/p/${shortcode}/embed/captioned/`;
+    const res = await fetch(embedUrl, {
+      headers: {
+        "User-Agent": UA,
+        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+        "Accept": "text/html,application/xhtml+xml",
+      },
+    });
+    if (res.ok) {
+      const html = await res.text();
+      let videoUrl: string | null = null;
+      let caption: string | null = null;
+
+      const videoPatterns = [
+        /"video_url":"([^"]+)"/,
+        /"contentUrl":"([^"]+\.mp4[^"]*)"/,
+        /<video[^>]+src=["']([^"']+\.mp4[^"']*)["']/i,
+      ];
+      for (const re of videoPatterns) {
+        const m = html.match(re);
+        if (m && m[1]) {
+          videoUrl = m[1].replace(/\\u0026/g, "&").replace(/\\\//g, "/").replace(/\\"/g, '"');
+          if (videoUrl.startsWith("https://")) break;
+          videoUrl = null;
+        }
+      }
+
+      const capPatterns = [
+        /<div class="Caption">[\s\S]*?<div class="CaptionUsername">[\s\S]*?<\/div>([\s\S]*?)<div class="CaptionComments"/i,
+        /"edge_media_to_caption":\{"edges":\[\{"node":\{"text":"([^"]+)"/,
+        /"caption":"([^"]+)"/,
+      ];
+      for (const re of capPatterns) {
+        const m = html.match(re);
+        if (m && m[1]) {
+          caption = m[1].replace(/<[^>]+>/g, " ").replace(/\\n/g, "\n").replace(/\\"/g, '"').trim();
+          if (caption.length > 10) break;
+          caption = null;
+        }
+      }
+
+      if (videoUrl || caption) return { videoUrl, caption };
+    }
+  } catch (e) { console.error("embed fetch error:", e); }
+
+  // 2) Try public GraphQL endpoint (sometimes works)
+  try {
+    const apiUrl = `https://www.instagram.com/p/${shortcode}/?__a=1&__d=dis`;
+    const res = await fetch(apiUrl, {
+      headers: { "User-Agent": UA, "Accept": "application/json" },
+    });
+    if (res.ok) {
+      const data = await res.json().catch(() => null);
+      const media = data?.items?.[0] || data?.graphql?.shortcode_media;
+      if (media) {
+        const videoUrl = media?.video_versions?.[0]?.url || media?.video_url || null;
+        const caption = media?.caption?.text || media?.edge_media_to_caption?.edges?.[0]?.node?.text || null;
+        if (videoUrl || caption) return { videoUrl, caption };
+      }
+    }
+  } catch (e) { console.error("graphql fetch error:", e); }
+
+  return { videoUrl: null, caption: null, error: "Instagram bloqueou todas as tentativas de scrape (login obrigatório)." };
+}
+
 async function fetchScrapeRaw(url: string, waitFor = 3500): Promise<{ markdown: string | null; error?: string }> {
   const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
   if (!FIRECRAWL_API_KEY) return { markdown: null, error: "Firecrawl não configurado." };
