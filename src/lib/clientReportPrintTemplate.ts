@@ -797,12 +797,12 @@ export function createClientReportPrintTemplate({
             page-break-inside: avoid;
             break-after: page;
             page-break-after: always;
-            min-height: 245mm;
+            height: 251mm;
           }
 
           .post-card:last-child {
-            break-after: auto;
-            page-break-after: auto;
+            break-after: avoid;
+            page-break-after: avoid;
           }
 
           .post-card__index {
