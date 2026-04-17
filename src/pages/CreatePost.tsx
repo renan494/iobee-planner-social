@@ -388,6 +388,7 @@ export default function CreatePost() {
             total={entries.length}
             clients={clients}
             briefings={briefings}
+            onNavigate={navigate}
             analysts={analysts}
             onUpdate={(patch) => updateEntry(idx, patch)}
             onRemove={() => removeEntry(idx)}
@@ -457,13 +458,14 @@ export default function CreatePost() {
 }
 
 function PostEntryForm({
-  entry, idx, total, clients, briefings, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag, onGenerateAI,
+  entry, idx, total, clients, briefings, onNavigate, analysts, onUpdate, onRemove, onAddHashtag, onRemoveHashtag, onGenerateAI,
 }: {
   entry: PostEntry;
   idx: number;
   total: number;
   clients: string[];
   briefings: Record<string, BriefingStatus>;
+  onNavigate: (path: string) => void;
   analysts: string[];
   onUpdate: (patch: Partial<PostEntry>) => void;
   onRemove: () => void;
@@ -513,8 +515,8 @@ function PostEntryForm({
                   ) : (
                     <button
                       type="button"
-                      onClick={() => navigate(`/clientes/${encodeURIComponent(effectiveClient)}`)}
-                      className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 hover:bg-amber-500/20 transition-colors dark:text-amber-400"
+                      onClick={() => onNavigate(`/clientes/${encodeURIComponent(effectiveClient)}`)}
+                      className="inline-flex items-center gap-1 rounded-full border border-destructive/30 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive hover:bg-destructive/20 transition-colors"
                       title="Clique para completar o briefing"
                     >
                       <AlertCircle className="h-3 w-3" />
@@ -621,9 +623,17 @@ function PostEntryForm({
 
           {/* AI Generation */}
           <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-primary">
-              <Sparkles className="h-4 w-4" />
-              Gerar com IA
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                <Sparkles className="h-4 w-4" />
+                Gerar com IA
+              </div>
+              {effectiveClient && briefing?.hasCore && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-primary">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Vai usar briefing
+                </span>
+              )}
             </div>
             <div className="flex gap-2 items-end">
               <Textarea
