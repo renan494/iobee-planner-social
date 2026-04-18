@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from "react";
 import {
   addMonths, subMonths,
   addDays, subDays,
@@ -11,12 +11,6 @@ import { usePosts } from "@/contexts/PostsContext";
 import { getClients, getAnalysts, type Post, FORMAT_LABELS, CHANNEL_OPTIONS, type PostFormat } from "@/data/posts";
 import { CalendarHeader } from "@/components/CalendarHeader";
 import { CalendarGrid } from "@/components/CalendarGrid";
-import { DayView } from "@/components/DayView";
-import { WeekView } from "@/components/WeekView";
-import { QuarterView } from "@/components/QuarterView";
-import { YearView } from "@/components/YearView";
-import { SemesterView } from "@/components/SemesterView";
-import { CalendarListView } from "@/components/CalendarListView";
 import { ClientFilter } from "@/components/ClientFilter";
 import { AnalystFilter } from "@/components/AnalystFilter";
 import { ViewModeSwitcher } from "@/components/ViewModeSwitcher";
@@ -31,12 +25,35 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Upload, Download, FileText, FileSpreadsheet, List, LayoutGrid, PenTool } from "lucide-react";
-import { exportToPDF, exportToExcel } from "@/lib/exportCalendar";
+import { Upload, Download, FileText, FileSpreadsheet, List, LayoutGrid, PenTool, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { VIEW_LABELS } from "@/types/calendar";
 import type { ViewMode } from "@/types/calendar";
 import { PageContainer } from "@/components/PageContainer";
+
+// Lazy: secondary calendar views (split out of initial chunk)
+const DayView = lazy(() => import("@/components/DayView").then(m => ({ default: m.DayView })));
+const WeekView = lazy(() => import("@/components/WeekView").then(m => ({ default: m.WeekView })));
+const QuarterView = lazy(() => import("@/components/QuarterView").then(m => ({ default: m.QuarterView })));
+const SemesterView = lazy(() => import("@/components/SemesterView").then(m => ({ default: m.SemesterView })));
+const YearView = lazy(() => import("@/components/YearView").then(m => ({ default: m.YearView })));
+const CalendarListView = lazy(() => import("@/components/CalendarListView").then(m => ({ default: m.CalendarListView })));
+
+const ViewFallback = () => (
+  <div className="flex items-center justify-center py-16">
+    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+  </div>
+);
+
+// Defer heavy export libs (jspdf, xlsx) until user clicks export
+async function handleExportPDF(posts: Post[], label: string) {
+  const { exportToPDF } = await import("@/lib/exportCalendar");
+  return exportToPDF(posts, label);
+}
+async function handleExportExcel(posts: Post[], label: string) {
+  const { exportToExcel } = await import("@/lib/exportCalendar");
+  return exportToExcel(posts, label);
+}
 
 
 export default function CalendarPage() {
