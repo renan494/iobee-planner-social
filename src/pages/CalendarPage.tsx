@@ -226,9 +226,11 @@ export default function CalendarPage() {
       </div>
 
       {layoutMode === "list" ? (
-        <CalendarListView posts={filteredPosts} onPostClick={handlePostClick} />
+        <Suspense fallback={<ViewFallback />}>
+          <CalendarListView posts={filteredPosts} onPostClick={handlePostClick} />
+        </Suspense>
       ) : (
-        renderView()
+        <Suspense fallback={<ViewFallback />}>{renderView()}</Suspense>
       )}
 
       {/* Legend + Import/Export below calendar */}
