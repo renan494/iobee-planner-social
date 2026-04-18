@@ -249,11 +249,11 @@ export default function CalendarPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => exportToPDF(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
+              <DropdownMenuItem onClick={() => handleExportPDF(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
                 <FileText className="mr-2 h-4 w-4" />
                 Exportar PDF
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => exportToExcel(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
+              <DropdownMenuItem onClick={() => handleExportExcel(filteredPosts, `Visão: ${VIEW_LABELS[viewMode]}`)}>
                 <FileSpreadsheet className="mr-2 h-4 w-4" />
                 Exportar Excel
               </DropdownMenuItem>
