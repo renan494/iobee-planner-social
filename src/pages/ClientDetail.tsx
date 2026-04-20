@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Camera, FileText, Pencil, Eye, PenTool, X, FileCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { FORMAT_LABELS, FUNNEL_LABELS, type PostFormat, type Post } from "@/data/posts";
 import { PostBadge } from "@/components/PostBadge";
 import { toast } from "sonner";
-import { ClientReportPreview } from "@/components/ClientReportPreview";
+const ClientReportPreview = lazy(() =>
+  import("@/components/ClientReportPreview").then((m) => ({ default: m.ClientReportPreview })),
+);
 import { PostDetailModal } from "@/components/PostDetailModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClientCopyHistory } from "@/components/ClientCopyHistory";
@@ -203,16 +205,18 @@ export default function ClientDetail() {
       ) : null}
 
       {editingBriefing ? null : showReport ? (
-        <ClientReportPreview
-          clientName={clientName}
-          posts={clientPosts}
-          analysts={analysts}
-          byFormat={byFormat}
-          avatarUrl={avatarUrl}
-          onPostClick={(post) => setSelectedPost(post)}
-          onEditPost={(post) => setSelectedPost(post)}
-          onDeletePost={async (id) => { await deletePost(id); }}
-        />
+        <Suspense fallback={<div className="py-12 text-center text-sm text-muted-foreground">Carregando relatório…</div>}>
+          <ClientReportPreview
+            clientName={clientName}
+            posts={clientPosts}
+            analysts={analysts}
+            byFormat={byFormat}
+            avatarUrl={avatarUrl}
+            onPostClick={(post) => setSelectedPost(post)}
+            onEditPost={(post) => setSelectedPost(post)}
+            onDeletePost={async (id) => { await deletePost(id); }}
+          />
+        </Suspense>
       ) : (
         <>
           {/* Stats */}

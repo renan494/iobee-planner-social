@@ -10,7 +10,6 @@ import { FUNNEL_LABELS, FORMAT_LABELS, type Post, type PostFormat } from "@/data
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { exportClientReportPdf } from "@/lib/exportClientReport";
 import { toast } from "sonner";
 
 interface ClientReportPreviewProps {
@@ -45,6 +44,7 @@ export function ClientReportPreview({ clientName, posts, analysts, byFormat, ava
   const handleDownloadPDF = async () => {
     try {
       setIsExporting(true);
+      const { exportClientReportPdf } = await import("@/lib/exportClientReport");
       await exportClientReportPdf({
         clientName,
         posts: sortedPosts,
