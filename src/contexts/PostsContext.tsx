@@ -1,7 +1,7 @@
 import { createContext, useContext, useCallback, useMemo, type ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getClients, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
+import { getClients, type Post, type PostFormat, type FunnelStage, type InstagramStatus } from "@/data/posts";
 
 export interface ClientFormData {
   name: string;
@@ -67,6 +67,9 @@ async function fetchPostsFn(): Promise<Post[]> {
     format: row.format as PostFormat,
     funnelStage: row.funnel_stage as FunnelStage,
     date: row.date,
+    scheduledTime: ((row as any).scheduled_time as string | null)?.slice(0, 5) ?? "09:00",
+    autoPublishInstagram: (row as any).auto_publish_instagram ?? false,
+    instagramStatus: ((row as any).instagram_status as InstagramStatus | null) ?? null,
     hashtags: row.hashtags || [],
     legend: row.legend ?? undefined,
     artUrl: (row as any).art_url ?? undefined,
@@ -213,6 +216,13 @@ export function PostsProvider({ children }: { children: ReactNode }) {
       if (fields.analyst !== undefined) dbFields.analyst = fields.analyst;
       if (fields.channels !== undefined) dbFields.channels = fields.channels;
       if (fields.reference !== undefined) dbFields.reference = fields.reference || null;
+      if (fields.scheduledTime !== undefined) {
+        // garante formato HH:MM:SS para o tipo TIME do Postgres
+        const t = fields.scheduledTime;
+        dbFields.scheduled_time = t ? (t.length === 5 ? `${t}:00` : t) : "09:00:00";
+      }
+      if (fields.autoPublishInstagram !== undefined) dbFields.auto_publish_instagram = fields.autoPublishInstagram;
+      if (fields.instagramStatus !== undefined) dbFields.instagram_status = fields.instagramStatus;
       const { error } = await supabase.from("posts").update(dbFields as any).eq("id", postId);
       if (error) throw error;
     },

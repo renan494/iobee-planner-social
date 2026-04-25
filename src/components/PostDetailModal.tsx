@@ -7,11 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { PostBadge } from "./PostBadge";
-import { FORMAT_LABELS, FUNNEL_LABELS, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
+import { FORMAT_LABELS, FUNNEL_LABELS, INSTAGRAM_STATUS_LABELS, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight, Check, X, Trash2 } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight, Check, X, Trash2, Clock, Instagram } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,6 +117,9 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editFields, setEditFields] = useState({ title: "", headline: "", legend: "", format: "" as PostFormat, funnelStage: "" as FunnelStage });
+  const [scheduledTime, setScheduledTime] = useState("09:00");
+  const [autoPublish, setAutoPublish] = useState(false);
+  const [savingSchedule, setSavingSchedule] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -126,6 +131,8 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
         format: post.format,
         funnelStage: post.funnelStage,
       });
+      setScheduledTime(post.scheduledTime || "09:00");
+      setAutoPublish(!!post.autoPublishInstagram);
       setEditing(false);
     }
   }, [post, open]);
@@ -179,6 +186,25 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
     setEditing(false);
     toast({ title: "Post atualizado", description: "As alterações foram salvas." });
   };
+
+  const handleSaveSchedule = async () => {
+    if (!onUpdatePost) return;
+    setSavingSchedule(true);
+    try {
+      await onUpdatePost(post.id, {
+        scheduledTime,
+        autoPublishInstagram: autoPublish,
+      });
+      toast({ title: "Agendamento salvo", description: autoPublish ? `Será publicado em ${format(postDate, "dd/MM")} às ${scheduledTime}.` : "Configurações atualizadas." });
+    } catch (err) {
+      console.error("Save schedule error:", err);
+      toast({ title: "Erro", description: "Não foi possível salvar o agendamento.", variant: "destructive" });
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  const scheduleChanged = scheduledTime !== (post.scheduledTime || "09:00") || autoPublish !== !!post.autoPublishInstagram;
 
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) { setEditingDate(false); setEditing(false); } }}>
@@ -312,6 +338,81 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
                     {ch}
                   </span>
                 ))}
+              </div>
+            )}
+
+            {/* Agendamento */}
+            {!editing && onUpdatePost && (
+              <div className="rounded-lg border border-border bg-card/50 p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    Agendamento
+                  </div>
+                  {post.instagramStatus && (
+                    <Badge
+                      variant={
+                        post.instagramStatus === "published"
+                          ? "default"
+                          : post.instagramStatus === "failed"
+                            ? "destructive"
+                            : "secondary"
+                      }
+                      className="gap-1 text-[10px]"
+                    >
+                      <Instagram className="h-3 w-3" />
+                      {INSTAGRAM_STATUS_LABELS[post.instagramStatus]}
+                    </Badge>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="scheduled-time" className="text-xs text-muted-foreground">
+                      Hora de publicação
+                    </Label>
+                    <Input
+                      id="scheduled-time"
+                      type="time"
+                      value={scheduledTime}
+                      onChange={(e) => setScheduledTime(e.target.value)}
+                      className="h-8 text-sm"
+                      disabled={post.instagramStatus === "published" || post.instagramStatus === "publishing"}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Data programada</Label>
+                    <div className="flex h-8 items-center text-sm text-foreground">
+                      {format(postDate, "dd/MM/yyyy")}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-2 rounded-md bg-muted/40 px-3 py-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Instagram className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <div className="min-w-0">
+                      <Label htmlFor="auto-publish" className="text-sm font-medium cursor-pointer">
+                        Publicar automaticamente no Instagram
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground leading-tight">
+                        Será publicado na data e hora acima quando a conta estiver conectada.
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="auto-publish"
+                    checked={autoPublish}
+                    onCheckedChange={setAutoPublish}
+                    disabled={post.instagramStatus === "published" || post.instagramStatus === "publishing"}
+                  />
+                </div>
+                {scheduleChanged && (
+                  <div className="flex justify-end">
+                    <Button size="sm" onClick={handleSaveSchedule} disabled={savingSchedule}>
+                      <Check className="h-3.5 w-3.5 mr-1" />
+                      {savingSchedule ? "Salvando…" : "Salvar agendamento"}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 

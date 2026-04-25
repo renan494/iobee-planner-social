@@ -1,6 +1,8 @@
 export type PostFormat = "static" | "carousel" | "reels" | "stories";
 export type FunnelStage = "topo" | "meio" | "fundo";
 
+export type InstagramStatus = "pending" | "publishing" | "published" | "failed";
+
 export interface Post {
   id: string;
   client: string;
@@ -10,6 +12,9 @@ export interface Post {
   format: PostFormat;
   funnelStage: FunnelStage;
   date: string; // YYYY-MM-DD
+  scheduledTime?: string; // HH:MM (24h) — hora de publicação automática
+  autoPublishInstagram?: boolean;
+  instagramStatus?: InstagramStatus | null;
   hashtags: string[];
   legend?: string;
   artUrl?: string;
@@ -17,6 +22,13 @@ export interface Post {
   channels?: string[];
   reference?: string;
 }
+
+export const INSTAGRAM_STATUS_LABELS: Record<InstagramStatus, string> = {
+  pending: "Aguardando",
+  publishing: "Publicando…",
+  published: "Publicado",
+  failed: "Falhou",
+};
 
 export const CHANNEL_OPTIONS = [
   "Instagram",
