@@ -341,6 +341,81 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
               </div>
             )}
 
+            {/* Agendamento */}
+            {!editing && onUpdatePost && (
+              <div className="rounded-lg border border-border bg-card/50 p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    Agendamento
+                  </div>
+                  {post.instagramStatus && (
+                    <Badge
+                      variant={
+                        post.instagramStatus === "published"
+                          ? "default"
+                          : post.instagramStatus === "failed"
+                            ? "destructive"
+                            : "secondary"
+                      }
+                      className="gap-1 text-[10px]"
+                    >
+                      <Instagram className="h-3 w-3" />
+                      {INSTAGRAM_STATUS_LABELS[post.instagramStatus]}
+                    </Badge>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="scheduled-time" className="text-xs text-muted-foreground">
+                      Hora de publicação
+                    </Label>
+                    <Input
+                      id="scheduled-time"
+                      type="time"
+                      value={scheduledTime}
+                      onChange={(e) => setScheduledTime(e.target.value)}
+                      className="h-8 text-sm"
+                      disabled={post.instagramStatus === "published" || post.instagramStatus === "publishing"}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Data programada</Label>
+                    <div className="flex h-8 items-center text-sm text-foreground">
+                      {format(postDate, "dd/MM/yyyy")}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-2 rounded-md bg-muted/40 px-3 py-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Instagram className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <div className="min-w-0">
+                      <Label htmlFor="auto-publish" className="text-sm font-medium cursor-pointer">
+                        Publicar automaticamente no Instagram
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground leading-tight">
+                        Será publicado na data e hora acima quando a conta estiver conectada.
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="auto-publish"
+                    checked={autoPublish}
+                    onCheckedChange={setAutoPublish}
+                    disabled={post.instagramStatus === "published" || post.instagramStatus === "publishing"}
+                  />
+                </div>
+                {scheduleChanged && (
+                  <div className="flex justify-end">
+                    <Button size="sm" onClick={handleSaveSchedule} disabled={savingSchedule}>
+                      <Check className="h-3.5 w-3.5 mr-1" />
+                      {savingSchedule ? "Salvando…" : "Salvar agendamento"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {editing ? (
               <Textarea
                 value={editFields.legend}
