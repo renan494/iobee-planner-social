@@ -187,6 +187,25 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
     toast({ title: "Post atualizado", description: "As alterações foram salvas." });
   };
 
+  const handleSaveSchedule = async () => {
+    if (!onUpdatePost) return;
+    setSavingSchedule(true);
+    try {
+      await onUpdatePost(post.id, {
+        scheduledTime,
+        autoPublishInstagram: autoPublish,
+      });
+      toast({ title: "Agendamento salvo", description: autoPublish ? `Será publicado em ${format(postDate, "dd/MM")} às ${scheduledTime}.` : "Configurações atualizadas." });
+    } catch (err) {
+      console.error("Save schedule error:", err);
+      toast({ title: "Erro", description: "Não foi possível salvar o agendamento.", variant: "destructive" });
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  const scheduleChanged = scheduledTime !== (post.scheduledTime || "09:00") || autoPublish !== !!post.autoPublishInstagram;
+
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) { setEditingDate(false); setEditing(false); } }}>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
