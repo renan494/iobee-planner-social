@@ -7,11 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { PostBadge } from "./PostBadge";
-import { FORMAT_LABELS, FUNNEL_LABELS, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
+import { FORMAT_LABELS, FUNNEL_LABELS, INSTAGRAM_STATUS_LABELS, type Post, type PostFormat, type FunnelStage } from "@/data/posts";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight, Check, X, Trash2 } from "lucide-react";
+import { Calendar, Tag, Target, User, UserCheck, Pencil, ImageOff, ImagePlus, ChevronLeft, ChevronRight, Check, X, Trash2, Clock, Instagram } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,6 +117,9 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editFields, setEditFields] = useState({ title: "", headline: "", legend: "", format: "" as PostFormat, funnelStage: "" as FunnelStage });
+  const [scheduledTime, setScheduledTime] = useState("09:00");
+  const [autoPublish, setAutoPublish] = useState(false);
+  const [savingSchedule, setSavingSchedule] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -126,6 +131,8 @@ export function PostDetailModal({ post, open, onOpenChange, onUpdateDate, onUpda
         format: post.format,
         funnelStage: post.funnelStage,
       });
+      setScheduledTime(post.scheduledTime || "09:00");
+      setAutoPublish(!!post.autoPublishInstagram);
       setEditing(false);
     }
   }, [post, open]);
