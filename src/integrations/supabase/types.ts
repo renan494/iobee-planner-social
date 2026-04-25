@@ -249,11 +249,98 @@ export type Database = {
         }
         Relationships: []
       }
+      instagram_accounts: {
+        Row: {
+          access_token: string
+          auto_publish: boolean
+          client_id: string
+          connected_by: string | null
+          created_at: string
+          id: string
+          ig_business_id: string
+          ig_username: string | null
+          page_id: string
+          page_name: string | null
+          token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          auto_publish?: boolean
+          client_id: string
+          connected_by?: string | null
+          created_at?: string
+          id?: string
+          ig_business_id: string
+          ig_username?: string | null
+          page_id: string
+          page_name?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          auto_publish?: boolean
+          client_id?: string
+          connected_by?: string | null
+          created_at?: string
+          id?: string
+          ig_business_id?: string
+          ig_username?: string | null
+          page_id?: string
+          page_name?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instagram_accounts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instagram_publish_log: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          ig_media_id: string | null
+          post_id: string | null
+          status: string
+          triggered_by: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          ig_media_id?: string | null
+          post_id?: string | null
+          status: string
+          triggered_by?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          ig_media_id?: string | null
+          post_id?: string | null
+          status?: string
+          triggered_by?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           analyst: string
           art_url: string | null
           art_urls: string[] | null
+          auto_publish_instagram: boolean
           channels: string[] | null
           client: string
           created_at: string
@@ -263,8 +350,10 @@ export type Database = {
           hashtags: string[]
           headline: string
           id: string
+          instagram_status: string | null
           legend: string | null
           reference: string | null
+          scheduled_time: string
           title: string
           updated_at: string
         }
@@ -272,6 +361,7 @@ export type Database = {
           analyst: string
           art_url?: string | null
           art_urls?: string[] | null
+          auto_publish_instagram?: boolean
           channels?: string[] | null
           client: string
           created_at?: string
@@ -281,8 +371,10 @@ export type Database = {
           hashtags?: string[]
           headline: string
           id?: string
+          instagram_status?: string | null
           legend?: string | null
           reference?: string | null
+          scheduled_time?: string
           title: string
           updated_at?: string
         }
@@ -290,6 +382,7 @@ export type Database = {
           analyst?: string
           art_url?: string | null
           art_urls?: string[] | null
+          auto_publish_instagram?: boolean
           channels?: string[] | null
           client?: string
           created_at?: string
@@ -299,8 +392,10 @@ export type Database = {
           hashtags?: string[]
           headline?: string
           id?: string
+          instagram_status?: string | null
           legend?: string | null
           reference?: string | null
+          scheduled_time?: string
           title?: string
           updated_at?: string
         }
