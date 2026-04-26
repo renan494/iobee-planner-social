@@ -136,7 +136,7 @@ export default function ReverseEngineerCopy() {
     setGenerating(true); setResult(null); setSavedId(null);
     try {
       const { data, error } = await supabase.functions.invoke("reverse-engineer-copy", {
-        body: { action: "generate", transcript: transcript.trim(), contexto_extra: contextoExtra.trim() },
+        body: { action: "generate", transcript: transcript.trim(), contexto_extra: contextoExtra.trim(), model: (await import("@/lib/aiModels")).getAIModel("reverseCopy") },
       });
       if (error) throw error;
       if (data?.error) { toast.error(data.error); return; }

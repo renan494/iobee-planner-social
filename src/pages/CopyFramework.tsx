@@ -99,6 +99,7 @@ export default function CopyFramework() {
           publicoAlvo: publicoAlvo.trim(),
           formato: formatLabel,
           guideIA: guideIA.trim(),
+          model: (await import("@/lib/aiModels")).getAIModel("copy"),
         },
       });
       if (error) throw error;
@@ -119,6 +120,7 @@ export default function CopyFramework() {
         framework: config.label,
         frameworkDescription: config.description,
         sections: config.sections.map((s) => ({ key: s.key, label: s.label, description: s.description })),
+        model: (await import("@/lib/aiModels")).getAIModel("analyzeAd"),
       },
     });
     if (error) throw error;

@@ -405,6 +405,7 @@ export default function CreatePost() {
                     funnelStage: entry.funnelStage,
                     channels: entry.channels,
                     theme: entry.aiTheme || undefined,
+                    model: (await import("@/lib/aiModels")).getAIModel("generatePost"),
                   },
                 });
                 if (res.error) throw res.error;
