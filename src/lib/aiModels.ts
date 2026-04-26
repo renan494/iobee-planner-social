@@ -155,7 +155,7 @@ export function getAllAIModelChoices(): Record<AITaskKey, string> {
 }
 
 export function getAIModel(task: AITaskKey): string {
-  return getAllAIModelChoices()[task] || DEFAULT_MODEL;
+  return getAllAIModelChoices()[task] || defaultsByTask()[task];
 }
 
 export function setAIModel(task: AITaskKey, model: string) {
