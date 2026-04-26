@@ -12,7 +12,8 @@ serve(async (req) => {
   }
 
   try {
-    const { strategyContent, clientName, messages } = await req.json();
+    const { strategyContent, clientName, messages, model } = await req.json();
+    const aiModel = typeof model === "string" && model.trim() ? model : "openai/gpt-5.2";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
