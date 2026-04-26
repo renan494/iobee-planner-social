@@ -271,14 +271,15 @@ async function fetchYouTubeTranscript(videoId: string): Promise<string | null> {
   return await tryTimedTextDirect(videoId);
 }
 
-async function callAI(messages: Array<{ role: string; content: string }>, temperature = 0.7) {
+async function callAI(messages: Array<{ role: string; content: string }>, temperature = 0.7, model?: string) {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY não configurada");
 
+  const aiModel = typeof model === "string" && model.trim() ? model : "openai/gpt-5.2";
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "google/gemini-2.5-flash", messages, temperature }),
+    body: JSON.stringify({ model: aiModel, messages, temperature }),
   });
 
   if (!response.ok) {
@@ -365,7 +366,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { action, url, transcript, contexto_extra } = body;
+    const { action, url, transcript, contexto_extra, model } = body;
 
     if (action === "extract") {
       if (!url || typeof url !== "string") return errorResponse("URL é obrigatória", 400);
@@ -458,7 +459,7 @@ serve(async (req) => {
       const content = await callAI([
         { role: "system", content: "Você é um copywriter sênior com cabeça de social media. Responda APENAS em JSON válido." },
         { role: "user", content: prompt },
-      ]);
+      ], 0.7, model);
 
       const result = parseJSON(content);
       return new Response(JSON.stringify({ result }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });

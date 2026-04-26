@@ -100,7 +100,7 @@ export default function Strategy() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ client: selectedClient }),
+        body: JSON.stringify({ client: selectedClient, model: (await import("@/lib/aiModels")).getAIModel("strategy") }),
       });
 
       if (!resp.ok) {

@@ -69,7 +69,8 @@ serve(async (req) => {
   }
 
   try {
-    const { client, format, funnelStage, channels, theme } = await req.json();
+    const { client, format, funnelStage, channels, theme, model } = await req.json();
+    const aiModel = typeof model === "string" && model.trim() ? model : "openai/gpt-5.2";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -188,7 +189,7 @@ Gere um título curto e impactante, uma legenda completa com emojis e CTA, e 3 a
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: aiModel,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },

@@ -46,7 +46,8 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { action, url, adContent, framework, frameworkDescription, sections } = await req.json();
+    const { action, url, adContent, framework, frameworkDescription, sections, model } = await req.json();
+    const aiModel = typeof model === "string" && model.trim() ? model : "openai/gpt-5.2";
 
     // Action: scrape ad content from URL
     if (action === "scrape") {
@@ -101,7 +102,7 @@ Responda APENAS o JSON, sem markdown.`;
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: aiModel,
         messages: [
           { role: "system", content: "Você é um copywriter sênior com cabeça de social media. Analisa criativos e adapta para novas marcas. Responda APENAS em JSON válido." },
           { role: "user", content: prompt },

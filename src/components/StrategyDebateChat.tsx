@@ -58,6 +58,7 @@ export default function StrategyDebateChat({ strategyContent, clientName }: Stra
           strategyContent,
           clientName,
           messages: newMessages,
+          model: (await import("@/lib/aiModels")).getAIModel("debate"),
         }),
       });
 

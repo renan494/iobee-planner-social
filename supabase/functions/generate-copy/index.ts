@@ -12,7 +12,8 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { framework, frameworkDescription, sections, produto, publicoAlvo, formato, guideIA } = await req.json();
+    const { framework, frameworkDescription, sections, produto, publicoAlvo, formato, guideIA, model } = await req.json();
+    const aiModel = typeof model === "string" && model.trim() ? model : "openai/gpt-5.2";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY não configurada");
@@ -62,7 +63,7 @@ Responda APENAS o JSON, sem markdown, sem explicações.`;
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: aiModel,
         messages: [
           { role: "system", content: "Você é um copywriter de elite com cabeça de social media. Escreve para parar o scroll e construir conexão. Responda APENAS em JSON válido sem markdown." },
           { role: "user", content: prompt },
