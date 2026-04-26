@@ -101,7 +101,7 @@ Responda APENAS o JSON, sem markdown.`;
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: (typeof (globalThis as any).__model === "string") ? (globalThis as any).__model : "openai/gpt-5.2",
         messages: [
           { role: "system", content: "Você é um copywriter sênior com cabeça de social media. Analisa criativos e adapta para novas marcas. Responda APENAS em JSON válido." },
           { role: "user", content: prompt },
