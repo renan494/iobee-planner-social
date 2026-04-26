@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { UserCircle, Mail, Shield, KeyRound, Loader2 } from "lucide-react";
+import { UserCircle, Mail, Shield, KeyRound, Loader2, Sparkles, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,6 +125,24 @@ export default function MyProfile() {
             </Button>
           </CardContent>
         </Card>
+
+        {/* AI Models Settings Card */}
+        <Link to="/configuracoes/ia" className="block group">
+          <Card className="transition-all hover:border-primary/50 hover:shadow-sm">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">Modelos de IA por tarefa</p>
+                <p className="text-xs text-muted-foreground">
+                  Escolha qual modelo (GPT-5.2, Gemini, etc.) usar em cada funcionalidade
+                </p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </PageContainer>
   );
