@@ -111,7 +111,7 @@ export const AI_TASKS: { key: AITaskKey; label: string; description: string; rec
     key: "copy",
     label: "Copy por framework",
     description: "Geração de copy usando AIDA, PAS, etc.",
-    recommended: "openai/gpt-5.2",
+    recommended: "google/gemini-3-flash-preview",
   },
   {
     key: "analyzeAd",
@@ -133,26 +133,29 @@ export const AI_TASKS: { key: AITaskKey; label: string; description: string; rec
   },
 ];
 
-const STORAGE_KEY = "iobee:ai-models:v1";
-const DEFAULT_MODEL = "openai/gpt-5.2";
+const STORAGE_KEY = "iobee:ai-models:v2";
+
+// Default por tarefa = o "recommended" definido acima
+function defaultsByTask(): Record<AITaskKey, string> {
+  return Object.fromEntries(AI_TASKS.map((t) => [t.key, t.recommended])) as Record<AITaskKey, string>;
+}
 
 export function getAllAIModelChoices(): Record<AITaskKey, string> {
-  if (typeof window === "undefined") {
-    return Object.fromEntries(AI_TASKS.map((t) => [t.key, DEFAULT_MODEL])) as Record<AITaskKey, string>;
-  }
+  if (typeof window === "undefined") return defaultsByTask();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
+    const defaults = defaultsByTask();
     return Object.fromEntries(
-      AI_TASKS.map((t) => [t.key, typeof parsed[t.key] === "string" ? parsed[t.key] : DEFAULT_MODEL]),
+      AI_TASKS.map((t) => [t.key, typeof parsed[t.key] === "string" ? parsed[t.key] : defaults[t.key]]),
     ) as Record<AITaskKey, string>;
   } catch {
-    return Object.fromEntries(AI_TASKS.map((t) => [t.key, DEFAULT_MODEL])) as Record<AITaskKey, string>;
+    return defaultsByTask();
   }
 }
 
 export function getAIModel(task: AITaskKey): string {
-  return getAllAIModelChoices()[task] || DEFAULT_MODEL;
+  return getAllAIModelChoices()[task] || defaultsByTask()[task];
 }
 
 export function setAIModel(task: AITaskKey, model: string) {
