@@ -28,6 +28,7 @@ const CopyFramework = lazy(() => import("./pages/CopyFramework"));
 const ReverseEngineerCopy = lazy(() => import("./pages/ReverseEngineerCopy"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers"));
 const MyProfile = lazy(() => import("./pages/MyProfile"));
+const AIModelSettings = lazy(() => import("./pages/AIModelSettings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -73,6 +74,7 @@ function ProtectedRoutes() {
               <Route path="/analistas/:name" element={<AnalystDetail />} />
               <Route path="/admin/usuarios" element={<AdminUsers />} />
               <Route path="/perfil" element={<MyProfile />} />
+              <Route path="/configuracoes/ia" element={<AIModelSettings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
